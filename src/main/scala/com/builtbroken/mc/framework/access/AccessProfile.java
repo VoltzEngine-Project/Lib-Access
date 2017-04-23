@@ -1,14 +1,14 @@
 package com.builtbroken.mc.framework.access;
 
+import com.builtbroken.mc.api.IVirtualObject;
+import com.builtbroken.mc.api.tile.ITile;
+import com.builtbroken.mc.core.handler.SaveManager;
+import com.builtbroken.mc.lib.helper.LanguageUtility;
+import com.builtbroken.mc.lib.helper.NBTUtility;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.tileentity.TileEntity;
-import com.builtbroken.mc.lib.helper.LanguageUtility;
-import com.builtbroken.mc.api.IVirtualObject;
-import com.builtbroken.mc.lib.helper.NBTUtility;
-import com.builtbroken.mc.core.handler.SaveManager;
 import net.minecraft.world.World;
 
 import java.io.File;
@@ -80,7 +80,7 @@ public class AccessProfile implements IVirtualObject
         {
             if (!global)
             {
-                this.generateNew("Default", (TileEntity) null);
+                this.generateNew("Default", (ITile) null);
             }
             else
             {
@@ -115,7 +115,7 @@ public class AccessProfile implements IVirtualObject
      * @param entity - tile that created this group
      * @return this
      */
-    public AccessProfile generateNew(String name, TileEntity entity)
+    public AccessProfile generateNew(String name, ITile entity)
     {
         AccessUtility.loadNewGroupSet(this);
         initName(name.trim(), "LocalHost:" + name);
