@@ -1,5 +1,6 @@
 package com.builtbroken.mc.framework.access.gui;
 
+import com.builtbroken.mc.client.SharedAssets;
 import com.builtbroken.mc.core.network.IPacketIDReceiver;
 import com.builtbroken.mc.core.network.packet.PacketType;
 import com.builtbroken.mc.framework.access.AccessGroup;
@@ -8,13 +9,16 @@ import com.builtbroken.mc.framework.access.gui.packets.PacketAccessGui;
 import com.builtbroken.mc.imp.transform.region.Rectangle;
 import com.builtbroken.mc.lib.helper.LanguageUtility;
 import com.builtbroken.mc.prefab.gui.GuiButton2;
+import com.builtbroken.mc.prefab.gui.buttons.GuiButton9px;
 import com.builtbroken.mc.prefab.gui.buttons.GuiImageButton;
+import com.builtbroken.mc.prefab.gui.components.GuiScrollBar;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.entity.player.EntityPlayer;
+import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -28,26 +32,37 @@ import java.util.HashMap;
  */
 public class GuiAccessSystem extends GuiScreen implements IPacketIDReceiver
 {
+    public static int groupRowSpacingY = 16;
+    public static int groupRows = 14;
+    public static int profileRows = 10;
+
     protected HashMap<Rectangle, String> tooltips = new HashMap();
     protected ArrayList<GuiTextField> fields = new ArrayList();
 
     GuiButton2 refreshButton;
     GuiButton2[] profileButtons;
+    GuiButton2[][] groupButtons;
 
-    int currentProfileIndex = -1;
+    GuiScrollBar profileScrollBar;
+    GuiScrollBar groupScrollBar;
+
     AccessProfile currentProfile;
 
-    String[] profileNames = new String[]{"One", "Two", "There"};
-    String[] profileIDs = new String[]{"0", "1", "3"};
-
-    long lastUpdate = 0L;
+    String[] profileNames = new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
+    String[] profileIDs = new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
 
     String errorMessage = "";
 
+    long lastUpdate = 0L;
+
+    int currentProfileIndex = -1;
 
     @Override
     public void initGui()
     {
+        super.initGui();
+        //TODO add favorite option to profiles so they sort to top
+        //TODO add search bar
         errorMessage = "";
         this.buttonList.clear();
         this.fields.clear();
@@ -55,23 +70,107 @@ public class GuiAccessSystem extends GuiScreen implements IPacketIDReceiver
 
         refreshButton = GuiImageButton.newRefreshButton(0, width - 20, 2);
         buttonList.add(refreshButton);
-        createProfileList();
+
+        //Profile scroll bar
+        profileScrollBar = new GuiScrollBar(4, 40, 104, 240, profileNames.length - profileRows);
+        groupScrollBar = new GuiScrollBar(5, 40, 240, 100, 0);
+
+        reloadProfileList();
+        reloadGroupList();
     }
 
-    @Override
-    public boolean doesGuiPauseGame()
+    protected void reloadProfileList()
     {
-        return false;
-    }
+        //TODO ensure index matches
 
-    protected void createProfileList()
-    {
-        profileButtons = new GuiButton2[10];
-        for (int i = 0; i < 10 && i < profileNames.length; i++)
+        //Reset visiblity
+        if (profileButtons != null)
         {
-            profileButtons[i] = new GuiButton2(10 + i, 5, 40 + (i * 20), 100, 20, profileNames[i]);
-            buttonList.add(profileButtons[i].setEnabled(i != currentProfileIndex));
+            for (GuiButton2 button2 : profileButtons)
+            {
+                button2.visible = false;
+                button2.enable();
+            }
         }
+        //Generate array if missing
+        else
+        {
+            profileButtons = new GuiButton2[profileRows];
+        }
+        if (profileNames != null)
+        {
+            for (int i = 0; i < profileButtons.length; i++)
+            {
+                if (profileButtons[i] == null || !buttonList.contains(profileButtons[i]))
+                {
+                    profileButtons[i] = new GuiButton2(10 + i, 2, 40 + (i * 20), 100, 20, "");
+                    profileButtons[i].visible = false;
+                    buttonList.add(profileButtons[i]);
+                }
+
+                if (i < profileNames.length)
+                {
+                    profileButtons[i].displayString = profileNames[i + profileScrollBar.currentScroll];
+                    profileButtons[i].visible = true;
+                }
+                else
+                {
+                    profileButtons[i].visible = false;
+                }
+            }
+        }
+        profileScrollBar.setMaxScroll(profileNames.length - profileRows);
+    }
+
+    protected void reloadGroupList()
+    {
+        if (groupButtons != null)
+        {
+            for (GuiButton2[] buttons : groupButtons)
+            {
+                for (GuiButton2 button2 : buttons)
+                {
+                    button2.visible = false;
+                }
+            }
+        }
+        if (currentProfile != null && currentProfile.getGroups().size() > 0)
+        {
+            if (groupButtons == null)
+            {
+                groupButtons = new GuiButton2[groupRows][3];
+            }
+            int y = 50;
+            int x = 220;
+            for (int i = 0; i < groupButtons.length; i++)
+            {
+                if (groupButtons[i][0] == null || !buttonList.contains(groupButtons[i][0]))
+                {
+                    groupButtons[i][0] = GuiButton9px.newBlankButton(20 + i, x, y + (i * groupRowSpacingY));
+                    groupButtons[i][0].visible = false;
+                    buttonList.add(groupButtons[i][0]);
+                }
+                if (groupButtons[i][1] == null || !buttonList.contains(groupButtons[i][1]))
+                {
+                    groupButtons[i][1] = GuiButton9px.newBlankButton(30 + i, x + 9, y + (i * groupRowSpacingY));
+                    groupButtons[i][1].visible = false;
+                    buttonList.add(groupButtons[i][1]);
+                }
+                if (groupButtons[i][2] == null || !buttonList.contains(groupButtons[i][2]))
+                {
+                    groupButtons[i][2] = GuiButton9px.newBlankButton(40 + i, x + 9 * 2, y + (i * groupRowSpacingY));
+                    groupButtons[i][2].visible = false;
+                    buttonList.add(groupButtons[i][2]);
+                }
+                if (i < currentProfile.getGroups().size())
+                {
+                    groupButtons[i][0].visible = true;
+                    groupButtons[i][1].visible = true;
+                    groupButtons[i][2].visible = true;
+                }
+            }
+        }
+        groupScrollBar.setMaxScroll(currentProfile != null ? (currentProfile.getGroups().size() - groupRows) : 0);
     }
 
     @Override
@@ -103,6 +202,16 @@ public class GuiAccessSystem extends GuiScreen implements IPacketIDReceiver
         {
 
         }
+        //profile scroll bar
+        else if (id == 4)
+        {
+            reloadProfileList();
+        }
+        //group scroll bar
+        else if (id == 5)
+        {
+            reloadGroupList();
+        }
         else if (id >= 10 && id < 20)
         {
             int index = id - 10;
@@ -132,7 +241,6 @@ public class GuiAccessSystem extends GuiScreen implements IPacketIDReceiver
 
     protected void loadProfile()
     {
-        initGui();
         if (profileIDs != null && currentProfileIndex >= 0 && currentProfileIndex < profileIDs.length)
         {
             currentProfile = null;
@@ -146,6 +254,12 @@ public class GuiAccessSystem extends GuiScreen implements IPacketIDReceiver
         this.drawDefaultBackground();
         this.drawCenteredString(this.fontRendererObj, "Global Access Permission System", this.width / 2, 3, 16777215);
 
+
+        ///====================================================
+        Color a = new Color(122, 122, 122, 143);
+        Color b = new Color(122, 122, 122, 143);
+        this.drawGradientRect(0, 0, 114, this.height, a.getRGB(), b.getRGB());
+
         String name = "";
         String id = "";
         if (currentProfileIndex >= 0 && currentProfileIndex < profileNames.length)
@@ -156,16 +270,22 @@ public class GuiAccessSystem extends GuiScreen implements IPacketIDReceiver
         this.drawString(this.fontRendererObj, "Profile: " + name, 130, 20, 16777215);
         this.drawString(this.fontRendererObj, "ID: " + id, 130, 30, 16777215);
 
-
         if (currentProfile != null)
         {
             int y = 0;
             for (AccessGroup group : currentProfile.getGroups())
             {
-                this.drawString(this.fontRendererObj, "G[" + y + "]: " + group.getName(), 130, 50 + (y++ * 20), 16777215);
+                this.drawString(this.fontRendererObj, "G[" + y + "]: " + group.getName(), 130, 50 + (y++ * groupRowSpacingY), 16777215);
             }
         }
 
+        //Set texture and reset color
+        this.mc.renderEngine.bindTexture(SharedAssets.GUI_COMPONENTS_BARS);
+        float c = 192f / 255f;
+        GL11.glColor4f(c, c, c, 1.0F);
+
+
+        //============================================================
         //Debug message
         if (errorMessage != null && !errorMessage.trim().isEmpty())
         {
@@ -193,7 +313,6 @@ public class GuiAccessSystem extends GuiScreen implements IPacketIDReceiver
         //Read profile list
         if (id == 0)
         {
-            int prev_n = profileIDs.length;
             int n = buf.readInt();
             profileIDs = new String[n];
             profileNames = new String[n];
@@ -203,15 +322,7 @@ public class GuiAccessSystem extends GuiScreen implements IPacketIDReceiver
                 profileIDs[i] = ByteBufUtils.readUTF8String(buf);
                 buf.readBoolean();
             }
-            if (prev_n != n)
-            {
-                //TODO ensure index matches
-                for (GuiButton2 button2 : profileButtons)
-                {
-                    buttonList.remove(button2);
-                }
-                createProfileList();
-            }
+            reloadProfileList();
             return true;
         }
         //Read profile
@@ -225,6 +336,7 @@ public class GuiAccessSystem extends GuiScreen implements IPacketIDReceiver
             {
                 currentProfile.load(ByteBufUtils.readTag(buf));
             }
+            reloadGroupList();
             return true;
         }
         else if (id == 5)
@@ -232,6 +344,13 @@ public class GuiAccessSystem extends GuiScreen implements IPacketIDReceiver
             errorMessage = ByteBufUtils.readUTF8String(buf);
             return true;
         }
+        return false;
+    }
+
+    @Override
+    public boolean doesGuiPauseGame()
+    {
+        //Packet data is not sent if game is paused
         return false;
     }
 }
