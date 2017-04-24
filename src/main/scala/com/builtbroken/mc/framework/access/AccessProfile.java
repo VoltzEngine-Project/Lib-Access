@@ -28,6 +28,8 @@ public class AccessProfile implements IVirtualObject
      */
     private final Set<IProfileContainer> containers = Collections.newSetFromMap(new WeakHashMap<IProfileContainer, Boolean>());
 
+    public final HashMap<EntityPlayer, Long> playersWithSettingsGUIOpen = new HashMap();
+
     /**
      * A list of all groups attached to this profile
      */
@@ -61,6 +63,12 @@ public class AccessProfile implements IVirtualObject
 
     public AccessProfile()
     {
+
+    }
+
+    public AccessProfile(boolean global)
+    {
+        this.global = global;
         if (global)
         {
             SaveManager.register(this);
@@ -135,7 +143,7 @@ public class AccessProfile implements IVirtualObject
     public AccessProfile generateNew(String name, EntityPlayer player)
     {
         AccessUtility.loadNewGroupSet(this);
-        initName(name, player.getCommandSenderName() + "_" + System.currentTimeMillis());
+        initName(name, player.getCommandSenderName() + "_" + System.nanoTime());
         return this;
     }
 

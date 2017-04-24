@@ -1,10 +1,12 @@
 package com.builtbroken.mc.framework.access;
 
+import com.builtbroken.mc.core.Engine;
 import com.builtbroken.mc.lib.helper.NBTUtility;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -15,7 +17,7 @@ import java.util.List;
  */
 public final class GlobalAccessSystem
 {
-    private static final HashMap<String, AccessProfile> name_to_profiles = new HashMap();
+    private static final HashMap<String, AccessProfile> id_to_profiles = new HashMap();
     //TODO implement an automated unload system
 
 
@@ -28,27 +30,27 @@ public final class GlobalAccessSystem
      */
     public static AccessProfile getOrCreateProfile(String name, boolean defaultGroups)
     {
-        if (name_to_profiles.containsKey(name) && name_to_profiles.get(name) != null)
+        if (id_to_profiles.containsKey(name) && id_to_profiles.get(name) != null)
         {
-            return name_to_profiles.get(name);
+            return id_to_profiles.get(name);
         }
         AccessProfile p = loadProfile(name, false);
         if (p == null)
         {
             p = createProfile(name, defaultGroups);
         }
-        if (!name_to_profiles.containsKey(name) || name_to_profiles.get(name) == null)
+        if (!id_to_profiles.containsKey(name) || id_to_profiles.get(name) == null)
         {
-            name_to_profiles.put(name, p);
+            id_to_profiles.put(name, p);
         }
         return p;
     }
 
     public static AccessProfile getProfile(String name)
     {
-        if (name_to_profiles.containsKey(name) && name_to_profiles.get(name) != null)
+        if (id_to_profiles.containsKey(name) && id_to_profiles.get(name) != null)
         {
-            return name_to_profiles.get(name);
+            return id_to_profiles.get(name);
         }
         return loadProfile(name, false);
     }
@@ -61,9 +63,9 @@ public final class GlobalAccessSystem
             AccessUtility.loadNewGroupSet(profile);
         }
         profile.initName(name.trim(), "P_" + name + "_" + System.currentTimeMillis());
-        if (!name_to_profiles.containsKey(name) || name_to_profiles.get(name) == null)
+        if (!id_to_profiles.containsKey(name) || id_to_profiles.get(name) == null)
         {
-            name_to_profiles.put(name, profile);
+            id_to_profiles.put(name, profile);
         }
         return profile;
     }
@@ -98,20 +100,55 @@ public final class GlobalAccessSystem
     public static List<AccessProfile> getProfilesFor(EntityPlayer player)
     {
         List<AccessProfile> profiles = new ArrayList();
-        for (String name : name_to_profiles.keySet())
+        for (String name : id_to_profiles.keySet())
         {
             if (name != null)
             {
                 AccessProfile profile = getProfile(name); //Will load from disk if not loaded
                 if (profile != null)
                 {
-                    if (profile.containsUser(player) && !profile.getUserAccess(player).hasNode(Permissions.targetHostile))
+                    if (profile.containsUser(player) && !profile.getUserAccess(player).hasExactNode(Permissions.targetHostile.toString()))
                     {
                         profiles.add(profile);
                     }
                 }
             }
         }
+        if (Engine.runningAsDev)
+        {
+            if (profiles.isEmpty())
+            {
+                AccessProfile profile = new AccessProfile(true).generateNew("Profile1", player);
+                id_to_profiles.put(profile.getID(), profile);
+                profile.getOwnerGroup().addMember(player);
+                profiles.add(profile);
+
+                profile = new AccessProfile(true).generateNew("Profile2", player);
+                id_to_profiles.put(profile.getID(), profile);
+                profile.getOwnerGroup().addMember(player);
+                profiles.add(profile);
+
+                profile = new AccessProfile(true).generateNew("Profile3", player);
+                id_to_profiles.put(profile.getID(), profile);
+                profile.getOwnerGroup().addMember(player);
+                profiles.add(profile);
+
+                profile = new AccessProfile(true).generateNew("Profile4", player);
+                id_to_profiles.put(profile.getID(), profile);
+                profile.getOwnerGroup().addMember(player);
+                profiles.add(profile);
+
+                profile = new AccessProfile(true).generateNew("Profile5", player);
+                id_to_profiles.put(profile.getID(), profile);
+                profile.getOwnerGroup().addMember(player);
+                profiles.add(profile);
+            }
+        }
         return profiles;
+    }
+
+    public static Collection<AccessProfile> getProfiles()
+    {
+        return id_to_profiles.values();
     }
 }
