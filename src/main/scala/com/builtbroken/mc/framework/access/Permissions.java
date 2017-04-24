@@ -38,8 +38,15 @@ public class Permissions
 	public static final Permission machineUpgrade = machine.addChild("upgrade");
 	public static final Permission machineDowngrade = machine.addChild("downgrade");
 
+    //FoF system, used in place of giving users groups permissions
+    public static final Permission target = root.addChild("target");
+    public static final Permission targetFriend = root.addChild("friendly");
+    public static final Permission targetHostile = root.addChild("hostile");
+
 	// Group permissions, these are almost always held by only admins and owners
 	public static final Permission profile = root.addChild("profile");
+	public static final Permission profileView = profile.addChild("view");
+	public static final Permission profileEdit = profile.addChild("edit");
 	public static final Permission profileAddGroup = profile.addChild("addGroup");
 	public static final Permission profileRemoveGroup = profile.addChild("removeGroup");
 	public static final Permission profileModifyGroup = profile.addChild("modifyGroup");
@@ -66,11 +73,13 @@ public class Permissions
 	public static final Permission PROFILE_OWNER = profile.addChild("owner");
 	public static final Permission PROFILE_ADMIN = profile.addChild("admin");
 	public static final Permission PROFILE_USER = profile.addChild("user");
+    public static final Permission PROFILE_FOF = profile.addChild("fof");
 
 	// Default user ID nodes for a single group
 	public static final Permission GROUP_OWNER = group.addChild("owner");
 	public static final Permission GROUP_ADMIN = group.addChild("admin");
 	public static final Permission GROUP_USER = group.addChild("user");
+    public static final Permission GROUP_FOF = group.addChild("fof");
 
 	/**
 	 * Gets the permission instance with the specific name.

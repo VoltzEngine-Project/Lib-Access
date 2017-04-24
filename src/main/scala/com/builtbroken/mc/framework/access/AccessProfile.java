@@ -181,6 +181,24 @@ public class AccessProfile implements IVirtualObject
         return getUserAccess(player.getCommandSenderName());
     }
 
+    public boolean containsUser(EntityPlayer player)
+    {
+        return containsUser(player.getCommandSenderName());
+    }
+
+    public boolean containsUser(String username)
+    {
+        for (AccessGroup group : this.groups)
+        {
+            AccessUser user = group.getMember(username);
+            if (user != null)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * EntityPlayer version should be used as usernames are not longer going to be supported.
      */

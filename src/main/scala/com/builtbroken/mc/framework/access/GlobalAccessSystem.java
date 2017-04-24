@@ -1,9 +1,12 @@
 package com.builtbroken.mc.framework.access;
 
 import com.builtbroken.mc.lib.helper.NBTUtility;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Reference class for storing and access {@link AccessProfile} that are shared
@@ -41,6 +44,15 @@ public final class GlobalAccessSystem
         return p;
     }
 
+    public static AccessProfile getProfile(String name)
+    {
+        if (name_to_profiles.containsKey(name) && name_to_profiles.get(name) != null)
+        {
+            return name_to_profiles.get(name);
+        }
+        return loadProfile(name, false);
+    }
+
     public static AccessProfile createProfile(String name, boolean defaultGroups)
     {
         AccessProfile profile = new AccessProfile();
@@ -54,6 +66,12 @@ public final class GlobalAccessSystem
             name_to_profiles.put(name, profile);
         }
         return profile;
+    }
+
+    public static void cleanup()
+    {
+        //todo clear broken, empty, and unowned profiles
+        // ^ might happen by neglect from users
     }
 
     /**
@@ -75,5 +93,25 @@ public final class GlobalAccessSystem
             return createProfile(name, true);
         }
         return null;
+    }
+
+    public static List<AccessProfile> getProfilesFor(EntityPlayer player)
+    {
+        List<AccessProfile> profiles = new ArrayList();
+        for (String name : name_to_profiles.keySet())
+        {
+            if (name != null)
+            {
+                AccessProfile profile = getProfile(name); //Will load from disk if not loaded
+                if (profile != null)
+                {
+                    if (profile.containsUser(player) && !profile.getUserAccess(player).hasNode(Permissions.targetHostile))
+                    {
+                        profiles.add(profile);
+                    }
+                }
+            }
+        }
+        return profiles;
     }
 }
