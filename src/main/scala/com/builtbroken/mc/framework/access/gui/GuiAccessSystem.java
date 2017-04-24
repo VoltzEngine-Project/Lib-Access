@@ -6,23 +6,19 @@ import com.builtbroken.mc.core.network.packet.PacketType;
 import com.builtbroken.mc.framework.access.AccessGroup;
 import com.builtbroken.mc.framework.access.AccessProfile;
 import com.builtbroken.mc.framework.access.gui.packets.PacketAccessGui;
-import com.builtbroken.mc.imp.transform.region.Rectangle;
 import com.builtbroken.mc.lib.helper.LanguageUtility;
 import com.builtbroken.mc.prefab.gui.GuiButton2;
 import com.builtbroken.mc.prefab.gui.buttons.GuiButton9px;
 import com.builtbroken.mc.prefab.gui.buttons.GuiImageButton;
 import com.builtbroken.mc.prefab.gui.components.GuiScrollBar;
+import com.builtbroken.mc.prefab.gui.screen.GuiScreenBase;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.entity.player.EntityPlayer;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * Global access system
@@ -30,14 +26,11 @@ import java.util.HashMap;
  * @see <a href="https://github.com/BuiltBrokenModding/VoltzEngine/blob/development/license.md">License</a> for what you can and can't do with the code.
  * Created by Dark(DarkGuardsman, Robert) on 4/24/2017.
  */
-public class GuiAccessSystem extends GuiScreen implements IPacketIDReceiver
+public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
 {
     public static int groupRowSpacingY = 16;
     public static int groupRows = 14;
     public static int profileRows = 10;
-
-    protected HashMap<Rectangle, String> tooltips = new HashMap();
-    protected ArrayList<GuiTextField> fields = new ArrayList();
 
     GuiButton2 refreshButton;
     GuiButton2[] profileButtons;
@@ -48,12 +41,12 @@ public class GuiAccessSystem extends GuiScreen implements IPacketIDReceiver
 
     AccessProfile currentProfile;
 
-    String[] profileNames = new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
-    String[] profileIDs = new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
+    String[] profileNames = new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"};
+    String[] profileIDs = new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"};
 
     String errorMessage = "";
 
-    long lastUpdate = 0L;
+    long lastKeepAlivePacket = 0L;
 
     int currentProfileIndex = -1;
 
@@ -64,16 +57,15 @@ public class GuiAccessSystem extends GuiScreen implements IPacketIDReceiver
         //TODO add favorite option to profiles so they sort to top
         //TODO add search bar
         errorMessage = "";
-        this.buttonList.clear();
-        this.fields.clear();
-        tooltips.clear();
 
         refreshButton = GuiImageButton.newRefreshButton(0, width - 20, 2);
         buttonList.add(refreshButton);
 
         //Profile scroll bar
-        profileScrollBar = new GuiScrollBar(4, 40, 104, 240, profileNames.length - profileRows);
-        groupScrollBar = new GuiScrollBar(5, 40, 240, 100, 0);
+        profileScrollBar = new GuiScrollBar(4, 104, 40, 200, profileNames.length - profileRows);
+        buttonList.add(profileScrollBar);
+        groupScrollBar = new GuiScrollBar(5, 250, 40, 300, 0);
+        buttonList.add(groupScrollBar);
 
         reloadProfileList();
         reloadGroupList();
@@ -232,10 +224,10 @@ public class GuiAccessSystem extends GuiScreen implements IPacketIDReceiver
     public void updateScreen()
     {
         super.updateScreen();
-        if (currentProfile != null && System.currentTimeMillis() - lastUpdate > 1000)
+        if (currentProfile != null && System.currentTimeMillis() - lastKeepAlivePacket > 1000)
         {
             PacketAccessGui.keepAlive(currentProfile.getID());
-            lastUpdate = System.currentTimeMillis();
+            lastKeepAlivePacket = System.currentTimeMillis();
         }
     }
 
@@ -344,13 +336,6 @@ public class GuiAccessSystem extends GuiScreen implements IPacketIDReceiver
             errorMessage = ByteBufUtils.readUTF8String(buf);
             return true;
         }
-        return false;
-    }
-
-    @Override
-    public boolean doesGuiPauseGame()
-    {
-        //Packet data is not sent if game is paused
         return false;
     }
 }
