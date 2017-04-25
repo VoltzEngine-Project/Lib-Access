@@ -1,22 +1,20 @@
 package com.builtbroken.mc.framework.access.gui;
 
-import com.builtbroken.mc.client.SharedAssets;
 import com.builtbroken.mc.core.network.IPacketIDReceiver;
 import com.builtbroken.mc.core.network.packet.PacketType;
-import com.builtbroken.mc.framework.access.AccessGroup;
 import com.builtbroken.mc.framework.access.AccessProfile;
+import com.builtbroken.mc.framework.access.gui.frame.group.GuiFrameGroups;
 import com.builtbroken.mc.framework.access.gui.packets.PacketAccessGui;
 import com.builtbroken.mc.lib.helper.LanguageUtility;
 import com.builtbroken.mc.prefab.gui.GuiButton2;
-import com.builtbroken.mc.prefab.gui.buttons.GuiButton9px;
 import com.builtbroken.mc.prefab.gui.buttons.GuiImageButton;
-import com.builtbroken.mc.prefab.gui.components.GuiScrollBar;
+import com.builtbroken.mc.prefab.gui.components.GuiArray;
+import com.builtbroken.mc.prefab.gui.components.frame.GuiFrame;
 import com.builtbroken.mc.prefab.gui.screen.GuiScreenBase;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.entity.player.EntityPlayer;
-import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 
@@ -28,27 +26,26 @@ import java.awt.*;
  */
 public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
 {
-    public static int groupRowSpacingY = 16;
-    public static int groupRows = 14;
-    public static int profileRows = 10;
+    public static int profileRows = 12;
 
-    GuiButton2 refreshButton;
-    GuiButton2[] profileButtons;
-    GuiButton2[][] groupButtons;
+    public GuiButton2 refreshButton;
 
-    GuiScrollBar profileScrollBar;
-    GuiScrollBar groupScrollBar;
+    public GuiArray profileArray;
 
-    AccessProfile currentProfile;
+    public AccessProfile currentProfile;
 
-    String[] profileNames = new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"};
-    String[] profileIDs = new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"};
+    public String[] profileNames = new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"};
+    public String[] profileIDs = new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"};
 
-    String errorMessage = "";
+    public String errorMessage = "";
 
-    long lastKeepAlivePacket = 0L;
+    public long lastKeepAlivePacket = 0L;
 
-    int currentProfileIndex = -1;
+    public int currentProfileIndex = -1;
+
+    public GuiFrame currentFrame;
+
+    public GuiFrameGroups groupsFrame;
 
     @Override
     public void initGui()
@@ -58,111 +55,30 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
         //TODO add search bar
         errorMessage = "";
 
-        refreshButton = GuiImageButton.newRefreshButton(0, width - 20, 2);
-        buttonList.add(refreshButton);
+        //Menu buttons
+        refreshButton = add(GuiImageButton.newRefreshButton(0, width - 20, 2));
 
-        //Profile scroll bar
-        profileScrollBar = new GuiScrollBar(4, 104, 40, 200, profileNames.length - profileRows);
-        buttonList.add(profileScrollBar);
-        groupScrollBar = new GuiScrollBar(5, 250, 40, 200, 0);
-        buttonList.add(groupScrollBar);
+        //Profile array
+        profileArray = add(new GuiArray(new ProfileArrayCallback(this), 4, 2, 40, profileRows, 20));
+        profileArray.setWidth(100 + 9);
+
+        //Group frame
+        groupsFrame = add(new GuiFrameGroups(this, 5, 120, 40));
+        groupsFrame.hide();
+        groupsFrame.initGui();
 
         reloadProfileList();
         reloadGroupList();
     }
 
-    protected void reloadProfileList()
+    public void reloadProfileList()
     {
-        //TODO ensure index matches
-
-        //Reset visiblity
-        if (profileButtons != null)
-        {
-            for (GuiButton2 button2 : profileButtons)
-            {
-                button2.visible = false;
-                button2.enable();
-            }
-        }
-        //Generate array if missing
-        else
-        {
-            profileButtons = new GuiButton2[profileRows];
-        }
-        if (profileNames != null)
-        {
-            for (int i = 0; i < profileButtons.length; i++)
-            {
-                if (profileButtons[i] == null || !buttonList.contains(profileButtons[i]))
-                {
-                    profileButtons[i] = new GuiButton2(10 + i, 2, 40 + (i * 20), 100, 20, "");
-                    profileButtons[i].visible = false;
-                    buttonList.add(profileButtons[i]);
-                }
-
-                if (i < profileNames.length)
-                {
-                    profileButtons[i].displayString = profileNames[i + profileScrollBar.getCurrentScroll()];
-                    profileButtons[i].visible = true;
-                }
-                else
-                {
-                    profileButtons[i].visible = false;
-                }
-            }
-        }
-        profileScrollBar.setMaxScroll(profileNames.length - profileRows);
+        profileArray.reloadEntries();
     }
 
     protected void reloadGroupList()
     {
-        if (groupButtons != null)
-        {
-            for (GuiButton2[] buttons : groupButtons)
-            {
-                for (GuiButton2 button2 : buttons)
-                {
-                    button2.visible = false;
-                }
-            }
-        }
-        if (currentProfile != null && currentProfile.getGroups().size() > 0)
-        {
-            if (groupButtons == null)
-            {
-                groupButtons = new GuiButton2[groupRows][3];
-            }
-            int y = 50;
-            int x = 220;
-            for (int i = 0; i < groupButtons.length; i++)
-            {
-                if (groupButtons[i][0] == null || !buttonList.contains(groupButtons[i][0]))
-                {
-                    groupButtons[i][0] = GuiButton9px.newBlankButton(20 + i, x, y + (i * groupRowSpacingY));
-                    groupButtons[i][0].visible = false;
-                    buttonList.add(groupButtons[i][0]);
-                }
-                if (groupButtons[i][1] == null || !buttonList.contains(groupButtons[i][1]))
-                {
-                    groupButtons[i][1] = GuiButton9px.newBlankButton(30 + i, x + 9, y + (i * groupRowSpacingY));
-                    groupButtons[i][1].visible = false;
-                    buttonList.add(groupButtons[i][1]);
-                }
-                if (groupButtons[i][2] == null || !buttonList.contains(groupButtons[i][2]))
-                {
-                    groupButtons[i][2] = GuiButton9px.newBlankButton(40 + i, x + 9 * 2, y + (i * groupRowSpacingY));
-                    groupButtons[i][2].visible = false;
-                    buttonList.add(groupButtons[i][2]);
-                }
-                if (i < currentProfile.getGroups().size())
-                {
-                    groupButtons[i][0].visible = true;
-                    groupButtons[i][1].visible = true;
-                    groupButtons[i][2].visible = true;
-                }
-            }
-        }
-        groupScrollBar.setMaxScroll(currentProfile != null ? (currentProfile.getGroups().size() - groupRows) : 0);
+        groupsFrame.groupArray.reloadEntries();
     }
 
     @Override
@@ -194,29 +110,15 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
         {
 
         }
-        //profile scroll bar
+        //profile array
         else if (id == 4)
         {
-            reloadProfileList();
+
         }
-        //group scroll bar
+        //group array
         else if (id == 5)
         {
-            reloadGroupList();
-        }
-        else if (id >= 10 && id < 20)
-        {
-            int index = id - 10;
-            if (currentProfileIndex != -1)
-            {
-                profileButtons[currentProfileIndex].enable();
-            }
-            if (currentProfileIndex != index && profileButtons[index] != null)
-            {
-                profileButtons[index].disable();
-                currentProfileIndex = index;
-                loadProfile();
-            }
+
         }
     }
 
@@ -231,13 +133,32 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
         }
     }
 
-    protected void loadProfile()
+    public void loadProfile(int index)
     {
+        currentProfileIndex = index;
+        currentProfile = null;
         if (profileIDs != null && currentProfileIndex >= 0 && currentProfileIndex < profileIDs.length)
         {
-            currentProfile = null;
+            loadFrame(groupsFrame);
             PacketAccessGui.doRequest(profileIDs[currentProfileIndex]);
         }
+        else
+        {
+            currentProfileIndex = -1;
+        }
+    }
+
+    public void loadFrame(GuiFrame frame)
+    {
+        GuiFrame last = currentFrame;
+        if (last != null)
+        {
+            last.hide();
+            last.lastOpenedFrame = null;
+        }
+        currentFrame = frame;
+        currentFrame.show();
+        currentFrame.lastOpenedFrame = last;
     }
 
     @Override
@@ -261,20 +182,6 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
         }
         this.drawString(this.fontRendererObj, "Profile: " + name, 130, 20, 16777215);
         this.drawString(this.fontRendererObj, "ID: " + id, 130, 30, 16777215);
-
-        if (currentProfile != null)
-        {
-            int y = 0;
-            for (AccessGroup group : currentProfile.getGroups())
-            {
-                this.drawString(this.fontRendererObj, "G[" + y + "]: " + group.getName(), 130, 50 + (y++ * groupRowSpacingY), 16777215);
-            }
-        }
-
-        //Set texture and reset color
-        this.mc.renderEngine.bindTexture(SharedAssets.GUI_COMPONENTS_BARS);
-        float c = 192f / 255f;
-        GL11.glColor4f(c, c, c, 1.0F);
 
 
         //============================================================
