@@ -166,7 +166,7 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
     }
 
     @Override
-    protected void actionPerformed(GuiButton button)
+    public void actionPerformed(GuiButton button)
     {
         int id = button.id;
         //TODO add new button
