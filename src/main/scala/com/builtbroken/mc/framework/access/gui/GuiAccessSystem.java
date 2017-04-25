@@ -64,7 +64,7 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
         //Profile scroll bar
         profileScrollBar = new GuiScrollBar(4, 104, 40, 200, profileNames.length - profileRows);
         buttonList.add(profileScrollBar);
-        groupScrollBar = new GuiScrollBar(5, 250, 40, 300, 0);
+        groupScrollBar = new GuiScrollBar(5, 250, 40, 200, 0);
         buttonList.add(groupScrollBar);
 
         reloadProfileList();
@@ -102,7 +102,7 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
 
                 if (i < profileNames.length)
                 {
-                    profileButtons[i].displayString = profileNames[i + profileScrollBar.currentScroll];
+                    profileButtons[i].displayString = profileNames[i + profileScrollBar.getCurrentScroll()];
                     profileButtons[i].visible = true;
                 }
                 else
@@ -184,10 +184,10 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
         {
             PacketAccessGui.doRequest(profileIDs[currentProfileIndex]);
         }
-        //Save profile
-        else if (id == 2)
+        ///Del profile
+        else if (id == 3)
         {
-
+            //TODO if more than one person owns a profile then del acts as a remove self button
         }
         ///New profile
         else if (id == 3)
