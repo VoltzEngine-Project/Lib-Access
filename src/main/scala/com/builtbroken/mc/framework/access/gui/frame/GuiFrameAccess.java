@@ -12,7 +12,7 @@ public class GuiFrameAccess<E extends GuiFrameAccess> extends GuiFrame<E>
     public GuiFrameAccess(GuiAccessSystem parent, int id, int x, int y)
     {
         super(id, x, y);
-        this.host = parent;
+        this.setHost(parent);
     }
 
     @Override
