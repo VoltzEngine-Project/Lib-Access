@@ -29,11 +29,16 @@ public class PacketAccessGui extends PacketType implements IPacket
     public static int KEEP_ALIVE = 2;
     public static int ADD_USER_TO_GROUP = 3;
     public static int REMOVE_USER_FROM_GROUP = 4;
+    public static int CREATE_PROFILE = 5;
+    public static int CREATE_GROUP = 6;
+    public static int REMOVE_GROUP = 7;
+    public static int UPDATE_GROUP_PARENT = 9;
+
     int id = 0;
 
     public PacketAccessGui()
     {
-
+        //Needed so forge can make the packet
     }
 
     public PacketAccessGui(int id)
@@ -184,6 +189,12 @@ public class PacketAccessGui extends PacketType implements IPacket
         }
     }
 
+    /**
+     * Called to clear the user off of all update
+     * trackers for GUI packets.
+     *
+     * @param player - player to remove
+     */
     protected void clearGui(EntityPlayer player)
     {
         for (AccessProfile profile : GlobalAccessSystem.getProfiles())
@@ -195,28 +206,106 @@ public class PacketAccessGui extends PacketType implements IPacket
         }
     }
 
+    /**
+     * Called to download a list of profiles for the user
+     */
     public static void doRequest()
     {
         Engine.instance.packetHandler.sendToServer(new PacketAccessGui(REQUEST_ALL_PROFILES));
     }
 
+    /**
+     * Called to request data about the profile
+     *
+     * @param profileID - profile to download
+     */
     public static void doRequest(String profileID)
     {
         Engine.instance.packetHandler.sendToServer(new PacketAccessGui(REQUEST_PROFILE).write(profileID));
     }
 
+    /**
+     * Called every so often to remind the server that a
+     * player has a GUI open with the profile.
+     * <p>
+     * This needs to be sent so that the GUI will be updated
+     * with current data.
+     *
+     * @param profileID - current profile opened by player
+     */
     public static void keepAlive(String profileID)
     {
         Engine.instance.packetHandler.sendToServer(new PacketAccessGui(KEEP_ALIVE).write(profileID));
     }
 
+    /**
+     * Called to remove a user from a group
+     *
+     * @param profileID - profile to access
+     * @param group     - group to access
+     * @param userName  - user to remove
+     */
     public static void removeUser(String profileID, String group, String userName)
     {
         Engine.instance.packetHandler.sendToServer(new PacketAccessGui(REMOVE_USER_FROM_GROUP).write(profileID).write(group).write(userName));
     }
 
+    /**
+     * Called to add a user to a group
+     *
+     * @param profileID - profile to access
+     * @param group     - group to access
+     * @param userName  - user to add
+     */
     public static void addUser(String profileID, String group, String userName)
     {
         Engine.instance.packetHandler.sendToServer(new PacketAccessGui(ADD_USER_TO_GROUP).write(profileID).write(group).write(userName));
+    }
+
+    /**
+     * Called to create a new profile
+     *
+     * @param name     - name of the group to use, a new ID will be made
+     * @param defaults - should the group be generated with default values
+     */
+    public static void createProfile(String name, boolean defaults)
+    {
+        Engine.instance.packetHandler.sendToServer(new PacketAccessGui(CREATE_PROFILE).write(name).write(defaults));
+    }
+
+    /**
+     * Called to create a new group
+     *
+     * @param profile - profile to access
+     * @param name    - group to access
+     * @param parent  - group to extend
+     */
+    public static void createGroup(String profile, String name, String parent)
+    {
+        Engine.instance.packetHandler.sendToServer(new PacketAccessGui(CREATE_GROUP).write(profile).write(name).write(parent));
+    }
+
+    /**
+     * Called to change the group's parent group
+     *
+     * @param profile - profile to access
+     * @param name    - group to access
+     * @param parent  - new value
+     */
+    public static void updateGroupParent(String profile, String name, String parent)
+    {
+        Engine.instance.packetHandler.sendToServer(new PacketAccessGui(UPDATE_GROUP_PARENT).write(profile).write(name).write(parent));
+    }
+
+    /**
+     * Called to remove a group from a profile.
+     *
+     * @param profile         - id of the profile to remove the group from
+     * @param name            - name to ID the group
+     * @param pullUpSubGroups - should the sub groups be updated to use the group's parent in place of the removed group
+     */
+    public static void removeGroup(String profile, String name, boolean pullUpSubGroups)
+    {
+        Engine.instance.packetHandler.sendToServer(new PacketAccessGui(REMOVE_GROUP).write(profile).write(name).write(pullUpSubGroups));
     }
 }

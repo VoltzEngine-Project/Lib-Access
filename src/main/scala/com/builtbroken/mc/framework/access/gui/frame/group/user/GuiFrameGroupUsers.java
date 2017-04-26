@@ -22,6 +22,7 @@ public class GuiFrameGroupUsers extends GuiGroupFrame<GuiFrameGroupUsers>
 
     public GuiArray groupArray;
     public GuiField userNameField;
+    public GuiButton2 addButton;
     public String[] users;
 
     public GuiFrameGroupUsers(GuiAccessSystem parent, String groupID, int id, int x, int y)
@@ -48,8 +49,9 @@ public class GuiFrameGroupUsers extends GuiGroupFrame<GuiFrameGroupUsers>
             userNameField = add(new GuiField(0, 0));
             userNameField.setRelativePosition(new HugBottom(this, 1, -21, true));
             userNameField.setWidth(100);
+            userNameField.setHeight(20);
 
-            GuiButton2 addButton = add(new GuiButton2(2, 0, 0, "Add"));
+            addButton = add(new GuiButton2(2, 0, 0, "Add")); //TODO check if user has permission to edit
             addButton.setWidth(50);
             addButton.setRelativePosition(new HugBottom(this, -addButton.getWidth(), -20, false));
         }

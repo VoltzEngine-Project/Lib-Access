@@ -467,9 +467,14 @@ public class AccessProfile implements IVirtualObject
     {
         if (this.saveFile == null)
         {
-            this.saveFile = new File(NBTUtility.getSaveDirectory(MinecraftServer.getServer().getFolderName()), "Access/Profile/" + this.getID() + ".dat");
+            this.saveFile = new File(NBTUtility.getSaveDirectory(MinecraftServer.getServer().getFolderName()), getPathToProfile(this.getID()));
         }
         return this.saveFile;
+    }
+
+    public static String getPathToProfile(String name)
+    {
+        return NBTUtility.BBM_FOLDER + "access/profiles/" + name + ".dat";
     }
 
     @Override

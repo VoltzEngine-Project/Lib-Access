@@ -1,6 +1,5 @@
 package com.builtbroken.mc.framework.access;
 
-import com.builtbroken.mc.core.Engine;
 import com.builtbroken.mc.lib.helper.NBTUtility;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
@@ -85,7 +84,7 @@ public final class GlobalAccessSystem
      */
     protected static AccessProfile loadProfile(String name, boolean create)
     {
-        NBTTagCompound tag = NBTUtility.loadData("bbm/accessProfiles/" + name + ".dat");
+        NBTTagCompound tag = NBTUtility.loadData(AccessProfile.getPathToProfile(name));
         if (!tag.hasNoTags())
         {
             return new AccessProfile(tag, true);
@@ -112,41 +111,6 @@ public final class GlobalAccessSystem
                         profiles.add(profile);
                     }
                 }
-            }
-        }
-        if (Engine.runningAsDev)
-        {
-            if (profiles.isEmpty())
-            {
-                AccessProfile profile = new AccessProfile(true).generateNew("Profile1", player);
-                id_to_profiles.put(profile.getID(), profile);
-                profile.getOwnerGroup().addMember(player);
-                profiles.add(profile);
-
-                profile = new AccessProfile(true).generateNew("Profile2", player);
-                id_to_profiles.put(profile.getID(), profile);
-                profile.getOwnerGroup().addMember(player);
-                profiles.add(profile);
-
-                for (int i = 0; i < 30; i++)
-                {
-                    profile.getGroup(Permissions.GROUP_USER.id).addMember(new AccessUser("player_" + i));
-                }
-
-                profile = new AccessProfile(true).generateNew("Profile3", player);
-                id_to_profiles.put(profile.getID(), profile);
-                profile.getOwnerGroup().addMember(player);
-                profiles.add(profile);
-
-                profile = new AccessProfile(true).generateNew("Profile4", player);
-                id_to_profiles.put(profile.getID(), profile);
-                profile.getOwnerGroup().addMember(player);
-                profiles.add(profile);
-
-                profile = new AccessProfile(true).generateNew("Profile5", player);
-                id_to_profiles.put(profile.getID(), profile);
-                profile.getOwnerGroup().addMember(player);
-                profiles.add(profile);
             }
         }
         return profiles;
