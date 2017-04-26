@@ -68,19 +68,7 @@ public class PacketAccessGui extends PacketType implements IPacket
             if (id == REQUEST_ALL_PROFILES)
             {
                 clearGui(player);
-                PacketGui packetGui = new PacketGui(0);
-
-                List<AccessProfile> profileList = GlobalAccessSystem.getProfilesFor(player);
-                packetGui.data().writeInt(profileList.size());
-                for (AccessProfile profile : profileList)
-                {
-                    //We only want to send the bare minimal to function
-                    packetGui.write(profile.getName());
-                    packetGui.write(profile.getID());
-                    packetGui.write(profile.getUserAccess(player).hasNode(Permissions.profileView)); //Disables view option
-                }
-
-                Engine.instance.packetHandler.sendToPlayer(packetGui, (EntityPlayerMP) player);
+                sendProfilesToClient((EntityPlayerMP) player);
             }
             else if (id == REQUEST_PROFILE)
             {
@@ -186,7 +174,32 @@ public class PacketAccessGui extends PacketType implements IPacket
                     Engine.instance.packetHandler.sendToPlayer(packetGui, (EntityPlayerMP) player);
                 }
             }
+            else if (id == CREATE_PROFILE)
+            {
+                String profileID = ByteBufUtils.readUTF8String(data());
+                boolean defaults = data().readBoolean();
+                AccessProfile profile = GlobalAccessSystem.createProfile(profileID, defaults);
+                profile.getOwnerGroup().addMember(player);
+                sendProfilesToClient((EntityPlayerMP) player);
+            }
         }
+    }
+
+    public void sendProfilesToClient(EntityPlayerMP player)
+    {
+        PacketGui packetGui = new PacketGui(0);
+
+        List<AccessProfile> profileList = GlobalAccessSystem.getProfilesFor(player);
+        packetGui.data().writeInt(profileList.size());
+        for (AccessProfile profile : profileList)
+        {
+            //We only want to send the bare minimal to function
+            packetGui.write(profile.getName());
+            packetGui.write(profile.getID());
+            packetGui.write(profile.getUserAccess(player).hasNode(Permissions.profileView)); //Disables view option
+        }
+
+        Engine.instance.packetHandler.sendToPlayer(packetGui, player);
     }
 
     /**

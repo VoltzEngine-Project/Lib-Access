@@ -3,6 +3,7 @@ package com.builtbroken.mc.framework.access.gui;
 import com.builtbroken.mc.core.network.IPacketIDReceiver;
 import com.builtbroken.mc.core.network.packet.PacketType;
 import com.builtbroken.mc.framework.access.AccessProfile;
+import com.builtbroken.mc.framework.access.gui.dialogs.GuiDialogNewProfile;
 import com.builtbroken.mc.framework.access.gui.frame.group.main.GuiFrameGroups;
 import com.builtbroken.mc.framework.access.gui.packets.PacketAccessGui;
 import com.builtbroken.mc.lib.helper.LanguageUtility;
@@ -29,6 +30,7 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
     public static int profileRows = 12;
 
     public GuiButton2 refreshButton;
+    public GuiButton2 newProfile;
 
     public GuiArray profileArray;
 
@@ -57,6 +59,7 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
 
         //Menu buttons
         refreshButton = add(GuiImageButton.newRefreshButton(0, width - 20, 2));
+        newProfile = add(GuiImageButton.newButtonEmpty(1, 20, 2));
 
         //Profile array
         profileArray = add(new GuiArray(new ProfileArrayCallback(this), 4, 2, 40, profileRows, 20));
@@ -95,30 +98,11 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
             currentProfile = null;
             PacketAccessGui.doRequest(); //TODO keep track of last click to prevent abuse
         }
-        //Refresh profile
+        ///New profile
         else if (id == 1)
         {
-            PacketAccessGui.doRequest(profileIDs[currentProfileIndex]);
-        }
-        ///Del profile
-        else if (id == 3)
-        {
-            //TODO if more than one person owns a profile then del acts as a remove self button
-        }
-        ///New profile
-        else if (id == 3)
-        {
-
-        }
-        //profile array
-        else if (id == 4)
-        {
-
-        }
-        //group array
-        else if (id == 5)
-        {
-
+            GuiDialogNewProfile guiDialogNewProfile = add(new GuiDialogNewProfile(2, 120, 40));
+            loadFrame(guiDialogNewProfile, false);
         }
     }
 
