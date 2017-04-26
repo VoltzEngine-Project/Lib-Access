@@ -4,6 +4,7 @@ import com.builtbroken.mc.api.data.IPacket;
 import com.builtbroken.mc.core.Engine;
 import com.builtbroken.mc.core.network.packet.PacketGui;
 import com.builtbroken.mc.core.network.packet.PacketType;
+import com.builtbroken.mc.framework.access.AccessGroup;
 import com.builtbroken.mc.framework.access.AccessProfile;
 import com.builtbroken.mc.framework.access.GlobalAccessSystem;
 import com.builtbroken.mc.framework.access.Permissions;
@@ -105,11 +106,30 @@ public class PacketAccessGui extends PacketType implements IPacket
             }
             else if (id == ADD_USER_TO_GROUP)
             {
-                String accessGroup = ByteBufUtils.readUTF8String(data());
-                AccessProfile profile = GlobalAccessSystem.getProfile(accessGroup);
+                String profileID = ByteBufUtils.readUTF8String(data());
+                String groupID = ByteBufUtils.readUTF8String(data());
+                String userID = ByteBufUtils.readUTF8String(data());
+
+
+                AccessProfile profile = GlobalAccessSystem.getProfile(profileID);
                 if (profile.containsUser(player) && profile.hasNode(player, Permissions.profileEdit.toString()))
                 {
-
+                    AccessGroup group = profile.getGroup(groupID);
+                    if (group != null)
+                    {
+                        if (!group.addMember(userID)) //TODO get UUID
+                        {
+                            PacketGui packetGui = new PacketGui(5);
+                            ByteBufUtils.writeUTF8String(packetGui.data(), "error.group.user.add");
+                            Engine.instance.packetHandler.sendToPlayer(packetGui, (EntityPlayerMP) player);
+                        }
+                    }
+                    else
+                    {
+                        PacketGui packetGui = new PacketGui(5);
+                        ByteBufUtils.writeUTF8String(packetGui.data(), "error.group.not.found");
+                        Engine.instance.packetHandler.sendToPlayer(packetGui, (EntityPlayerMP) player);
+                    }
                 }
                 else
                 {
@@ -120,11 +140,39 @@ public class PacketAccessGui extends PacketType implements IPacket
             }
             else if (id == REMOVE_USER_FROM_GROUP)
             {
-                String accessGroup = ByteBufUtils.readUTF8String(data());
-                AccessProfile profile = GlobalAccessSystem.getProfile(accessGroup);
-                if (profile.containsUser(player))
-                {
+                String profileID = ByteBufUtils.readUTF8String(data());
+                String groupID = ByteBufUtils.readUTF8String(data());
+                String userID = ByteBufUtils.readUTF8String(data());
 
+
+                AccessProfile profile = GlobalAccessSystem.getProfile(profileID);
+                if (profile.containsUser(player) && profile.hasNode(player, Permissions.profileEdit.toString()))
+                {
+                    AccessGroup group = profile.getGroup(groupID);
+                    if (group != null)
+                    {
+                        if (group.getMember(userID) != null)
+                        {
+                            if (!group.removeMember(userID))
+                            {
+                                PacketGui packetGui = new PacketGui(5);
+                                ByteBufUtils.writeUTF8String(packetGui.data(), "error.group.user.remove");
+                                Engine.instance.packetHandler.sendToPlayer(packetGui, (EntityPlayerMP) player);
+                            }
+                        }
+                        else
+                        {
+                            PacketGui packetGui = new PacketGui(5);
+                            ByteBufUtils.writeUTF8String(packetGui.data(), "error.group.user.not.found");
+                            Engine.instance.packetHandler.sendToPlayer(packetGui, (EntityPlayerMP) player);
+                        }
+                    }
+                    else
+                    {
+                        PacketGui packetGui = new PacketGui(5);
+                        ByteBufUtils.writeUTF8String(packetGui.data(), "error.group.not.found");
+                        Engine.instance.packetHandler.sendToPlayer(packetGui, (EntityPlayerMP) player);
+                    }
                 }
                 else
                 {
