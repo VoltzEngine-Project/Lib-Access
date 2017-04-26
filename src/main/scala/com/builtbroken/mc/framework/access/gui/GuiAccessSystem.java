@@ -3,7 +3,7 @@ package com.builtbroken.mc.framework.access.gui;
 import com.builtbroken.mc.core.network.IPacketIDReceiver;
 import com.builtbroken.mc.core.network.packet.PacketType;
 import com.builtbroken.mc.framework.access.AccessProfile;
-import com.builtbroken.mc.framework.access.gui.frame.group.GuiFrameGroups;
+import com.builtbroken.mc.framework.access.gui.frame.group.main.GuiFrameGroups;
 import com.builtbroken.mc.framework.access.gui.packets.PacketAccessGui;
 import com.builtbroken.mc.lib.helper.LanguageUtility;
 import com.builtbroken.mc.prefab.gui.GuiButton2;
@@ -139,7 +139,7 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
         currentProfile = null;
         if (profileIDs != null && currentProfileIndex >= 0 && currentProfileIndex < profileIDs.length)
         {
-            loadFrame(groupsFrame);
+            loadFrame(groupsFrame, false);
             PacketAccessGui.doRequest(profileIDs[currentProfileIndex]);
         }
         else
@@ -148,17 +148,23 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
         }
     }
 
-    public void loadFrame(GuiFrame frame)
+    public void loadFrame(GuiFrame frame, boolean addReturn)
     {
-        GuiFrame last = currentFrame;
-        if (last != null)
+        if (frame != null)
         {
-            last.hide();
-            last.lastOpenedFrame = null;
+            GuiFrame last = currentFrame;
+            if (last != null)
+            {
+                last.hide();
+            }
+            currentFrame = frame;
+            currentFrame.initGui();
+            currentFrame.show();
+            if (addReturn)
+            {
+                currentFrame.lastOpenedFrame = last;
+            }
         }
-        currentFrame = frame;
-        currentFrame.show();
-        currentFrame.lastOpenedFrame = last;
     }
 
     @Override

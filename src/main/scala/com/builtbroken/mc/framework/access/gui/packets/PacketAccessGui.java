@@ -22,6 +22,12 @@ import java.util.List;
  */
 public class PacketAccessGui extends PacketType implements IPacket
 {
+
+    public static int REQUEST_ALL_PROFILES = 0;
+    public static int REQUEST_PROFILE = 1;
+    public static int KEEP_ALIVE = 2;
+    public static int ADD_USER_TO_GROUP = 3;
+    public static int REMOVE_USER_FROM_GROUP = 4;
     int id = 0;
 
     public PacketAccessGui()
@@ -53,7 +59,7 @@ public class PacketAccessGui extends PacketType implements IPacket
     {
         if (player instanceof EntityPlayerMP) //Could be a fake player
         {
-            if (id == 0)
+            if (id == REQUEST_ALL_PROFILES)
             {
                 clearGui(player);
                 PacketGui packetGui = new PacketGui(0);
@@ -70,7 +76,7 @@ public class PacketAccessGui extends PacketType implements IPacket
 
                 Engine.instance.packetHandler.sendToPlayer(packetGui, (EntityPlayerMP) player);
             }
-            else if (id == 1)
+            else if (id == REQUEST_PROFILE)
             {
                 clearGui(player);
                 String accessGroup = ByteBufUtils.readUTF8String(data());
@@ -87,7 +93,7 @@ public class PacketAccessGui extends PacketType implements IPacket
                     Engine.instance.packetHandler.sendToPlayer(packetGui, (EntityPlayerMP) player);
                 }
             }
-            else if (id == 2)
+            else if (id == KEEP_ALIVE)
             {
                 clearGui(player);
                 String accessGroup = ByteBufUtils.readUTF8String(data());
@@ -95,6 +101,36 @@ public class PacketAccessGui extends PacketType implements IPacket
                 if (profile != null)
                 {
                     profile.playersWithSettingsGUIOpen.put(player, System.currentTimeMillis());
+                }
+            }
+            else if (id == ADD_USER_TO_GROUP)
+            {
+                String accessGroup = ByteBufUtils.readUTF8String(data());
+                AccessProfile profile = GlobalAccessSystem.getProfile(accessGroup);
+                if (profile.containsUser(player) && profile.hasNode(player, Permissions.profileEdit.toString()))
+                {
+
+                }
+                else
+                {
+                    PacketGui packetGui = new PacketGui(5);
+                    ByteBufUtils.writeUTF8String(packetGui.data(), "error.profile.not.found");
+                    Engine.instance.packetHandler.sendToPlayer(packetGui, (EntityPlayerMP) player);
+                }
+            }
+            else if (id == REMOVE_USER_FROM_GROUP)
+            {
+                String accessGroup = ByteBufUtils.readUTF8String(data());
+                AccessProfile profile = GlobalAccessSystem.getProfile(accessGroup);
+                if (profile.containsUser(player))
+                {
+
+                }
+                else
+                {
+                    PacketGui packetGui = new PacketGui(5);
+                    ByteBufUtils.writeUTF8String(packetGui.data(), "error.profile.not.found");
+                    Engine.instance.packetHandler.sendToPlayer(packetGui, (EntityPlayerMP) player);
                 }
             }
         }
@@ -113,16 +149,26 @@ public class PacketAccessGui extends PacketType implements IPacket
 
     public static void doRequest()
     {
-        Engine.instance.packetHandler.sendToServer(new PacketAccessGui(0));
+        Engine.instance.packetHandler.sendToServer(new PacketAccessGui(REQUEST_ALL_PROFILES));
     }
 
     public static void doRequest(String profileID)
     {
-        Engine.instance.packetHandler.sendToServer(new PacketAccessGui(1).write(profileID));
+        Engine.instance.packetHandler.sendToServer(new PacketAccessGui(REQUEST_PROFILE).write(profileID));
     }
 
     public static void keepAlive(String profileID)
     {
-        Engine.instance.packetHandler.sendToServer(new PacketAccessGui(2).write(profileID));
+        Engine.instance.packetHandler.sendToServer(new PacketAccessGui(KEEP_ALIVE).write(profileID));
+    }
+
+    public static void removeUser(String profileID, String group, String userName)
+    {
+        Engine.instance.packetHandler.sendToServer(new PacketAccessGui(REMOVE_USER_FROM_GROUP).write(profileID).write(group).write(userName));
+    }
+
+    public static void addUser(String profileID, String group, String userName)
+    {
+        Engine.instance.packetHandler.sendToServer(new PacketAccessGui(ADD_USER_TO_GROUP).write(profileID).write(group).write(userName));
     }
 }

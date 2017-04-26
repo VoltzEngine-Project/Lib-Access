@@ -55,12 +55,12 @@ public class AccessUtility
         list3.add(Permissions.inventoryOutput.toString());
 
         List<String> list4 = new ArrayList();
-        list3.add(Permissions.PROFILE_FOF.toString());
-        list3.add(Permissions.targetHostile.toString());
+        list4.add(Permissions.PROFILE_FOF.toString());
+        list4.add(Permissions.targetHostile.toString());
 
         List<String> list5 = new ArrayList();
-        list3.add(Permissions.PROFILE_FOF.toString());
-        list3.add(Permissions.targetFriend.toString());
+        list5.add(Permissions.PROFILE_FOF.toString());
+        list5.add(Permissions.targetFriend.toString());
 
         createDefaultGroup("hostile", null, list4);
         createDefaultGroup("friendly", null, list5);

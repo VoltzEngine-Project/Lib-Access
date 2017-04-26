@@ -1,8 +1,13 @@
-package com.builtbroken.mc.framework.access.gui.frame.group;
+package com.builtbroken.mc.framework.access.gui.frame.group.main;
 
+import com.builtbroken.mc.framework.access.gui.GuiAccessSystem;
+import com.builtbroken.mc.framework.access.gui.frame.group.edit.GuiFrameGroupSettings;
+import com.builtbroken.mc.framework.access.gui.frame.group.nodes.GuiFrameGroupNodes;
+import com.builtbroken.mc.framework.access.gui.frame.group.user.GuiFrameGroupUsers;
 import com.builtbroken.mc.prefab.gui.buttons.GuiButton9px;
 import com.builtbroken.mc.prefab.gui.buttons.GuiImageButton;
 import com.builtbroken.mc.prefab.gui.components.GuiComponentContainer;
+import com.builtbroken.mc.prefab.gui.pos.HugXSide;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 
@@ -20,8 +25,8 @@ public class GroupEntry extends GuiComponentContainer<GroupEntry>
     public GroupEntry(int id, int x, int y)
     {
         super(id, x, y, 190, 10, "");
+        resizeAsNeeded = false;
         reloadGroupList();
-        updatePositions();
     }
 
     @Override
@@ -41,15 +46,6 @@ public class GroupEntry extends GuiComponentContainer<GroupEntry>
     protected void updatePositions()
     {
         super.updatePositions();
-
-        final int x = xPosition + width - 12 * 3;
-        groupButtons[0].xPosition = x;
-        groupButtons[1].xPosition = x + 12;
-        groupButtons[2].xPosition = x + 12 * 2;
-
-        groupButtons[0].yPosition = yPosition;
-        groupButtons[1].yPosition = yPosition;
-        groupButtons[2].yPosition = yPosition;
     }
 
     @Override
@@ -59,17 +55,17 @@ public class GroupEntry extends GuiComponentContainer<GroupEntry>
         //Edit group
         if (id == 0)
         {
-
+            ((GuiAccessSystem) getHost()).loadFrame(new GuiFrameGroupSettings(((GuiAccessSystem) getHost()), groupID, 6, getParentComponent().xPosition, getParentComponent().yPosition), true);
         }
         //Edit nodes
         else if (id == 1)
         {
-
+            ((GuiAccessSystem) getHost()).loadFrame(new GuiFrameGroupNodes(((GuiAccessSystem) getHost()), groupID, 6, getParentComponent().xPosition, getParentComponent().yPosition), true);
         }
         //Edit users
         else if (id == 2)
         {
-
+            ((GuiAccessSystem) getHost()).loadFrame(new GuiFrameGroupUsers(((GuiAccessSystem) getHost()), groupID, 6, getParentComponent().xPosition, getParentComponent().yPosition), true);
         }
         else
         {
@@ -86,15 +82,18 @@ public class GroupEntry extends GuiComponentContainer<GroupEntry>
 
         if (groupButtons[0] == null)
         {
-            groupButtons[0] = add(GuiButton9px.newBlankButton(0, xPosition, yPosition));
+            groupButtons[0] = add(GuiButton9px.newGearButton(0, 0, 0));
+            groupButtons[0].setRelativePosition(new HugXSide(this, -9 - 12 * 2, false));
         }
         if (groupButtons[1] == null)
         {
-            groupButtons[1] = add(GuiButton9px.newBlankButton(1, xPosition, yPosition));
+            groupButtons[1] = add(GuiButton9px.newNodeButton(1, 0, 0));
+            groupButtons[1].setRelativePosition(new HugXSide(this, -9 - 12, false));
         }
         if (groupButtons[2] == null)
         {
-            groupButtons[2] = add(GuiButton9px.newBlankButton(2, xPosition, yPosition));
+            groupButtons[2] = add(GuiButton9px.newPlayerButton(2, 0, 0));
+            groupButtons[2].setRelativePosition(new HugXSide(this, -9, false));
         }
         updatePositions();
     }

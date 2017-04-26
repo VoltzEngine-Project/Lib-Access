@@ -128,6 +128,11 @@ public final class GlobalAccessSystem
                 profile.getOwnerGroup().addMember(player);
                 profiles.add(profile);
 
+                for (int i = 0; i < 30; i++)
+                {
+                    profile.getGroup(Permissions.GROUP_USER.id).addMember(new AccessUser("player_" + i));
+                }
+
                 profile = new AccessProfile(true).generateNew("Profile3", player);
                 id_to_profiles.put(profile.getID(), profile);
                 profile.getOwnerGroup().addMember(player);
