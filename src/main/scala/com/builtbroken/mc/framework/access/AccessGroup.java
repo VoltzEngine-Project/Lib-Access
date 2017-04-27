@@ -237,12 +237,24 @@ public class AccessGroup implements ISave, Cloneable
         return hasExactNode(node) || hasNodeInGroup(node) || this.getExtendGroup() != null && this.getExtendGroup().hasNode(node);
     }
 
+    /**
+     * Tries to match the node to a parent node
+     * <p>
+     * E.g. root.owner would return true if group has root or root.*
+     * <p>
+     * use {@link #hasExactNode(String)} to check for 100% match
+     * and to ignore parent checks.
+     *
+     * @param node - string value of node to check
+     * @return true if group contains the node's parent
+     */
     public boolean hasNodeInGroup(String node)
     {
-        String tempNode = node.replaceAll(".*", "");
-        for (String headNode : nodes)
+        final String tempNode = node.replace(".*", "");
+        for (String groupNode : nodes)
         {
-            if (tempNode.contains(headNode))
+            final String headNode = groupNode.replace(".*", "");
+            if (tempNode.startsWith(headNode))
             {
                 return true;
             }

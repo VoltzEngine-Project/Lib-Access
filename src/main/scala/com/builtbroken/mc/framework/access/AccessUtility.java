@@ -33,10 +33,11 @@ public class AccessUtility
     {
         List<String> list = new ArrayList();
         // Owner group defaults
+        list.add(Permissions.root.toString() + ".*");
         list.add(Permissions.PROFILE_OWNER.toString());
         list.add(Permissions.inventoryDisable.toString());
         list.add(Permissions.inventoryEnable.toString());
-        list.add(Permissions.profile.toString());
+        list.add(Permissions.profile.toString() + ".*");
 
         // Admin group defaults
         List<String> list2 = new ArrayList();
@@ -45,7 +46,7 @@ public class AccessUtility
         list2.add(Permissions.inventoryLock.toString());
         list2.add(Permissions.inventoryUnlock.toString());
         list2.add(Permissions.inventoryModify.toString());
-        list2.add(Permissions.group.toString());
+        list2.add(Permissions.group.toString() + ".*");
 
         // User group defaults
         List<String> list3 = new ArrayList();

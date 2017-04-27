@@ -10,6 +10,7 @@ import com.builtbroken.mc.lib.helper.LanguageUtility;
 import com.builtbroken.mc.prefab.gui.GuiButton2;
 import com.builtbroken.mc.prefab.gui.buttons.GuiImageButton;
 import com.builtbroken.mc.prefab.gui.components.GuiArray;
+import com.builtbroken.mc.prefab.gui.components.GuiComponent;
 import com.builtbroken.mc.prefab.gui.components.frame.GuiFrame;
 import com.builtbroken.mc.prefab.gui.screen.GuiScreenBase;
 import cpw.mods.fml.common.network.ByteBufUtils;
@@ -36,8 +37,8 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
 
     public AccessProfile currentProfile;
 
-    public String[] profileNames = new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"};
-    public String[] profileIDs = new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"};
+    public String[] profileNames;
+    public String[] profileIDs;
 
     public String errorMessage = "";
 
@@ -76,6 +77,9 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
 
     public void reloadProfileList()
     {
+        currentProfile = null;
+        currentProfileIndex = -1;
+        loadFrame(null, false);
         profileArray.reloadEntries();
     }
 
@@ -94,9 +98,8 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
         //Refresh profile list
         if (id == 0)
         {
-            currentProfileIndex = -1;
-            currentProfile = null;
-            PacketAccessGui.doRequest(); //TODO keep track of last click to prevent abuse
+            reloadProfileList();
+            PacketAccessGui.doRequest();
         }
         ///New profile
         else if (id == 1)
@@ -117,6 +120,11 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
         }
     }
 
+    /**
+     * Called to load a profile
+     *
+     * @param index - index of the profile in the {@link #profileNames} array
+     */
     public void loadProfile(int index)
     {
         currentProfileIndex = index;
@@ -132,6 +140,12 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
         }
     }
 
+    /**
+     * Called to load a frame to display on the right side of the GUI
+     *
+     * @param frame     - frame to load
+     * @param addReturn - should the last frame be stored for return
+     */
     public void loadFrame(GuiFrame frame, boolean addReturn)
     {
         if (frame != null)
@@ -139,15 +153,27 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
             GuiFrame last = currentFrame;
             if (last != null)
             {
+                remove(last);
                 last.hide();
             }
             currentFrame = frame;
+            if (!buttonList.contains(currentFrame))
+            {
+                add(currentFrame);
+            }
             currentFrame.initGui();
+            currentFrame.updatePositions();
             currentFrame.show();
             if (addReturn)
             {
                 currentFrame.lastOpenedFrame = last;
             }
+        }
+        else if (currentFrame != null)
+        {
+            currentFrame.hide();
+            remove(currentFrame);
+            currentFrame = null;
         }
     }
 
@@ -163,35 +189,48 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
         Color b = new Color(122, 122, 122, 143);
         this.drawGradientRect(0, 0, 114, this.height, a.getRGB(), b.getRGB());
 
-        String name = "";
-        String id = "";
-        if (currentProfileIndex >= 0 && currentProfileIndex < profileNames.length)
+        if (profileNames != null)
         {
-            name = currentProfile != null ? currentProfile.getName() : profileNames[currentProfileIndex];
-            id = currentProfile != null ? currentProfile.getID() : profileIDs[currentProfileIndex];
-        }
-        this.drawString(this.fontRendererObj, "Profile: " + name, 130, 20, 16777215);
-        this.drawString(this.fontRendererObj, "ID: " + id, 130, 30, 16777215);
-
-
-        //============================================================
-        //Debug message
-        if (errorMessage != null && !errorMessage.trim().isEmpty())
-        {
-            this.drawCenteredString(this.fontRendererObj, LanguageUtility.getLocal(errorMessage), this.width / 2, this.height / 2, Color.RED.getRGB());
-        }
-        else if (currentProfileIndex != -1)
-        {
-            if (currentProfile == null)
+            String name = "";
+            String id = "";
+            if (currentProfileIndex >= 0 && currentProfileIndex < profileNames.length)
             {
-                this.drawCenteredString(this.fontRendererObj, LanguageUtility.getLocal("gui.access.waiting.on.server"), this.width / 2, this.height / 2, 16777215);
+                name = currentProfile != null ? currentProfile.getName() : profileNames[currentProfileIndex];
+                id = currentProfile != null ? currentProfile.getID() : profileIDs[currentProfileIndex];
+            }
+            this.drawString(this.fontRendererObj, "Profile: " + name, 130, 20, 16777215);
+            this.drawString(this.fontRendererObj, "ID: " + id, 130, 30, 16777215);
+
+
+            //============================================================
+            //Debug message
+            if (errorMessage != null && !errorMessage.trim().isEmpty())
+            {
+                if (errorMessage.startsWith("error"))
+                {
+                    this.drawCenteredString(this.fontRendererObj, LanguageUtility.getLocal(errorMessage), this.width / 2, this.height / 2, Color.RED.getRGB());
+                }
+                else
+                {
+                    this.drawCenteredString(this.fontRendererObj, LanguageUtility.getLocal(errorMessage), this.width / 2, this.height / 2, GuiComponent.DEFAULT_STRING_COLOR);
+                }
+            }
+            else if (currentProfileIndex != -1)
+            {
+                if (currentProfile == null)
+                {
+                    this.drawCenteredString(this.fontRendererObj, LanguageUtility.getLocal("gui.access.waiting.on.server"), this.width / 2, this.height / 2, GuiComponent.DEFAULT_STRING_COLOR);
+                }
+            }
+            else
+            {
+                this.drawCenteredString(this.fontRendererObj, LanguageUtility.getLocal("gui.access.select.profile"), this.width / 2, this.height / 2, GuiComponent.DEFAULT_STRING_COLOR);
             }
         }
         else
         {
-            this.drawCenteredString(this.fontRendererObj, LanguageUtility.getLocal("gui.access.select.profile"), this.width / 2, this.height / 2, 16777215);
+            this.drawCenteredString(this.fontRendererObj, LanguageUtility.getLocal("gui.access.click.refresh"), this.width / 2, this.height / 2, GuiComponent.DEFAULT_STRING_COLOR);
         }
-
 
         super.drawScreen(p_73863_1_, p_73863_2_, p_73863_3_);
     }

@@ -43,29 +43,23 @@ public class GroupEntry extends GuiComponentContainer<GroupEntry>
     }
 
     @Override
-    protected void updatePositions()
-    {
-        super.updatePositions();
-    }
-
-    @Override
     public void actionPerformed(GuiButton button)
     {
         int id = button.id;
         //Edit group
         if (id == 0)
         {
-            ((GuiAccessSystem) getHost()).loadFrame(new GuiFrameGroupSettings(((GuiAccessSystem) getHost()), groupID, 6, getParentComponent().xPosition, getParentComponent().yPosition), true);
+            ((GuiAccessSystem) getHost()).loadFrame(new GuiFrameGroupSettings(((GuiAccessSystem) getHost()), groupID, -1, getParentComponent().xPosition, getParentComponent().yPosition), true);
         }
         //Edit nodes
         else if (id == 1)
         {
-            ((GuiAccessSystem) getHost()).loadFrame(new GuiFrameGroupNodes(((GuiAccessSystem) getHost()), groupID, 6, getParentComponent().xPosition, getParentComponent().yPosition), true);
+            ((GuiAccessSystem) getHost()).loadFrame(new GuiFrameGroupNodes(((GuiAccessSystem) getHost()), groupID, -1, getParentComponent().xPosition, getParentComponent().yPosition), true);
         }
         //Edit users
         else if (id == 2)
         {
-            ((GuiAccessSystem) getHost()).loadFrame(new GuiFrameGroupUsers(((GuiAccessSystem) getHost()), groupID, 6, getParentComponent().xPosition, getParentComponent().yPosition), true);
+            ((GuiAccessSystem) getHost()).loadFrame(new GuiFrameGroupUsers(((GuiAccessSystem) getHost()), groupID, -1, getParentComponent().xPosition, getParentComponent().yPosition), true);
         }
         else
         {

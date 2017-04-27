@@ -83,7 +83,7 @@ public final class GlobalAccessSystem extends AbstractLoadable
         profile.initName(name.trim(), "P_" + name + "_" + System.nanoTime());
         if (!id_to_profiles.containsKey(name) || id_to_profiles.get(name) == null)
         {
-            id_to_profiles.put(name, profile);
+            id_to_profiles.put(profile.getID(), profile);
         }
         SaveManager.register(profile);
         return profile;

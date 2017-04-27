@@ -43,23 +43,17 @@ public class UserEntry extends GuiComponentContainer<UserEntry>
     }
 
     @Override
-    protected void updatePositions()
-    {
-        super.updatePositions();
-    }
-
-    @Override
     public void actionPerformed(GuiButton button)
     {
         int id = button.id;
         //Edit group
         if (id == 0)
         {
-            GuiYesNo gui = new GuiYesNo(1, getParentComponent().x(), getParentComponent().y(), "Remove User", "Do you want to remove this user?");
+            GuiYesNo gui = new GuiYesNo(1, getParentComponent().x(), getParentComponent().y(), "Remove User Dialog", "Do you want to remove user '" + userName + "' from group '" + group + "'?");
             gui.setParentComponent(this);
-            getHost().add(gui);
             ((GuiAccessSystem) getHost()).loadFrame(gui, true);
         }
+        //Callback from yes/no dialog
         else if (id == 1)
         {
             if (button instanceof GuiYesNo)
