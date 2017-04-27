@@ -9,6 +9,7 @@ import com.builtbroken.mc.prefab.gui.components.GuiArray;
 import com.builtbroken.mc.prefab.gui.components.GuiField;
 import com.builtbroken.mc.prefab.gui.pos.GuiRelativePos;
 import com.builtbroken.mc.prefab.gui.pos.HugBottom;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 
 /**
@@ -36,12 +37,6 @@ public class GuiFrameGroupUsers extends GuiGroupFrame<GuiFrameGroupUsers>
         super.initGui();
         if (getGroup() != null)
         {
-            users = new String[getGroup().getMembers().size()];
-            int i = 0;
-            for (AccessUser user : getGroup().getMembers())
-            {
-                users[i++] = user.getName();
-            }
             groupArray = add(new GuiArray(new UserArrayCallback(this), 1, 0, 0, rows, rowSpacingY));
             groupArray.setRelativePosition(new GuiRelativePos(this, 0, 20));
             groupArray.setWidth(200);
@@ -59,12 +54,35 @@ public class GuiFrameGroupUsers extends GuiGroupFrame<GuiFrameGroupUsers>
     }
 
     @Override
+    protected void update(Minecraft mc, int mouseX, int mouseY)
+    {
+        super.update(mc, mouseX, mouseY);
+        if (getGroup() == null || users == null || users != null && getGroup().getMembers().size() != users.length) //TODO check if exact match
+        {
+            if (getGroup() != null)
+            {
+                users = new String[getGroup().getMembers().size()];
+                int i = 0;
+                for (AccessUser user : getGroup().getMembers())
+                {
+                    users[i++] = user.getName();
+                }
+            }
+            else
+            {
+                users = null;
+            }
+            groupArray.reloadEntries();
+        }
+    }
+
+    @Override
     public void actionPerformed(GuiButton button)
     {
         int id = button.id;
-        if(id == 2)
+        if (id == 2)
         {
-            if(userNameField.getText() != null && !userNameField.getText().isEmpty())
+            if (userNameField.getText() != null && !userNameField.getText().isEmpty())
             {
                 PacketAccessGui.addUser(getHost().currentProfile.getID(), groupID, userNameField.getText());
             }

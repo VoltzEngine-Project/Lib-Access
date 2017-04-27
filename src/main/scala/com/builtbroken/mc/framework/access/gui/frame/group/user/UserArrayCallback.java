@@ -26,7 +26,7 @@ public class UserArrayCallback extends CallbackGuiArray
     @Override
     public String getEntryName(int index)
     {
-        return "User[" + index + "]";
+        return gui.users != null ? gui.users[index] : "User[" + index + "]"; //TODO check if username match client player then add [You]
     }
 
     @Override
@@ -36,8 +36,7 @@ public class UserArrayCallback extends CallbackGuiArray
         if (buttonEntry instanceof UserEntry)
         {
             ((UserEntry) buttonEntry).group = gui.groupID;
-            ((UserEntry) buttonEntry).userName = gui.users[index];
-
+            ((UserEntry) buttonEntry).userName = getEntryName(index);
         }
     }
 
@@ -45,7 +44,7 @@ public class UserArrayCallback extends CallbackGuiArray
     public boolean isEnabled(int index)
     {
         //TODO check if user can edit user
-        return !gui.users[index].equalsIgnoreCase(Minecraft.getMinecraft().thePlayer.getCommandSenderName());
+        return gui.users != null && !gui.users[index].equalsIgnoreCase(Minecraft.getMinecraft().thePlayer.getCommandSenderName());
     }
 
     @Override
@@ -63,6 +62,6 @@ public class UserArrayCallback extends CallbackGuiArray
     @Override
     public int getSize()
     {
-        return gui.users.length;
+        return gui.users != null ? gui.users.length : 0;
     }
 }

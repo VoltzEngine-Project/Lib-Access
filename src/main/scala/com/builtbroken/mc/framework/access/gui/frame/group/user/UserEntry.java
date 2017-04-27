@@ -22,6 +22,8 @@ public class UserEntry extends GuiComponentContainer<UserEntry>
     public String group;
     private GuiImageButton removeUserButton;
 
+    private GuiYesNo yesNoDialog;
+
     public UserEntry(int id, int x, int y)
     {
         super(id, x, y, 190, 10, "");
@@ -49,22 +51,18 @@ public class UserEntry extends GuiComponentContainer<UserEntry>
         //Edit group
         if (id == 0)
         {
-            GuiYesNo gui = new GuiYesNo(1, getParentComponent().x(), getParentComponent().y(), "Remove User Dialog", "Do you want to remove user '" + userName + "' from group '" + group + "'?");
-            gui.setParentComponent(this);
-            ((GuiAccessSystem) getHost()).loadFrame(gui, true);
+            yesNoDialog = new GuiYesNo(-1, getParentComponent().x(), getParentComponent().y(), "Remove User Dialog", "Do you want to remove user '" + userName + "' from group '" + group + "'?");
+            yesNoDialog.setParentComponent(this);
+            ((GuiAccessSystem) getHost()).loadFrame(yesNoDialog, true);
         }
         //Callback from yes/no dialog
-        else if (id == 1)
+        else if (yesNoDialog == button)
         {
-            if (button instanceof GuiYesNo)
+            if (((GuiYesNo) button).state == 0)
             {
-                if (((GuiYesNo) button).state == 0)
-                {
-                    PacketAccessGui.removeUser(((GuiAccessSystem) getHost()).currentProfile.getID(), group, userName);
-                }
-                ((GuiAccessSystem) getHost()).loadFrame(((GuiYesNo) button).lastOpenedFrame, false);
-                getHost().remove(button);
+                PacketAccessGui.removeUser(((GuiAccessSystem) getHost()).currentProfile.getID(), group, userName);
             }
+            ((GuiAccessSystem) getHost()).loadFrame(((GuiYesNo) button).lastOpenedFrame, false);
         }
         else
         {

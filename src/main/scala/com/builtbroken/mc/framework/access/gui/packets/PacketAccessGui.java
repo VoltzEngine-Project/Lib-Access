@@ -23,7 +23,6 @@ import java.util.List;
  */
 public class PacketAccessGui extends PacketType implements IPacket
 {
-
     public static int REQUEST_ALL_PROFILES = 0;
     public static int REQUEST_PROFILE = 1;
     public static int KEEP_ALIVE = 2;
@@ -81,19 +80,8 @@ public class PacketAccessGui extends PacketType implements IPacket
             else if (id == REQUEST_PROFILE)
             {
                 clearGui(player);
-                String accessGroup = ByteBufUtils.readUTF8String(data());
-                AccessProfile profile = GlobalAccessSystem.getProfile(accessGroup);
-                if (profile != null)
-                {
-                    IPacket packetGui = new PacketGui(1).write(profile.save(new NBTTagCompound()));
-                    Engine.instance.packetHandler.sendToPlayer(packetGui, (EntityPlayerMP) player);
-                }
-                else
-                {
-                    PacketGui packetGui = new PacketGui(5);
-                    ByteBufUtils.writeUTF8String(packetGui.data(), "error.profile.not.found");
-                    Engine.instance.packetHandler.sendToPlayer(packetGui, (EntityPlayerMP) player);
-                }
+                final String profileID = ByteBufUtils.readUTF8String(data());
+                sendProfileToClient((EntityPlayerMP) player, profileID);
             }
             else if (id == KEEP_ALIVE)
             {
@@ -131,6 +119,10 @@ public class PacketAccessGui extends PacketType implements IPacket
                                 ByteBufUtils.writeUTF8String(packetGui.data(), "error.group.user.add");
                                 Engine.instance.packetHandler.sendToPlayer(packetGui, (EntityPlayerMP) player);
                             }
+                            else
+                            {
+                                sendProfileToClient((EntityPlayerMP) player, profileID);
+                            }
                         }
                         else
                         {
@@ -159,7 +151,6 @@ public class PacketAccessGui extends PacketType implements IPacket
                 String groupID = ByteBufUtils.readUTF8String(data());
                 String userID = ByteBufUtils.readUTF8String(data());
 
-
                 AccessProfile profile = GlobalAccessSystem.getProfile(profileID);
                 if (profile != null)
                 {
@@ -175,6 +166,10 @@ public class PacketAccessGui extends PacketType implements IPacket
                                     PacketGui packetGui = new PacketGui(5);
                                     ByteBufUtils.writeUTF8String(packetGui.data(), "error.group.user.remove");
                                     Engine.instance.packetHandler.sendToPlayer(packetGui, (EntityPlayerMP) player);
+                                }
+                                else
+                                {
+                                    sendProfileToClient((EntityPlayerMP) player, profileID);
                                 }
                             }
                             else
@@ -231,6 +226,22 @@ public class PacketAccessGui extends PacketType implements IPacket
         }
 
         Engine.instance.packetHandler.sendToPlayer(packetGui, player);
+    }
+
+    public void sendProfileToClient(EntityPlayerMP player, String profileID)
+    {
+        AccessProfile profile = GlobalAccessSystem.getProfile(profileID); //TODO send to all players
+        if (profile != null) //TODO check if player can view profile
+        {
+            IPacket packetGui = new PacketGui(1).write(profile.save(new NBTTagCompound()));
+            Engine.instance.packetHandler.sendToPlayer(packetGui, player);
+        }
+        else
+        {
+            PacketGui packetGui = new PacketGui(5);
+            ByteBufUtils.writeUTF8String(packetGui.data(), "error.profile.not.found");
+            Engine.instance.packetHandler.sendToPlayer(packetGui, player);
+        }
     }
 
     /**

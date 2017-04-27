@@ -150,11 +150,11 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
     {
         if (frame != null)
         {
-            GuiFrame last = currentFrame;
-            if (last != null)
+            GuiFrame previousOpenedFrame = currentFrame;
+            if (previousOpenedFrame != null)
             {
-                remove(last);
-                last.hide();
+                remove(previousOpenedFrame);
+                previousOpenedFrame.hide();
             }
             currentFrame = frame;
             if (!buttonList.contains(currentFrame))
@@ -166,12 +166,13 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
             currentFrame.show();
             if (addReturn)
             {
-                currentFrame.lastOpenedFrame = last;
+                currentFrame.lastOpenedFrame = previousOpenedFrame;
             }
         }
         else if (currentFrame != null)
         {
             currentFrame.hide();
+            currentFrame.lastOpenedFrame = null;
             remove(currentFrame);
             currentFrame = null;
         }
