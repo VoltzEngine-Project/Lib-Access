@@ -19,6 +19,7 @@ public class GuiFrameGroupNodes extends GuiGroupFrame<GuiFrameGroupNodes>
     @Override
     protected void doRender(Minecraft mc, AccessGroup group, int mouseX, int mouseY)
     {
+        super.doRender(mc, group, mouseX, mouseY);
         if (group != null)
         {
             int y = 0;

@@ -1,6 +1,5 @@
 package com.builtbroken.mc.framework.access.gui.frame.group.user;
 
-import com.builtbroken.mc.framework.access.Permissions;
 import com.builtbroken.mc.prefab.gui.components.CallbackGuiArray;
 import com.builtbroken.mc.prefab.gui.components.GuiComponent;
 import net.minecraft.client.Minecraft;
@@ -28,12 +27,12 @@ public class UserArrayCallback extends CallbackGuiArray
     public String getEntryName(int index)
     {
         String username;
-        if (gui.users != null)
+        if (gui.users != null && index < gui.users.length)
         {
             username = gui.users[index];
             if (username.equalsIgnoreCase(Minecraft.getMinecraft().thePlayer.getCommandSenderName()))
             {
-                username += "[You]";
+                username += "  [You]";
             }
         }
         else
@@ -57,7 +56,7 @@ public class UserArrayCallback extends CallbackGuiArray
     @Override
     public boolean isEnabled(int index)
     {
-        if (gui.users != null && gui.getPlayer().hasNode(Permissions.groupPermissionRemove))
+        if (gui.users != null && index < gui.users.length)
         {
             return !gui.users[index].equalsIgnoreCase(Minecraft.getMinecraft().thePlayer.getCommandSenderName()); //TODO prevent removing higher permission users than current user
         }

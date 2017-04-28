@@ -5,7 +5,8 @@ import com.builtbroken.mc.core.network.packet.PacketType;
 import com.builtbroken.mc.framework.access.AccessProfile;
 import com.builtbroken.mc.framework.access.AccessUser;
 import com.builtbroken.mc.framework.access.gui.dialogs.GuiDialogNewProfile;
-import com.builtbroken.mc.framework.access.gui.frame.group.main.GuiFrameGroups;
+import com.builtbroken.mc.framework.access.gui.frame.main.GuiFrameCenter;
+import com.builtbroken.mc.framework.access.gui.frame.main.ProfileArrayCallback;
 import com.builtbroken.mc.framework.access.gui.packets.PacketAccessGui;
 import com.builtbroken.mc.lib.helper.LanguageUtility;
 import com.builtbroken.mc.prefab.gui.GuiButton2;
@@ -48,9 +49,11 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
 
     public int currentProfileIndex = -1;
 
-    public GuiFrame currentFrame;
+    public GuiFrame leftFrame;
+    public GuiFrame centerFrame;
+    public GuiFrame rightFrame;
 
-    public GuiFrameGroups groupsFrame;
+    public GuiFrameCenter defaultCenterFrame;
 
     @Override
     public void initGui()
@@ -61,17 +64,14 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
         errorMessage = "";
 
         //Menu buttons
-        refreshButton = add(GuiImageButton.newRefreshButton(0, width - 20, 2));
-        newProfile = add(GuiImageButton.newButtonEmpty(1, 20, 2));
+        refreshButton = add(GuiImageButton.newRefreshButton(0, 2, 2));
+        newProfile = (GuiButton2) add(new GuiButton2(1, 20, 2, "New Profile").setWidth(60).setHeight(18));
 
         //Profile array
         profileArray = add(new GuiArray(new ProfileArrayCallback(this), 4, 2, 40, profileRows, 20));
         profileArray.setWidth(100 + 9);
 
-        //Group frame
-        groupsFrame = add(new GuiFrameGroups(this, 5, 120, 40));
-        groupsFrame.hide();
-        groupsFrame.initGui();
+        defaultCenterFrame = new GuiFrameCenter(this, 120, 40);
 
         reloadProfileList();
         reloadGroupList();
@@ -81,13 +81,13 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
     {
         currentProfile = null;
         currentProfileIndex = -1;
-        loadFrame(null, false);
+        loadFrame(defaultCenterFrame, false);
         profileArray.reloadEntries();
     }
 
     protected void reloadGroupList()
     {
-        groupsFrame.groupArray.reloadEntries();
+        defaultCenterFrame.reloadGroupList();
     }
 
     @Override
@@ -120,6 +120,11 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
             PacketAccessGui.keepAlive(currentProfile.getID());
             lastKeepAlivePacket = System.currentTimeMillis();
         }
+
+        if (centerFrame == null)
+        {
+            loadFrame(defaultCenterFrame, false);
+        }
     }
 
     /**
@@ -133,7 +138,7 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
         currentProfile = null;
         if (profileIDs != null && currentProfileIndex >= 0 && currentProfileIndex < profileIDs.length)
         {
-            loadFrame(groupsFrame, false);
+            loadFrame(defaultCenterFrame, false);
             PacketAccessGui.doRequest(profileIDs[currentProfileIndex]);
         }
         else
@@ -152,31 +157,31 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
     {
         if (frame != null)
         {
-            GuiFrame previousOpenedFrame = currentFrame;
+            GuiFrame previousOpenedFrame = centerFrame;
             if (previousOpenedFrame != null)
             {
-                remove(previousOpenedFrame);
                 previousOpenedFrame.hide();
+                remove(previousOpenedFrame);
             }
-            currentFrame = frame;
-            if (!buttonList.contains(currentFrame))
+            centerFrame = frame;
+            if (!buttonList.contains(centerFrame))
             {
-                add(currentFrame);
+                add(centerFrame);
             }
-            currentFrame.initGui();
-            currentFrame.updatePositions();
-            currentFrame.show();
+            centerFrame.initGui();
+            centerFrame.updatePositions();
+            centerFrame.show();
             if (addReturn)
             {
-                currentFrame.lastOpenedFrame = previousOpenedFrame;
+                centerFrame.lastOpenedFrame = previousOpenedFrame;
             }
         }
-        else if (currentFrame != null)
+        else if (centerFrame != null)
         {
-            currentFrame.hide();
-            currentFrame.lastOpenedFrame = null;
-            remove(currentFrame);
-            currentFrame = null;
+            centerFrame.hide();
+            centerFrame.lastOpenedFrame = null;
+            remove(centerFrame);
+            centerFrame = null;
         }
     }
 
@@ -192,19 +197,22 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
         Color b = new Color(122, 122, 122, 143);
         this.drawGradientRect(0, 0, 114, this.height, a.getRGB(), b.getRGB());
 
+        a = new Color(73, 73, 73, 143);
+        b = new Color(122, 122, 122, 143);
+        this.drawGradientRect(114, 0, this.width, this.height, a.getRGB(), b.getRGB());
+
+        String name = "";
+        String id = "";
+        if (profileNames != null && currentProfileIndex >= 0 && currentProfileIndex < profileNames.length)
+        {
+            name = currentProfile != null ? currentProfile.getName() : profileNames[currentProfileIndex];
+            id = currentProfile != null ? currentProfile.getID() : profileIDs[currentProfileIndex];
+        }
+        this.drawString(this.fontRendererObj, "Profile: " + name, 122, 20, 16777215);
+        this.drawString(this.fontRendererObj, "ID: " + id, 122, 30, 16777215);
+
         if (profileNames != null)
         {
-            String name = "";
-            String id = "";
-            if (currentProfileIndex >= 0 && currentProfileIndex < profileNames.length)
-            {
-                name = currentProfile != null ? currentProfile.getName() : profileNames[currentProfileIndex];
-                id = currentProfile != null ? currentProfile.getID() : profileIDs[currentProfileIndex];
-            }
-            this.drawString(this.fontRendererObj, "Profile: " + name, 130, 20, 16777215);
-            this.drawString(this.fontRendererObj, "ID: " + id, 130, 30, 16777215);
-
-
             //============================================================
             //Debug message
             if (errorMessage != null && !errorMessage.trim().isEmpty())

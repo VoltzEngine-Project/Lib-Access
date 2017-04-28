@@ -1,5 +1,6 @@
-package com.builtbroken.mc.framework.access.gui;
+package com.builtbroken.mc.framework.access.gui.frame.main;
 
+import com.builtbroken.mc.framework.access.gui.GuiAccessSystem;
 import com.builtbroken.mc.prefab.gui.components.CallbackGuiArray;
 
 /**

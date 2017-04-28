@@ -19,7 +19,7 @@ public class GuiFrameGroupSettings extends GuiGroupFrame<GuiFrameGroupSettings>
     @Override
     protected void doRender(Minecraft mc, AccessGroup group, int mouseX, int mouseY)
     {
-        super.doRender(mc, mouseX, mouseY);
+        super.doRender(mc, group, mouseX, mouseY);
         if (group != null)
         {
             drawString(mc.fontRenderer, "Parent: " + group.getExtendGroupName(), x() + 20, y() + 15, DEFAULT_STRING_COLOR);

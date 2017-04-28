@@ -29,7 +29,6 @@ public class GuiGroupFrame<E extends GuiGroupFrame> extends GuiSubFrameAccess<E>
         AccessGroup group = getGroup();
         if (group != null)
         {
-            drawString(mc.fontRenderer, "Name: " + group.getName(), x() + 20, y() + 5, DEFAULT_STRING_COLOR);
             doRender(mc, group, mouseX, mouseY);
         }
         else
@@ -50,5 +49,6 @@ public class GuiGroupFrame<E extends GuiGroupFrame> extends GuiSubFrameAccess<E>
 
     protected void doRender(Minecraft mc, AccessGroup group, int mouseX, int mouseY)
     {
+        drawString(mc.fontRenderer, "Name: " + group.getName(), x() + 20, y() + 5, DEFAULT_STRING_COLOR);
     }
 }

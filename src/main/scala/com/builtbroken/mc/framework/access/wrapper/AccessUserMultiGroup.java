@@ -27,7 +27,7 @@ public class AccessUserMultiGroup extends AccessUser
     @Override
     public boolean groupHasNode(String node)
     {
-        for (AccessGroup group : profile.getGroupsWithUser(username))
+        for (AccessGroup group : profile.getGroupsWithUser(getName()))
         {
             if (group.hasNode(node))
             {
