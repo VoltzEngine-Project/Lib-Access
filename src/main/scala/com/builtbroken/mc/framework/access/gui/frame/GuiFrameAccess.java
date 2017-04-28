@@ -20,4 +20,15 @@ public class GuiFrameAccess<E extends GuiFrameAccess> extends GuiFrame<E>
     {
         return (GuiAccessSystem) super.getHost();
     }
+
+    /**
+     * Called to load a frame to display on the right side of the GUI
+     *
+     * @param frame     - frame to load
+     * @param addReturn - should the last frame be stored for return
+     */
+    public void loadFrame(GuiFrame frame, boolean addReturn)
+    {
+        getHost().loadCenterFrame(frame, addReturn);
+    }
 }

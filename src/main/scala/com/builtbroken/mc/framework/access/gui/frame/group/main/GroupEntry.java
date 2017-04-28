@@ -4,9 +4,11 @@ import com.builtbroken.mc.framework.access.gui.GuiAccessSystem;
 import com.builtbroken.mc.framework.access.gui.frame.group.edit.GuiFrameGroupSettings;
 import com.builtbroken.mc.framework.access.gui.frame.group.nodes.GuiFrameGroupNodes;
 import com.builtbroken.mc.framework.access.gui.frame.group.user.GuiFrameGroupUsers;
+import com.builtbroken.mc.framework.access.gui.frame.main.GuiFrameCenter;
 import com.builtbroken.mc.prefab.gui.buttons.GuiButton9px;
 import com.builtbroken.mc.prefab.gui.buttons.GuiImageButton;
 import com.builtbroken.mc.prefab.gui.components.GuiComponentContainer;
+import com.builtbroken.mc.prefab.gui.pos.GuiRelativePos;
 import com.builtbroken.mc.prefab.gui.pos.HugXSide;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
@@ -19,12 +21,14 @@ import java.awt.*;
  */
 public class GroupEntry extends GuiComponentContainer<GroupEntry>
 {
+    public final GuiFrameCenter frameCenter;
     public String groupID;
     private GuiImageButton[] groupButtons;
 
-    public GroupEntry(int id, int x, int y)
+    public GroupEntry(GuiFrameCenter frameCenter, int id, int x, int y)
     {
         super(id, x, y, 190, 10, "");
+        this.frameCenter = frameCenter;
         resizeAsNeeded = false;
         reloadGroupList();
     }
@@ -46,25 +50,30 @@ public class GroupEntry extends GuiComponentContainer<GroupEntry>
     public void actionPerformed(GuiButton button)
     {
         int id = button.id;
-        //Edit group
-        if (id == 0)
+        if (((GuiAccessSystem) getHost()).centerFrame instanceof GuiFrameCenter)
         {
-            ((GuiAccessSystem) getHost()).loadFrame(new GuiFrameGroupSettings(((GuiAccessSystem) getHost()), groupID, -1, getParentComponent().xPosition, getParentComponent().yPosition), true);
+            GuiFrameCenter guiFrameCenter = (GuiFrameCenter) ((GuiAccessSystem) getHost()).centerFrame;
+            GuiRelativePos pos = new GuiRelativePos(((GuiAccessSystem) getHost()).centerFrame, 0, 0);
+            //Edit group
+            if (id == 0)
+            {
+                guiFrameCenter.show(new GuiFrameGroupSettings(frameCenter, groupID, -1, 0, 0).setRelativePosition(guiFrameCenter.centerFramePos));
+                return;
+            }
+            //Edit nodes
+            else if (id == 1)
+            {
+                guiFrameCenter.show(new GuiFrameGroupNodes(frameCenter, groupID, -1, 0, 0).setRelativePosition(guiFrameCenter.centerFramePos));
+                return;
+            }
+            //Edit users
+            else if (id == 2)
+            {
+                guiFrameCenter.show(new GuiFrameGroupUsers(frameCenter, groupID, -1, 0, 0).setRelativePosition(guiFrameCenter.centerFramePos));
+                return;
+            }
         }
-        //Edit nodes
-        else if (id == 1)
-        {
-            ((GuiAccessSystem) getHost()).loadFrame(new GuiFrameGroupNodes(((GuiAccessSystem) getHost()), groupID, -1, getParentComponent().xPosition, getParentComponent().yPosition), true);
-        }
-        //Edit users
-        else if (id == 2)
-        {
-            ((GuiAccessSystem) getHost()).loadFrame(new GuiFrameGroupUsers(((GuiAccessSystem) getHost()), groupID, -1, getParentComponent().xPosition, getParentComponent().yPosition), true);
-        }
-        else
-        {
-            super.actionPerformed(button);
-        }
+        super.actionPerformed(button);
     }
 
     protected void reloadGroupList()

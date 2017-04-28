@@ -6,6 +6,7 @@ import com.builtbroken.mc.framework.access.AccessProfile;
 import com.builtbroken.mc.framework.access.AccessUser;
 import com.builtbroken.mc.framework.access.gui.dialogs.GuiDialogNewProfile;
 import com.builtbroken.mc.framework.access.gui.frame.main.GuiFrameCenter;
+import com.builtbroken.mc.framework.access.gui.frame.main.GuiFrameEvents;
 import com.builtbroken.mc.framework.access.gui.frame.main.ProfileArrayCallback;
 import com.builtbroken.mc.framework.access.gui.packets.PacketAccessGui;
 import com.builtbroken.mc.lib.helper.LanguageUtility;
@@ -71,7 +72,13 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
         profileArray = add(new GuiArray(new ProfileArrayCallback(this), 4, 2, 40, profileRows, 20));
         profileArray.setWidth(100 + 9);
 
+        int remainingWidth = this.width - profileArray.width;
         defaultCenterFrame = new GuiFrameCenter(this, 120, 40);
+        defaultCenterFrame.setWidth((int) Math.ceil(remainingWidth * .6));
+        remainingWidth -= defaultCenterFrame.getWidth();
+
+        rightFrame = add(new GuiFrameEvents(this, defaultCenterFrame.x() + defaultCenterFrame.getWidth(), 40));
+        rightFrame.setWidth(remainingWidth);
 
         reloadProfileList();
         reloadGroupList();
@@ -81,7 +88,7 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
     {
         currentProfile = null;
         currentProfileIndex = -1;
-        loadFrame(defaultCenterFrame, false);
+        loadCenterFrame(defaultCenterFrame, false);
         profileArray.reloadEntries();
     }
 
@@ -107,7 +114,7 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
         else if (id == 1)
         {
             GuiDialogNewProfile guiDialogNewProfile = add(new GuiDialogNewProfile(2, 120, 40));
-            loadFrame(guiDialogNewProfile, false);
+            loadCenterFrame(guiDialogNewProfile, false);
         }
     }
 
@@ -123,7 +130,7 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
 
         if (centerFrame == null)
         {
-            loadFrame(defaultCenterFrame, false);
+            loadCenterFrame(defaultCenterFrame, false);
         }
     }
 
@@ -138,7 +145,7 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
         currentProfile = null;
         if (profileIDs != null && currentProfileIndex >= 0 && currentProfileIndex < profileIDs.length)
         {
-            loadFrame(defaultCenterFrame, false);
+            loadCenterFrame(defaultCenterFrame, false);
             PacketAccessGui.doRequest(profileIDs[currentProfileIndex]);
         }
         else
@@ -153,7 +160,7 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
      * @param frame     - frame to load
      * @param addReturn - should the last frame be stored for return
      */
-    public void loadFrame(GuiFrame frame, boolean addReturn)
+    public void loadCenterFrame(GuiFrame frame, boolean addReturn)
     {
         if (frame != null)
         {

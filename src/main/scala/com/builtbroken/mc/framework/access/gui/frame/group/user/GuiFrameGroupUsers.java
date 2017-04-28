@@ -2,8 +2,8 @@ package com.builtbroken.mc.framework.access.gui.frame.group.user;
 
 import com.builtbroken.mc.framework.access.AccessUser;
 import com.builtbroken.mc.framework.access.Permissions;
-import com.builtbroken.mc.framework.access.gui.GuiAccessSystem;
 import com.builtbroken.mc.framework.access.gui.frame.group.GuiGroupFrame;
+import com.builtbroken.mc.framework.access.gui.frame.main.GuiFrameCenter;
 import com.builtbroken.mc.framework.access.gui.packets.PacketAccessGui;
 import com.builtbroken.mc.prefab.gui.GuiButton2;
 import com.builtbroken.mc.prefab.gui.components.GuiArray;
@@ -27,7 +27,7 @@ public class GuiFrameGroupUsers extends GuiGroupFrame<GuiFrameGroupUsers>
     public GuiButton2 addButton;
     public String[] users;
 
-    public GuiFrameGroupUsers(GuiAccessSystem parent, String groupID, int id, int x, int y)
+    public GuiFrameGroupUsers(GuiFrameCenter parent, String groupID, int id, int x, int y)
     {
         super(parent, groupID, id, x, y);
     }

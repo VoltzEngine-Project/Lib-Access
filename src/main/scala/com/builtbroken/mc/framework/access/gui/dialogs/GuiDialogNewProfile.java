@@ -58,7 +58,7 @@ public class GuiDialogNewProfile extends GuiDialog<GuiDialogNewProfile>
             {
                 PacketAccessGui.createProfile(profileNameField.getText(), defaultCheckBox.isChecked());
             }
-            ((GuiAccessSystem) getHost()).loadFrame(lastOpenedFrame, false);
+            ((GuiAccessSystem) getHost()).loadCenterFrame(lastOpenedFrame, false);
             getHost().remove(this);
         }
     }

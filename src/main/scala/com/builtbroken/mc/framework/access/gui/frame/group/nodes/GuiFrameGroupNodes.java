@@ -1,8 +1,8 @@
 package com.builtbroken.mc.framework.access.gui.frame.group.nodes;
 
 import com.builtbroken.mc.framework.access.AccessGroup;
-import com.builtbroken.mc.framework.access.gui.GuiAccessSystem;
 import com.builtbroken.mc.framework.access.gui.frame.group.GuiGroupFrame;
+import com.builtbroken.mc.framework.access.gui.frame.main.GuiFrameCenter;
 import net.minecraft.client.Minecraft;
 
 /**
@@ -11,7 +11,7 @@ import net.minecraft.client.Minecraft;
  */
 public class GuiFrameGroupNodes extends GuiGroupFrame<GuiFrameGroupNodes>
 {
-    public GuiFrameGroupNodes(GuiAccessSystem parent, String groupID, int id, int x, int y)
+    public GuiFrameGroupNodes(GuiFrameCenter parent, String groupID, int id, int x, int y)
     {
         super(parent, groupID, id, x, y);
     }

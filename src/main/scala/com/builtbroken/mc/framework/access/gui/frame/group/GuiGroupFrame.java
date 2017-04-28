@@ -2,9 +2,11 @@ package com.builtbroken.mc.framework.access.gui.frame.group;
 
 import com.builtbroken.mc.framework.access.AccessGroup;
 import com.builtbroken.mc.framework.access.AccessUser;
-import com.builtbroken.mc.framework.access.gui.GuiAccessSystem;
 import com.builtbroken.mc.framework.access.gui.frame.GuiSubFrameAccess;
+import com.builtbroken.mc.framework.access.gui.frame.main.GuiFrameCenter;
+import com.builtbroken.mc.prefab.gui.components.frame.GuiFrame;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiButton;
 
 import java.awt.*;
 
@@ -15,12 +17,32 @@ import java.awt.*;
 public class GuiGroupFrame<E extends GuiGroupFrame> extends GuiSubFrameAccess<E>
 {
     public final String groupID;
+    protected final GuiFrameCenter frameCenter;
 
-    public GuiGroupFrame(GuiAccessSystem parent, String groupID, int id, int x, int y)
+    public GuiGroupFrame(GuiFrameCenter frameCenter, String groupID, int id, int x, int y)
     {
-        super(parent, id, x, y);
+        super(frameCenter.getHost(), id, x, y);
+        this.frameCenter = frameCenter;
         this.groupID = groupID;
     }
+
+    @Override
+    public void loadFrame(GuiFrame frame, boolean addReturn)
+    {
+        //Not used by group frame
+    }
+
+    @Override
+    public void actionPerformed(GuiButton button)
+    {
+        int id = button.id;
+        if (id == 0)
+        {
+            frameCenter.show(frameCenter.groupsFrame);
+            frameCenter.remove(this);
+        }
+    }
+
 
     @Override
     protected void doRender(Minecraft mc, int mouseX, int mouseY)

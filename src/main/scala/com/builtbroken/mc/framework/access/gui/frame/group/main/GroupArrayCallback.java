@@ -1,6 +1,6 @@
 package com.builtbroken.mc.framework.access.gui.frame.group.main;
 
-import com.builtbroken.mc.framework.access.gui.GuiAccessSystem;
+import com.builtbroken.mc.framework.access.gui.frame.main.GuiFrameCenter;
 import com.builtbroken.mc.prefab.gui.components.CallbackGuiArray;
 import com.builtbroken.mc.prefab.gui.components.GuiComponent;
 
@@ -10,17 +10,17 @@ import com.builtbroken.mc.prefab.gui.components.GuiComponent;
  */
 public class GroupArrayCallback extends CallbackGuiArray
 {
-    public final GuiAccessSystem gui;
+    public final GuiFrameCenter frameCenter;
 
-    public GroupArrayCallback(GuiAccessSystem gui)
+    public GroupArrayCallback(GuiFrameCenter center)
     {
-        this.gui = gui;
+        this.frameCenter = center;
     }
 
     @Override
     protected GuiComponent newEntry(int index, int buttonID, int x, int y)
     {
-        return new GroupEntry(buttonID, x, y);
+        return new GroupEntry(frameCenter, buttonID, x, y);
     }
 
     @Override
@@ -35,7 +35,7 @@ public class GroupArrayCallback extends CallbackGuiArray
         buttonEntry.displayString = getEntryName(index);
         if (buttonEntry instanceof GroupEntry)
         {
-            ((GroupEntry) buttonEntry).groupID = gui.currentProfile != null ? gui.currentProfile.getGroups().get(index).getName() : null;
+            ((GroupEntry) buttonEntry).groupID = frameCenter.getHost().currentProfile != null ? frameCenter.getHost().currentProfile.getGroups().get(index).getName() : null;
         }
     }
 
@@ -61,6 +61,6 @@ public class GroupArrayCallback extends CallbackGuiArray
     @Override
     public int getSize()
     {
-        return gui.currentProfile != null ? gui.currentProfile.getGroups().size() : 0;
+        return frameCenter.getHost().currentProfile != null ? frameCenter.getHost().currentProfile.getGroups().size() : 0;
     }
 }

@@ -16,7 +16,6 @@ public class GuiSubFrameAccess<E extends GuiSubFrameAccess> extends GuiFrameAcce
     public GuiSubFrameAccess(GuiAccessSystem parent, int id, int x, int y)
     {
         super(parent, id, x, y);
-        parent.add(this);
         this.setWidth(200);
         this.setHeight(200);
     }
@@ -37,8 +36,7 @@ public class GuiSubFrameAccess<E extends GuiSubFrameAccess> extends GuiFrameAcce
         int id = button.id;
         if (id == 0)
         {
-            getHost().loadFrame(lastOpenedFrame, false);
-            getHost().remove(this);
+            loadFrame(lastOpenedFrame, false);
         }
     }
 }

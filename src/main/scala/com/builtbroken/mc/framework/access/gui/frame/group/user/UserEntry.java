@@ -54,7 +54,7 @@ public class UserEntry extends GuiComponentContainer<UserEntry>
         {
             yesNoDialog = new GuiYesNo(-1, getParentComponent().x(), getParentComponent().y(), "Remove User Dialog", "Do you want to remove user '" + userName + "' from group '" + group + "'?");
             yesNoDialog.setParentComponent(this);
-            ((GuiAccessSystem) getHost()).loadFrame(yesNoDialog, true);
+            ((GuiAccessSystem) getHost()).loadCenterFrame(yesNoDialog, true);
         }
         //Callback from yes/no dialog
         else if (yesNoDialog == button)
@@ -63,7 +63,7 @@ public class UserEntry extends GuiComponentContainer<UserEntry>
             {
                 PacketAccessGui.removeUser(((GuiAccessSystem) getHost()).currentProfile.getID(), group, userName);
             }
-            ((GuiAccessSystem) getHost()).loadFrame(((GuiYesNo) button).lastOpenedFrame, false);
+            ((GuiAccessSystem) getHost()).loadCenterFrame(((GuiYesNo) button).lastOpenedFrame, false);
         }
         else
         {
