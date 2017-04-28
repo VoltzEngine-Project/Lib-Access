@@ -45,15 +45,7 @@ public class GuiGroupFrame<E extends GuiGroupFrame> extends GuiSubFrameAccess<E>
 
     public AccessUser getPlayer()
     {
-        if (getGroup() != null)
-        {
-            AccessUser user = getGroup().getMember(Minecraft.getMinecraft().thePlayer);
-            if (user != null)
-            {
-                return user;
-            }
-        }
-        return new AccessUser(Minecraft.getMinecraft().thePlayer).setTempary(true);
+        return getHost().getPlayer();
     }
 
     protected void doRender(Minecraft mc, AccessGroup group, int mouseX, int mouseY)

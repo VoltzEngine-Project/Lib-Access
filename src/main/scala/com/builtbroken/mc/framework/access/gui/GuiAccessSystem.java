@@ -293,6 +293,6 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
                 return user;
             }
         }
-        return new AccessUser(Minecraft.getMinecraft().thePlayer).setTempary(true);
+        return new AccessUser(Minecraft.getMinecraft().thePlayer).setTemporary(true);
     }
 }

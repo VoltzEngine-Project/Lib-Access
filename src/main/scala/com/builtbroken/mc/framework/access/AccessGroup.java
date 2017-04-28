@@ -93,9 +93,9 @@ public class AccessGroup implements ISave, Cloneable
     {
         if (isValid(obj))
         {
-            if (obj.userID != null)
+            if (obj.getUserID() != null)
             {
-                uuid_to_profile.put(obj.userID, obj);
+                uuid_to_profile.put(obj.getUserID(), obj);
             }
             username_to_profile.put(obj.username, obj);
             obj.setGroup(this);
@@ -157,9 +157,9 @@ public class AccessGroup implements ISave, Cloneable
         if (user != null && username_to_profile.containsKey(user.getName()))
         {
             username_to_profile.remove(user.username);
-            if (user.userID != null)
+            if (user.getUserID() != null)
             {
-                uuid_to_profile.remove(user.userID);
+                uuid_to_profile.remove(user.getUserID());
             }
             return true;
         }

@@ -18,8 +18,7 @@ public class AccessUser implements ISave
 {
     /** Username of player, main way to check owner */
     protected String username;
-    /** User's UUID, secondary way to check owner or main way if permission node is major */
-    protected UUID userID;
+    private UUID userID;
 
     /** Toggle to note this user will not save, and is only used for a short time */
     protected boolean isTempary = false;
@@ -52,7 +51,7 @@ public class AccessUser implements ISave
     public AccessUser(String username, UUID id)
     {
         this.username = username;
-        this.userID = id;
+        this.setUserID(id);
     }
 
     public AccessUser(EntityPlayer player)
@@ -201,11 +200,11 @@ public class AccessUser implements ISave
             usersTag.appendTag(accessData);
         }
         nbt.setTag("permissions", usersTag);
-        if (userID != null)
+        if (getUserID() != null)
         {
             NBTTagCompound tag = new NBTTagCompound();
-            tag.setLong("l", userID.getLeastSignificantBits());
-            tag.setLong("m", userID.getMostSignificantBits());
+            tag.setLong("l", getUserID().getLeastSignificantBits());
+            tag.setLong("m", getUserID().getMostSignificantBits());
             nbt.setTag("UUID", tag);
         }
         return nbt;
@@ -227,7 +226,7 @@ public class AccessUser implements ISave
             NBTTagCompound tag = nbt.getCompoundTag("UUID");
             long l = tag.getLong("l");
             long m = tag.getLong("m");
-            userID = new UUID(m, l);
+            setUserID(new UUID(m, l));
         }
     }
 
@@ -241,9 +240,15 @@ public class AccessUser implements ISave
         return save(new NBTTagCompound());
     }
 
-    public AccessUser setTempary(boolean si)
+    /**
+     * Set user as temporary and notes it should not save
+     *
+     * @param temp
+     * @return
+     */
+    public AccessUser setTemporary(boolean temp)
     {
-        this.isTempary = si;
+        this.isTempary = temp;
         return this;
     }
 
@@ -262,6 +267,18 @@ public class AccessUser implements ISave
     public String getName()
     {
         return this.username;
+    }
+
+
+    /** User's UUID, secondary way to check owner or main way if permission node is major */
+    public UUID getUserID()
+    {
+        return userID;
+    }
+
+    public void setUserID(UUID userID)
+    {
+        this.userID = userID;
     }
 
     @Override

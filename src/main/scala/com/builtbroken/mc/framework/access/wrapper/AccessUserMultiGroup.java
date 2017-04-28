@@ -4,6 +4,8 @@ import com.builtbroken.mc.framework.access.AccessGroup;
 import com.builtbroken.mc.framework.access.AccessProfile;
 import com.builtbroken.mc.framework.access.AccessUser;
 
+import java.util.UUID;
+
 /**
  * Used to ensure that permission calls use all groups and nodes possible.
  *
@@ -33,5 +35,17 @@ public class AccessUserMultiGroup extends AccessUser
             }
         }
         return false;
+    }
+
+    @Override
+    public UUID getUserID()
+    {
+        return primary.getUserID();
+    }
+
+    @Override
+    public String getName()
+    {
+        return primary.getName();
     }
 }

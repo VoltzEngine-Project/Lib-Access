@@ -202,7 +202,7 @@ public final class GlobalAccessSystem extends AbstractLoadable
     {
         if (event.world.provider.dimensionId == 0)
         {
-            File folder = new File(NBTUtility.getSaveDirectory(MinecraftServer.getServer().getFolderName()), NBTUtility.BBM_FOLDER + "access/profiles/");
+            File folder = new File(NBTUtility.getSaveDirectory(MinecraftServer.getServer().getFolderName()), AccessProfile.SAVE_FOLDER);
             if (folder.exists())
             {
                 File[] files = folder.listFiles();

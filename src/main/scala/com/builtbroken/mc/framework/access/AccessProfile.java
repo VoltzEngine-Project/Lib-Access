@@ -24,6 +24,8 @@ import java.util.*;
  */
 public class AccessProfile implements IVirtualObject
 {
+    public static final String SAVE_FOLDER = NBTUtility.BBM_FOLDER + "access/profiles/";
+
     /** List of all containers that use this profile to define some part of their functionality */
     private final Set<IProfileContainer> containers = Collections.newSetFromMap(new WeakHashMap<IProfileContainer, Boolean>());
 
@@ -226,7 +228,7 @@ public class AccessProfile implements IVirtualObject
                 return new AccessUserMultiGroup(this, user); //temp fix for user being in several groups at once
             }
         }
-        return new AccessUser(username).setTempary(true);
+        return new AccessUser(username).setTemporary(true);
     }
 
     /**
@@ -238,7 +240,7 @@ public class AccessProfile implements IVirtualObject
     public List<AccessGroup> getGroupsWithUser(String username)
     {
         List<AccessGroup> groups = new ArrayList();
-        for (AccessGroup group : this.groups)
+        for (AccessGroup group : this.getGroups())
         {
             AccessUser user = group.getMember(username);
             if (user != null)
@@ -455,7 +457,7 @@ public class AccessProfile implements IVirtualObject
 
     public static String getPathToProfile(String name)
     {
-        return NBTUtility.BBM_FOLDER + "access/profiles/" + name + ".dat";
+        return SAVE_FOLDER + name + ".dat";
     }
 
     @Override

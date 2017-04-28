@@ -79,10 +79,6 @@ public class GuiFrameGroupUsers extends GuiGroupFrame<GuiFrameGroupUsers>
         if (getGroup() != null)
         {
             addButton.setEnabled(getPlayer().hasNode(Permissions.groupUserAdd));
-            if (getPlayer().hasNode(Permissions.groupPermissionRemove))
-            {
-                groupArray.reloadEntries(); //Reload to reset button states
-            }
         }
     }
 
