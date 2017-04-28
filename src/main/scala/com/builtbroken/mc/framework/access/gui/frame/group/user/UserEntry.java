@@ -70,6 +70,12 @@ public class UserEntry extends GuiComponentContainer<UserEntry>
         }
     }
 
+    @Override
+    protected void update(Minecraft mc, int mouseX, int mouseY)
+    {
+        super.update(mc, mouseX, mouseY);
+    }
+
     protected void reloadGroupList()
     {
         if (removeUserButton == null)

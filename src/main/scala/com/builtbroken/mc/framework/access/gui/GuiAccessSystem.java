@@ -3,6 +3,7 @@ package com.builtbroken.mc.framework.access.gui;
 import com.builtbroken.mc.core.network.IPacketIDReceiver;
 import com.builtbroken.mc.core.network.packet.PacketType;
 import com.builtbroken.mc.framework.access.AccessProfile;
+import com.builtbroken.mc.framework.access.AccessUser;
 import com.builtbroken.mc.framework.access.gui.dialogs.GuiDialogNewProfile;
 import com.builtbroken.mc.framework.access.gui.frame.group.main.GuiFrameGroups;
 import com.builtbroken.mc.framework.access.gui.packets.PacketAccessGui;
@@ -15,6 +16,7 @@ import com.builtbroken.mc.prefab.gui.components.frame.GuiFrame;
 import com.builtbroken.mc.prefab.gui.screen.GuiScreenBase;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.entity.player.EntityPlayer;
 
@@ -274,5 +276,23 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
             return true;
         }
         return false;
+    }
+
+    /**
+     * Gets the local player's access entry from the current profile
+     *
+     * @return
+     */
+    public AccessUser getPlayer()
+    {
+        if (currentProfile != null)
+        {
+            AccessUser user = currentProfile.getUserAccess(Minecraft.getMinecraft().thePlayer);
+            if (user != null)
+            {
+                return user;
+            }
+        }
+        return new AccessUser(Minecraft.getMinecraft().thePlayer).setTempary(true);
     }
 }

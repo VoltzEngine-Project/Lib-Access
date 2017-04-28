@@ -49,13 +49,36 @@ public class AccessGroup implements ISave, Cloneable
      * Gets the AccessUser object that goes with the user name
      *
      * @param username - user name of the EntityPlayer
-     * @return the exact user, or a fake user to prevent NPE
+     * @return the exact user
      */
     public AccessUser getMember(String username)
     {
         if (username_to_profile.containsKey(username))
         {
             return username_to_profile.get(username);
+        }
+        return null;
+    }
+
+    /**
+     * Gets the AccessUser object that goes to the player
+     *
+     * @param player - instance of player
+     * @return the exact user
+     */
+    public AccessUser getMember(EntityPlayer player)
+    {
+        if (player != null)
+        {
+            UUID id = player.getGameProfile().getId();
+            if (uuid_to_profile.containsKey(id))
+            {
+                return uuid_to_profile.get(id);
+            }
+            else if (username_to_profile.containsKey(player.getCommandSenderName()))
+            {
+                return username_to_profile.get(player.getCommandSenderName());
+            }
         }
         return null;
     }
@@ -235,6 +258,14 @@ public class AccessGroup implements ISave, Cloneable
     public boolean hasNode(String node)
     {
         return hasExactNode(node) || hasNodeInGroup(node) || this.getExtendGroup() != null && this.getExtendGroup().hasNode(node);
+    }
+
+    /**
+     * Checks if this or it's supper group has the permission node
+     */
+    public boolean hasNode(Permission node)
+    {
+        return hasNode(node.toString());
     }
 
     /**

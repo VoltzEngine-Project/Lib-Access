@@ -1,5 +1,6 @@
 package com.builtbroken.mc.framework.access.gui.frame.group.user;
 
+import com.builtbroken.mc.framework.access.Permissions;
 import com.builtbroken.mc.prefab.gui.components.CallbackGuiArray;
 import com.builtbroken.mc.prefab.gui.components.GuiComponent;
 import net.minecraft.client.Minecraft;
@@ -26,7 +27,20 @@ public class UserArrayCallback extends CallbackGuiArray
     @Override
     public String getEntryName(int index)
     {
-        return gui.users != null ? gui.users[index] : "User[" + index + "]"; //TODO check if username match client player then add [You]
+        String username;
+        if (gui.users != null)
+        {
+            username = gui.users[index];
+            if (username.equalsIgnoreCase(Minecraft.getMinecraft().thePlayer.getCommandSenderName()))
+            {
+                username += "[You]";
+            }
+        }
+        else
+        {
+            username = "User[" + index + "]";
+        }
+        return username;
     }
 
     @Override
@@ -43,8 +57,11 @@ public class UserArrayCallback extends CallbackGuiArray
     @Override
     public boolean isEnabled(int index)
     {
-        //TODO check if user can edit user
-        return gui.users != null && !gui.users[index].equalsIgnoreCase(Minecraft.getMinecraft().thePlayer.getCommandSenderName());
+        if (gui.users != null && gui.getPlayer().hasNode(Permissions.groupPermissionRemove))
+        {
+            return !gui.users[index].equalsIgnoreCase(Minecraft.getMinecraft().thePlayer.getCommandSenderName()); //TODO prevent removing higher permission users than current user
+        }
+        return false;
     }
 
     @Override

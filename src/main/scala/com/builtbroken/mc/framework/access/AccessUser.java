@@ -97,7 +97,12 @@ public class AccessUser implements ISave
      */
     public boolean hasNode(String node)
     {
-        return hasExactNode(node) || hasNodeInUser(node) || this.getGroup() != null && this.getGroup().hasNode(node);
+        return hasExactNode(node) || hasNodeInUser(node) || groupHasNode(node);
+    }
+
+    public boolean groupHasNode(String node)
+    {
+        return this.getGroup() != null && this.getGroup().hasNode(node);
     }
 
     /**
@@ -135,6 +140,7 @@ public class AccessUser implements ISave
 
     /**
      * Removes a permission node from this user
+     *
      * @param perm
      * @return
      */
@@ -146,6 +152,7 @@ public class AccessUser implements ISave
 
     /**
      * Adds a permission node to this user
+     *
      * @param perm
      * @return
      */
@@ -156,6 +163,7 @@ public class AccessUser implements ISave
 
     /**
      * Removes a permission node from this user
+     *
      * @param perm
      * @return
      */
@@ -166,13 +174,14 @@ public class AccessUser implements ISave
 
     /**
      * Adds a permission node to this user
+     *
      * @param perm
      * @return
      */
     public boolean addNode(String perm)
     {
         //TODO if contains * remove all sub nodes
-        if(!hasExactNode(perm))
+        if (!hasExactNode(perm))
         {
             nodes.add(perm);
         }

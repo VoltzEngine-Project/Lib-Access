@@ -3,6 +3,7 @@ package com.builtbroken.mc.framework.access;
 import com.builtbroken.mc.api.IVirtualObject;
 import com.builtbroken.mc.api.tile.ITile;
 import com.builtbroken.mc.core.handler.SaveManager;
+import com.builtbroken.mc.framework.access.wrapper.AccessUserMultiGroup;
 import com.builtbroken.mc.lib.helper.LanguageUtility;
 import com.builtbroken.mc.lib.helper.NBTUtility;
 import net.minecraft.entity.player.EntityPlayer;
@@ -23,21 +24,16 @@ import java.util.*;
  */
 public class AccessProfile implements IVirtualObject
 {
-    /**
-     * List of all containers that use this profile to define some part of their functionality
-     */
+    /** List of all containers that use this profile to define some part of their functionality */
     private final Set<IProfileContainer> containers = Collections.newSetFromMap(new WeakHashMap<IProfileContainer, Boolean>());
 
+    /** Players who currently have a GUI open looking at this access profile */
     public final HashMap<EntityPlayer, Long> playersWithSettingsGUIOpen = new HashMap();
 
-    /**
-     * A list of all groups attached to this profile
-     */
+    /** A list of all groups attached to this profile */
     protected List<AccessGroup> groups = new ArrayList();
 
-    /**
-     * Display name of the profile for the user to easily read
-     */
+    /** Display name of the profile for the user to easily read */
     protected String profileName = "";
 
     /**
@@ -46,18 +42,15 @@ public class AccessProfile implements IVirtualObject
      */
     protected String profileID = "LocalHost";
 
-    /**
-     * Is this profile global
-     */
+    /** Is this profile global */
     protected boolean global = false;
 
-    /**
-     * Save file by which this was loaded. Not currently used
-     */
+    /** Save file by which this was loaded. Not currently used but stored if ever needed. */
     protected File saveFile;
 
     static
     {
+        //Registers this class to the save manager so loading is easier
         SaveManager.registerClass("AccessProfile", AccessProfile.class);
     }
 
@@ -179,21 +172,22 @@ public class AccessProfile implements IVirtualObject
     }
 
     /**
-     * Gets the players Access object
+     * Checks to see if the profile contains the user
      *
-     * @param player - entity player
-     * @return AccessUser for the player, or an empty AccessUser instance if player was not found
+     * @param player
+     * @return
      */
-    public AccessUser getUserAccess(EntityPlayer player)
-    {
-        return getUserAccess(player.getCommandSenderName());
-    }
-
     public boolean containsUser(EntityPlayer player)
     {
         return containsUser(player.getCommandSenderName());
     }
 
+    /**
+     * Checks to see if the profile contains the user
+     *
+     * @param username
+     * @return
+     */
     public boolean containsUser(String username)
     {
         for (AccessGroup group : this.groups)
@@ -207,6 +201,18 @@ public class AccessProfile implements IVirtualObject
         return false;
     }
 
+
+    /**
+     * Gets the players Access object
+     *
+     * @param player - entity player
+     * @return AccessUser for the player, or an empty AccessUser instance if player was not found
+     */
+    public AccessUser getUserAccess(EntityPlayer player)
+    {
+        return getUserAccess(player.getCommandSenderName());
+    }
+
     /**
      * EntityPlayer version should be used as usernames are not longer going to be supported.
      */
@@ -217,11 +223,32 @@ public class AccessProfile implements IVirtualObject
             AccessUser user = group.getMember(username);
             if (user != null)
             {
-                return user;
+                return new AccessUserMultiGroup(this, user); //temp fix for user being in several groups at once
             }
         }
-        return new AccessUser(username);
+        return new AccessUser(username).setTempary(true);
     }
+
+    /**
+     * Gets all groups that contain a user
+     *
+     * @param username - username
+     * @return list of groups
+     */
+    public List<AccessGroup> getGroupsWithUser(String username)
+    {
+        List<AccessGroup> groups = new ArrayList();
+        for (AccessGroup group : this.groups)
+        {
+            AccessUser user = group.getMember(username);
+            if (user != null)
+            {
+                groups.add(group);
+            }
+        }
+        return groups;
+    }
+
 
     /**
      * List of all users, do not call often
@@ -268,57 +295,11 @@ public class AccessProfile implements IVirtualObject
     }
 
     /**
-     * Sets a player's access group
+     * Called to remove a user from the profile
      *
-     * @param player - user
-     * @param g      - group
-     * @return true if the user was added
+     * @param player
+     * @return
      */
-    public boolean setUserAccess(String player, AccessGroup g)
-    {
-        return setUserAccess(player, g, true);
-    }
-
-    /**
-     * Sets a player's access group
-     *
-     * @param player - user
-     * @param g      - group
-     * @param save   - true will save, false will be ignored when world is saved
-     * @return true if added
-     */
-    public boolean setUserAccess(String player, AccessGroup g, boolean save)
-    {
-        return setUserAccess(new AccessUser(player).setTempary(!save), g);
-    }
-
-    /**
-     * Sets a player's access group
-     *
-     * @param user  - user profile
-     * @param group - group profile
-     * @return true if the user was added
-     */
-    public boolean setUserAccess(AccessUser user, AccessGroup group)
-    {
-        boolean bool = false;
-
-        if (user != null && user.getName() != null)
-        {
-            bool = this.removeUserAccess(user.getName()) && group == null;
-
-            if (group != null)
-            {
-                bool = group.addMember(user);
-            }
-            if (bool)
-            {
-                this.onProfileUpdate();
-            }
-        }
-        return bool;
-    }
-
     public boolean removeUserAccess(String player)
     {
         boolean re = false;

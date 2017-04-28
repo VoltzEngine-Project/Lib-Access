@@ -1,6 +1,7 @@
 package com.builtbroken.mc.framework.access.gui.frame.group;
 
 import com.builtbroken.mc.framework.access.AccessGroup;
+import com.builtbroken.mc.framework.access.AccessUser;
 import com.builtbroken.mc.framework.access.gui.GuiAccessSystem;
 import com.builtbroken.mc.framework.access.gui.frame.GuiSubFrameAccess;
 import net.minecraft.client.Minecraft;
@@ -40,6 +41,19 @@ public class GuiGroupFrame<E extends GuiGroupFrame> extends GuiSubFrameAccess<E>
     public AccessGroup getGroup()
     {
         return getHost().currentProfile != null ? getHost().currentProfile.getGroup(groupID) : null;
+    }
+
+    public AccessUser getPlayer()
+    {
+        if (getGroup() != null)
+        {
+            AccessUser user = getGroup().getMember(Minecraft.getMinecraft().thePlayer);
+            if (user != null)
+            {
+                return user;
+            }
+        }
+        return new AccessUser(Minecraft.getMinecraft().thePlayer).setTempary(true);
     }
 
     protected void doRender(Minecraft mc, AccessGroup group, int mouseX, int mouseY)

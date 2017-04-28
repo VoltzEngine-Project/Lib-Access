@@ -1,6 +1,7 @@
 package com.builtbroken.mc.framework.access.gui.frame.group.user;
 
 import com.builtbroken.mc.framework.access.AccessUser;
+import com.builtbroken.mc.framework.access.Permissions;
 import com.builtbroken.mc.framework.access.gui.GuiAccessSystem;
 import com.builtbroken.mc.framework.access.gui.frame.group.GuiGroupFrame;
 import com.builtbroken.mc.framework.access.gui.packets.PacketAccessGui;
@@ -73,6 +74,15 @@ public class GuiFrameGroupUsers extends GuiGroupFrame<GuiFrameGroupUsers>
                 users = null;
             }
             groupArray.reloadEntries();
+        }
+
+        if (getGroup() != null)
+        {
+            addButton.setEnabled(getPlayer().hasNode(Permissions.groupUserAdd));
+            if (getPlayer().hasNode(Permissions.groupPermissionRemove))
+            {
+                groupArray.reloadEntries(); //Reload to reset button states
+            }
         }
     }
 

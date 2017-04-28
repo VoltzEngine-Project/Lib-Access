@@ -31,44 +31,67 @@ public class AccessUtility
     // Pre-loads the default groups
     static
     {
-        List<String> list = new ArrayList();
+        List<String> ownerPerms = new ArrayList();
         // Owner group defaults
-        list.add(Permissions.root.toString() + ".*");
-        list.add(Permissions.PROFILE_OWNER.toString());
-        list.add(Permissions.inventoryDisable.toString());
-        list.add(Permissions.inventoryEnable.toString());
-        list.add(Permissions.profile.toString() + ".*");
+        ownerPerms.add(Permissions.root.toString());
+        ownerPerms.add(Permissions.PROFILE_OWNER.toString());
+
+        ownerPerms.add(Permissions.inventoryDisable.toString());
+        ownerPerms.add(Permissions.inventoryEnable.toString());
+
+        ownerPerms.add(Permissions.profile.toString());
 
         // Admin group defaults
-        List<String> list2 = new ArrayList();
-        list2.add(Permissions.PROFILE_ADMIN.toString());
-        list2.add(Permissions.inventoryModify.toString());
-        list2.add(Permissions.inventoryLock.toString());
-        list2.add(Permissions.inventoryUnlock.toString());
-        list2.add(Permissions.inventoryModify.toString());
-        list2.add(Permissions.group.toString() + ".*");
+        List<String> adminPerms = new ArrayList();
+        adminPerms.add(Permissions.PROFILE_ADMIN.toString());
+
+        adminPerms.add(Permissions.inventoryModify.toString());
+        adminPerms.add(Permissions.inventoryLock.toString());
+        adminPerms.add(Permissions.inventoryUnlock.toString());
+        adminPerms.add(Permissions.inventoryModify.toString());
+
+        adminPerms.add(Permissions.machineLock.toString());
+        adminPerms.add(Permissions.machineUnlock.toString());
+        adminPerms.add(Permissions.machineUpgrade.toString());
+        adminPerms.add(Permissions.machineDowngrade.toString());
+        adminPerms.add(Permissions.machineEnable.toString());
+        adminPerms.add(Permissions.machineDisable.toString());
+
+        adminPerms.add(Permissions.group.toString());
+        adminPerms.add(Permissions.profileAddGroup.toString());
+        adminPerms.add(Permissions.profileModifyGroup.toString());
+        adminPerms.add(Permissions.profileRemoveGroup.toString());
+        adminPerms.add(Permissions.profileEditSettings.toString());
 
         // User group defaults
-        List<String> list3 = new ArrayList();
-        list3.add(Permissions.PROFILE_USER.toString());
-        list3.add(Permissions.inventoryOpen.toString());
-        list3.add(Permissions.inventoryInput.toString());
-        list3.add(Permissions.inventoryOutput.toString());
+        List<String> userPerms = new ArrayList();
+        userPerms.add(Permissions.PROFILE_USER.toString());
 
-        List<String> list4 = new ArrayList();
-        list4.add(Permissions.PROFILE_FOF.toString());
-        list4.add(Permissions.targetHostile.toString());
+        userPerms.add(Permissions.machineTurnOn.toString());
+        userPerms.add(Permissions.machineTurnOff.toString());
 
-        List<String> list5 = new ArrayList();
-        list5.add(Permissions.PROFILE_FOF.toString());
-        list5.add(Permissions.targetFriend.toString());
+        userPerms.add(Permissions.inventoryOpen.toString());
+        userPerms.add(Permissions.inventoryInput.toString());
+        userPerms.add(Permissions.inventoryOutput.toString());
 
-        createDefaultGroup("hostile", null, list4);
-        createDefaultGroup("friendly", null, list5);
-        createDefaultGroup("user", null, list3);
-        createDefaultGroup("admin", "user", list2);
-        createDefaultGroup("owner", "admin", list);
-        createDefaultGroup("owner", "admin", list);
+        userPerms.add(Permissions.profileView.toString());
+
+        createDefaultGroup("user", null, userPerms);
+        createDefaultGroup("admin", "user", adminPerms);
+        createDefaultGroup("owner", "admin", ownerPerms);
+        createDefaultGroup("owner", "admin", ownerPerms);
+
+        //FoF system groups - used as a user friendly solution
+        List<String> hostilePerms = new ArrayList();
+        hostilePerms.add(Permissions.PROFILE_FOF.toString());
+        hostilePerms.add(Permissions.targetHostile.toString());
+
+        List<String> friendlyPerms = new ArrayList();
+        friendlyPerms.add(Permissions.PROFILE_FOF.toString());
+        friendlyPerms.add(Permissions.targetFriend.toString());
+
+        createDefaultGroup("hostile", null, hostilePerms);
+        createDefaultGroup("friendly", null, friendlyPerms);
     }
 
     /**
