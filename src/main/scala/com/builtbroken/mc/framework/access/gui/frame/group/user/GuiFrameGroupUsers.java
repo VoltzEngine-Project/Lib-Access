@@ -10,6 +10,7 @@ import com.builtbroken.mc.prefab.gui.components.GuiArray;
 import com.builtbroken.mc.prefab.gui.components.GuiField;
 import com.builtbroken.mc.prefab.gui.pos.GuiRelativePos;
 import com.builtbroken.mc.prefab.gui.pos.HugBottom;
+import com.builtbroken.mc.prefab.gui.pos.size.GuiRelativeSize;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 
@@ -44,8 +45,7 @@ public class GuiFrameGroupUsers extends GuiGroupFrame<GuiFrameGroupUsers>
 
             userNameField = add(new GuiField(0, 0));
             userNameField.setRelativePosition(new HugBottom(this, 1, -41, true));
-            userNameField.setWidth(100);
-            userNameField.setHeight(20);
+            userNameField.setRelativeSize(new GuiRelativeSize(this, -55, 20).setUseHostHeight(false));
 
             addButton = add(new GuiButton2(2, 0, 0, "Add"));
             addButton.setWidth(50);
