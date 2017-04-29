@@ -1,5 +1,6 @@
 package com.builtbroken.mc.framework.access.gui.frame.group.main;
 
+import com.builtbroken.mc.framework.access.Permissions;
 import com.builtbroken.mc.framework.access.gui.GuiAccessSystem;
 import com.builtbroken.mc.framework.access.gui.frame.group.edit.GuiFrameGroupSettings;
 import com.builtbroken.mc.framework.access.gui.frame.group.nodes.GuiFrameGroupNodes;
@@ -8,8 +9,8 @@ import com.builtbroken.mc.framework.access.gui.frame.main.GuiFrameCenter;
 import com.builtbroken.mc.prefab.gui.buttons.GuiButton9px;
 import com.builtbroken.mc.prefab.gui.buttons.GuiImageButton;
 import com.builtbroken.mc.prefab.gui.components.GuiComponentContainer;
-import com.builtbroken.mc.prefab.gui.pos.GuiRelativePos;
 import com.builtbroken.mc.prefab.gui.pos.HugXSide;
+import com.builtbroken.mc.prefab.gui.pos.size.GuiRelativeSize;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 
@@ -53,27 +54,46 @@ public class GroupEntry extends GuiComponentContainer<GroupEntry>
         if (((GuiAccessSystem) getHost()).centerFrame instanceof GuiFrameCenter)
         {
             GuiFrameCenter guiFrameCenter = (GuiFrameCenter) ((GuiAccessSystem) getHost()).centerFrame;
-            GuiRelativePos pos = new GuiRelativePos(((GuiAccessSystem) getHost()).centerFrame, 0, 0);
             //Edit group
             if (id == 0)
             {
-                guiFrameCenter.show(new GuiFrameGroupSettings(frameCenter, groupID, -1, 0, 0).setRelativePosition(guiFrameCenter.centerFramePos));
+                guiFrameCenter.show(new GuiFrameGroupSettings(frameCenter, groupID, -1, 0, 0)
+                        .setRelativePosition(guiFrameCenter.centerFramePos)
+                        .setRelativeSize(new GuiRelativeSize(frameCenter.groupsFrame, 0, 0)));
                 return;
             }
             //Edit nodes
             else if (id == 1)
             {
-                guiFrameCenter.show(new GuiFrameGroupNodes(frameCenter, groupID, -1, 0, 0).setRelativePosition(guiFrameCenter.centerFramePos));
+                guiFrameCenter.show(new GuiFrameGroupNodes(frameCenter, groupID, -1, 0, 0)
+                        .setRelativePosition(guiFrameCenter.centerFramePos)
+                        .setRelativeSize(new GuiRelativeSize(frameCenter.groupsFrame, 0, 0)));
                 return;
             }
             //Edit users
             else if (id == 2)
             {
-                guiFrameCenter.show(new GuiFrameGroupUsers(frameCenter, groupID, -1, 0, 0).setRelativePosition(guiFrameCenter.centerFramePos));
+                guiFrameCenter.show(new GuiFrameGroupUsers(frameCenter, groupID, -1, 0, 0)
+                        .setRelativePosition(guiFrameCenter.centerFramePos)
+                        .setRelativeSize(new GuiRelativeSize(frameCenter.groupsFrame, 0, 0)));
                 return;
             }
         }
         super.actionPerformed(button);
+    }
+
+    @Override
+    protected void update(Minecraft mc, int mouseX, int mouseY)
+    {
+        super.update(mc, mouseX, mouseY);
+
+        groupButtons[0].setEnabled(((GuiAccessSystem) getHost()).getPlayer().hasNode(Permissions.groupSetting));
+        groupButtons[1].setEnabled(
+                ((GuiAccessSystem) getHost()).getPlayer().hasNode(Permissions.groupPermissionAdd)
+                        || ((GuiAccessSystem) getHost()).getPlayer().hasNode(Permissions.groupPermissionRemove));
+        groupButtons[2].setEnabled(
+                ((GuiAccessSystem) getHost()).getPlayer().hasNode(Permissions.groupUserPermissionAdd)
+                        || ((GuiAccessSystem) getHost()).getPlayer().hasNode(Permissions.groupUserPermissionRemove));
     }
 
     protected void reloadGroupList()

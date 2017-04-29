@@ -65,20 +65,22 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
         errorMessage = "";
 
         //Menu buttons
-        refreshButton = add(GuiImageButton.newRefreshButton(0, 2, 2));
-        newProfile = (GuiButton2) add(new GuiButton2(1, 20, 2, "New Profile").setWidth(60).setHeight(18));
+        refreshButton = add(GuiImageButton.newRefreshButton(0, 2, 16));
+        newProfile = (GuiButton2) add(new GuiButton2(1, 20, 16, "New Profile").setWidth(60).setHeight(18));
 
+        int sideWidths = 109;
         //Profile array
-        profileArray = add(new GuiArray(new ProfileArrayCallback(this), 4, 2, 40, profileRows, 20));
-        profileArray.setWidth(100 + 9);
+        profileArray = add(new GuiArray(new ProfileArrayCallback(this), -1, 2, 39, profileRows, 20));
+        profileArray.setWidth(sideWidths);
 
-        int remainingWidth = this.width - profileArray.width;
-        defaultCenterFrame = new GuiFrameCenter(this, 120, 40);
-        defaultCenterFrame.setWidth((int) Math.ceil(remainingWidth * .6));
-        remainingWidth -= defaultCenterFrame.getWidth();
+        int remainingWidth = this.width - sideWidths * 2 - 4;
+        defaultCenterFrame = new GuiFrameCenter(this, 109 + 4, 15);
+        defaultCenterFrame.setWidth(remainingWidth);
+        defaultCenterFrame.setHeight(this.height - 15);
 
-        rightFrame = add(new GuiFrameEvents(this, defaultCenterFrame.x() + defaultCenterFrame.getWidth(), 40));
-        rightFrame.setWidth(remainingWidth);
+        rightFrame = add(new GuiFrameEvents(this, defaultCenterFrame.x() + defaultCenterFrame.getWidth(), 15));
+        rightFrame.setWidth(sideWidths);
+        rightFrame.setHeight(this.height - 15);
 
         reloadProfileList();
         reloadGroupList();
@@ -196,17 +198,19 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
     public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_)
     {
         this.drawDefaultBackground();
-        this.drawCenteredString(this.fontRendererObj, "Global Access Permission System", this.width / 2, 3, 16777215);
-
 
         ///====================================================
         Color a = new Color(122, 122, 122, 143);
         Color b = new Color(122, 122, 122, 143);
-        this.drawGradientRect(0, 0, 114, this.height, a.getRGB(), b.getRGB());
+        this.drawGradientRect(0, 15, 109 + 4, this.height, a.getRGB(), b.getRGB());
+        this.drawVerticalLine(109 + 3, 14, this.height, Color.BLACK.getRGB());
 
-        a = new Color(73, 73, 73, 143);
-        b = new Color(122, 122, 122, 143);
-        this.drawGradientRect(114, 0, this.width, this.height, a.getRGB(), b.getRGB());
+        //Header bar render
+        this.drawGradientRect(0, 0, this.width, 15, a.getRGB(), b.getRGB());
+        this.drawRect(0, 14, this.width, 15, Color.BLACK.getRGB());
+        this.drawCenteredString(this.fontRendererObj, "Global Access Permission System", this.width / 2, 3, 16777215);
+
+
 
         String name = "";
         String id = "";

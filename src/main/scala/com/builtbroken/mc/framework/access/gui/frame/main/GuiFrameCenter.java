@@ -9,8 +9,11 @@ import com.builtbroken.mc.prefab.gui.GuiButton2;
 import com.builtbroken.mc.prefab.gui.buttons.GuiImageButton;
 import com.builtbroken.mc.prefab.gui.components.frame.GuiFrame;
 import com.builtbroken.mc.prefab.gui.pos.HugXSide;
+import com.builtbroken.mc.prefab.gui.pos.size.GuiRelativeSize;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
+
+import java.awt.*;
 
 /**
  * @see <a href="https://github.com/BuiltBrokenModding/VoltzEngine/blob/development/license.md">License</a> for what you can and can't do with the code.
@@ -21,6 +24,8 @@ public class GuiFrameCenter extends GuiFrameAccess<GuiFrameCenter>
     protected GuiFrame currentFrame;
     public GuiFrameGroups groupsFrame;
     public IPos2D centerFramePos;
+
+    public static Color backgroundColor = new Color(85, 85, 85);
 
     public GuiFrameCenter(GuiAccessSystem parent, int x, int y)
     {
@@ -41,7 +46,9 @@ public class GuiFrameCenter extends GuiFrameAccess<GuiFrameCenter>
 
         centerFramePos = new HugXSide(this, 0, true).setYOffset(yLevel + 22);
         //Group frame
-        groupsFrame = add(new GuiFrameGroups(this, -1, 0, 0)).setRelativePosition(centerFramePos);
+        groupsFrame = add(new GuiFrameGroups(this, -1, 0, 0));
+        groupsFrame.setRelativePosition(centerFramePos);
+        groupsFrame.setRelativeSize(new GuiRelativeSize(this, 0, -centerFramePos.yi())); //TODO get y dynamically in case it changes
         show(groupsFrame);
     }
 
@@ -49,9 +56,11 @@ public class GuiFrameCenter extends GuiFrameAccess<GuiFrameCenter>
     protected void update(Minecraft mc, int mouseX, int mouseY)
     {
         super.update(mc, mouseX, mouseY);
-        this.height = getHost().height;
-        this.groupsFrame.height = this.height;
-        this.groupsFrame.width = this.width;
+        int newHeight = getHost().height - y();
+        if (getHeight() != newHeight)
+        {
+            setHeight(newHeight);
+        }
     }
 
     @Override
@@ -75,7 +84,7 @@ public class GuiFrameCenter extends GuiFrameAccess<GuiFrameCenter>
 
     public void show(GuiFrame frame)
     {
-        if(frame != null)
+        if (frame != null)
         {
             if (!getComponents().contains(frame))
             {
@@ -101,5 +110,11 @@ public class GuiFrameCenter extends GuiFrameAccess<GuiFrameCenter>
     public void reloadGroupList()
     {
         groupsFrame.groupArray.reloadEntries();
+    }
+
+    @Override
+    protected Color getBackgroundColor()
+    {
+        return enableDebug ? Color.YELLOW : backgroundColor;
     }
 }

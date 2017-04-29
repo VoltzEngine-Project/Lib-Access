@@ -23,7 +23,7 @@ public class GuiFrameGroupSettings extends GuiGroupFrame<GuiFrameGroupSettings>
         if (group != null)
         {
             drawString(mc.fontRenderer, "Parent: " + group.getExtendGroupName(), x() + 20, y() + 15, DEFAULT_STRING_COLOR);
-            drawCenteredString(mc.fontRenderer, "No current settings to edit", x() + (width / 2), y() + (height / 2), DEFAULT_STRING_COLOR);
+            drawCenteredString(mc.fontRenderer, "No current settings to edit", x() + (getWidth() / 2), y() + (getHeight() / 2), DEFAULT_STRING_COLOR);
         }
     }
 }

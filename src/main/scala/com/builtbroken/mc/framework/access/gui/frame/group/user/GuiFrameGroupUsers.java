@@ -43,13 +43,13 @@ public class GuiFrameGroupUsers extends GuiGroupFrame<GuiFrameGroupUsers>
             groupArray.setWidth(200);
 
             userNameField = add(new GuiField(0, 0));
-            userNameField.setRelativePosition(new HugBottom(this, 1, -21, true));
+            userNameField.setRelativePosition(new HugBottom(this, 1, -41, true));
             userNameField.setWidth(100);
             userNameField.setHeight(20);
 
-            addButton = add(new GuiButton2(2, 0, 0, "Add")); //TODO check if user has permission to edit
+            addButton = add(new GuiButton2(2, 0, 0, "Add"));
             addButton.setWidth(50);
-            addButton.setRelativePosition(new HugBottom(this, -addButton.getWidth(), -20, false));
+            addButton.setRelativePosition(new HugBottom(this, -addButton.getWidth(), -40, false));
         }
         updatePositions();
     }

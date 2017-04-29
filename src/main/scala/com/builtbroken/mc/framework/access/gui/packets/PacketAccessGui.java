@@ -363,4 +363,14 @@ public class PacketAccessGui extends PacketType implements IPacket
     {
         Engine.instance.packetHandler.sendToServer(new PacketAccessGui(REMOVE_GROUP).write(profile).write(name).write(pullUpSubGroups));
     }
+
+    public static void removeNode(String profileID, String group, String node)
+    {
+
+    }
+
+    public static void addNode(String profileID, String group, String node)
+    {
+
+    }
 }

@@ -1,9 +1,16 @@
 package com.builtbroken.mc.framework.access.gui.frame.group.nodes;
 
-import com.builtbroken.mc.framework.access.AccessGroup;
+import com.builtbroken.mc.framework.access.Permissions;
 import com.builtbroken.mc.framework.access.gui.frame.group.GuiGroupFrame;
 import com.builtbroken.mc.framework.access.gui.frame.main.GuiFrameCenter;
+import com.builtbroken.mc.framework.access.gui.packets.PacketAccessGui;
+import com.builtbroken.mc.prefab.gui.GuiButton2;
+import com.builtbroken.mc.prefab.gui.components.GuiArray;
+import com.builtbroken.mc.prefab.gui.components.GuiField;
+import com.builtbroken.mc.prefab.gui.pos.GuiRelativePos;
+import com.builtbroken.mc.prefab.gui.pos.HugBottom;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiButton;
 
 /**
  * @see <a href="https://github.com/BuiltBrokenModding/VoltzEngine/blob/development/license.md">License</a> for what you can and can't do with the code.
@@ -11,22 +18,84 @@ import net.minecraft.client.Minecraft;
  */
 public class GuiFrameGroupNodes extends GuiGroupFrame<GuiFrameGroupNodes>
 {
+    public String[] nodes;
+
+    public static int rowSpacingY = 10;
+    public static int rows = 15;
+
+    public GuiArray groupArray;
+    public GuiField nodeField;
+    public GuiButton2 addButton;
+
     public GuiFrameGroupNodes(GuiFrameCenter parent, String groupID, int id, int x, int y)
     {
         super(parent, groupID, id, x, y);
     }
 
     @Override
-    protected void doRender(Minecraft mc, AccessGroup group, int mouseX, int mouseY)
+    public void initGui()
     {
-        super.doRender(mc, group, mouseX, mouseY);
-        if (group != null)
+        super.initGui();
+        if (getGroup() != null)
         {
-            int y = 0;
-            for (String node : group.getNodes())
+            groupArray = add(new GuiArray(new NodeArrayCallback(this), 1, 0, 0, rows, rowSpacingY));
+            groupArray.setRelativePosition(new GuiRelativePos(this, 0, 20));
+            groupArray.setWidth(200);
+
+            nodeField = add(new GuiField(0, 0));
+            nodeField.setRelativePosition(new HugBottom(this, 1, -41, true));
+            nodeField.setWidth(100);
+            nodeField.setHeight(20);
+
+            addButton = add(new GuiButton2(2, 0, 0, "Add"));
+            addButton.setWidth(50);
+            addButton.setRelativePosition(new HugBottom(this, -addButton.getWidth(), -40, false));
+        }
+        updatePositions();
+    }
+
+    @Override
+    protected void update(Minecraft mc, int mouseX, int mouseY)
+    {
+        super.update(mc, mouseX, mouseY);
+        if (getGroup() == null || nodes == null || nodes != null && getGroup().getNodes().size() != nodes.length) //TODO check if exact match
+        {
+            if (getGroup() != null)
             {
-                drawString(10, 20 + (y++ * 10), node);
+                nodes = new String[getGroup().getNodes().size()];
+                int i = 0;
+                for (String node : getGroup().getNodes())
+                {
+                    nodes[i++] = node;
+                }
             }
+            else
+            {
+                nodes = null;
+            }
+            groupArray.reloadEntries();
+        }
+
+        if (getGroup() != null)
+        {
+            addButton.setEnabled(getPlayer().hasNode(Permissions.groupPermissionAdd));
+        }
+    }
+
+    @Override
+    public void actionPerformed(GuiButton button)
+    {
+        int id = button.id;
+        if (id == 2)
+        {
+            if (nodeField.getText() != null && !nodeField.getText().isEmpty())
+            {
+                PacketAccessGui.addNode(getHost().currentProfile.getID(), groupID, nodeField.getText());
+            }
+        }
+        else
+        {
+            super.actionPerformed(button);
         }
     }
 }

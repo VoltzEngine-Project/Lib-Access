@@ -64,6 +64,7 @@ public class Permissions
 
     /** Applied to access group actions */
     public static final Permission group = profile.addChild("group");
+    public static final Permission groupSetting = group.addChild("settings");
     public static final Permission groupPermission = group.addChild("permission");
     public static final Permission groupPermissionAdd = groupPermission.addChild("add");
     public static final Permission groupPermissionRemove = groupPermission.addChild("remove");

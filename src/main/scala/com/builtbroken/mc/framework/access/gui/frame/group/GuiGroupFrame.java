@@ -55,7 +55,7 @@ public class GuiGroupFrame<E extends GuiGroupFrame> extends GuiSubFrameAccess<E>
         }
         else
         {
-            drawCenteredString(mc.fontRenderer, "Error: could not load group", x() + (width / 2), y() + (height / 2), Color.red.getRGB());
+            drawCenteredString(mc.fontRenderer, "Error: could not load group", x() + (getWidth() / 2), y() + (getHeight() / 2), Color.red.getRGB());
         }
     }
 

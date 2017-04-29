@@ -4,6 +4,9 @@ import com.builtbroken.mc.framework.access.gui.frame.GuiFrameAccess;
 import com.builtbroken.mc.framework.access.gui.frame.main.GuiFrameCenter;
 import com.builtbroken.mc.prefab.gui.components.GuiArray;
 import com.builtbroken.mc.prefab.gui.pos.HugXSide;
+import com.builtbroken.mc.prefab.gui.pos.size.GuiRelativeSize;
+
+import java.awt.*;
 
 /**
  * @see <a href="https://github.com/BuiltBrokenModding/VoltzEngine/blob/development/license.md">License</a> for what you can and can't do with the code.
@@ -21,8 +24,6 @@ public class GuiFrameGroups extends GuiFrameAccess<GuiFrameGroups>
     {
         super(parent.getHost(), id, x, y);
         this.frameCenter = parent;
-        this.setWidth(200);
-        this.setHeight(200);
     }
 
     @Override
@@ -31,6 +32,12 @@ public class GuiFrameGroups extends GuiFrameAccess<GuiFrameGroups>
         super.initGui();
         groupArray = add(new GuiArray(new GroupArrayCallback(frameCenter), 5, 0, 0, groupRows, groupRowSpacingY));
         groupArray.setRelativePosition(new HugXSide(this, 0, true));
-        groupArray.setWidth(200);
+        groupArray.setRelativeSize(new GuiRelativeSize(this, 0, 0));
+    }
+
+    @Override
+    protected Color getBackgroundColor()
+    {
+        return enableDebug ? Color.CYAN : null;
     }
 }
