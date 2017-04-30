@@ -17,7 +17,7 @@ import java.awt.*;
 public class GuiGroupFrame<E extends GuiGroupFrame> extends GuiSubFrameAccess<E>
 {
     public final String groupID;
-    protected final GuiFrameCenter frameCenter;
+    public final GuiFrameCenter frameCenter;
 
     public GuiGroupFrame(GuiFrameCenter frameCenter, String groupID, int id, int x, int y)
     {

@@ -1,13 +1,14 @@
 package com.builtbroken.mc.framework.access.global.gui.frame.group.user;
 
-import com.builtbroken.mc.framework.access.perm.Permissions;
 import com.builtbroken.mc.framework.access.global.gui.GuiAccessSystem;
 import com.builtbroken.mc.framework.access.global.packets.PacketAccessGui;
+import com.builtbroken.mc.framework.access.perm.Permissions;
 import com.builtbroken.mc.prefab.gui.buttons.GuiButton9px;
 import com.builtbroken.mc.prefab.gui.buttons.GuiImageButton;
 import com.builtbroken.mc.prefab.gui.components.GuiComponentContainer;
 import com.builtbroken.mc.prefab.gui.components.dialog.GuiYesNo;
 import com.builtbroken.mc.prefab.gui.pos.HugXSide;
+import com.builtbroken.mc.prefab.gui.pos.size.GuiRelativeSize;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 
@@ -23,11 +24,14 @@ public class UserEntry extends GuiComponentContainer<UserEntry>
     public String group;
     private GuiImageButton removeUserButton;
 
+    private GuiFrameGroupUsers usersFrame;
+
     private GuiYesNo yesNoDialog;
 
-    public UserEntry(int id, int x, int y)
+    public UserEntry(GuiFrameGroupUsers usersFrame, int id, int x, int y)
     {
         super(id, x, y, 190, 10, "");
+        this.usersFrame = usersFrame;
         resizeAsNeeded = false;
         reloadGroupList();
     }
@@ -53,8 +57,10 @@ public class UserEntry extends GuiComponentContainer<UserEntry>
         if (id == 0)
         {
             yesNoDialog = new GuiYesNo(-1, getParentComponent().x(), getParentComponent().y(), "Remove User Dialog", "Do you want to remove user '" + userName + "' from group '" + group + "'?");
+            yesNoDialog.setRelativePosition(usersFrame.frameCenter.centerFramePos);
+            yesNoDialog.setRelativeSize(new GuiRelativeSize(usersFrame.frameCenter.groupsFrame, 0, 0));
+            usersFrame.frameCenter.show(yesNoDialog);
             yesNoDialog.setParentComponent(this);
-            ((GuiAccessSystem) getHost()).loadCenterFrame(yesNoDialog, true);
         }
         //Callback from yes/no dialog
         else if (yesNoDialog == button)
@@ -63,7 +69,7 @@ public class UserEntry extends GuiComponentContainer<UserEntry>
             {
                 PacketAccessGui.removeUser(((GuiAccessSystem) getHost()).currentProfile.getID(), group, userName);
             }
-            ((GuiAccessSystem) getHost()).loadCenterFrame(((GuiYesNo) button).lastOpenedFrame, false);
+            usersFrame.frameCenter.show(usersFrame);
         }
         else
         {

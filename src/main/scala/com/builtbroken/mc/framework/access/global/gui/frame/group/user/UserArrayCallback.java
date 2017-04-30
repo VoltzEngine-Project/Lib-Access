@@ -20,7 +20,7 @@ public class UserArrayCallback extends CallbackGuiArray
     @Override
     protected GuiComponent newEntry(int index, int buttonID, int x, int y)
     {
-        return new UserEntry(buttonID, x, y);
+        return new UserEntry(gui, buttonID, x, y);
     }
 
     @Override

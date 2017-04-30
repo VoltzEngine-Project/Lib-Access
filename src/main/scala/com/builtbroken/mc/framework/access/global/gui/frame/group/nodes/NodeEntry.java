@@ -1,13 +1,14 @@
 package com.builtbroken.mc.framework.access.global.gui.frame.group.nodes;
 
-import com.builtbroken.mc.framework.access.perm.Permissions;
 import com.builtbroken.mc.framework.access.global.gui.GuiAccessSystem;
 import com.builtbroken.mc.framework.access.global.packets.PacketAccessGui;
+import com.builtbroken.mc.framework.access.perm.Permissions;
 import com.builtbroken.mc.prefab.gui.buttons.GuiButton9px;
 import com.builtbroken.mc.prefab.gui.buttons.GuiImageButton;
 import com.builtbroken.mc.prefab.gui.components.GuiComponentContainer;
 import com.builtbroken.mc.prefab.gui.components.dialog.GuiYesNo;
 import com.builtbroken.mc.prefab.gui.pos.HugXSide;
+import com.builtbroken.mc.prefab.gui.pos.size.GuiRelativeSize;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 
@@ -25,9 +26,12 @@ public class NodeEntry extends GuiComponentContainer<NodeEntry>
 
     private GuiYesNo yesNoDialog;
 
-    public NodeEntry(int id, int x, int y)
+    private GuiFrameGroupNodes nodesFrame;
+
+    public NodeEntry(GuiFrameGroupNodes nodesFrame, int id, int x, int y)
     {
         super(id, x, y, 190, 10, "");
+        this.nodesFrame = nodesFrame;
         resizeAsNeeded = false;
         reloadGroupList();
     }
@@ -52,9 +56,11 @@ public class NodeEntry extends GuiComponentContainer<NodeEntry>
         //Edit group
         if (id == 0)
         {
-            yesNoDialog = new GuiYesNo(-1, getParentComponent().x(), getParentComponent().y(), "Remove Node Dialog", "Do you want to remove node '" + node + "' from group '" + group + "'?");
+            yesNoDialog = new GuiYesNo(-1, 0, 0, "Remove Node Dialog", "Do you want to remove node '" + node + "' from group '" + group + "'?");
+            yesNoDialog.setRelativePosition(nodesFrame.frameCenter.centerFramePos);
+            yesNoDialog.setRelativeSize(new GuiRelativeSize(nodesFrame.frameCenter.groupsFrame, 0, 0));
+            nodesFrame.frameCenter.show(yesNoDialog);
             yesNoDialog.setParentComponent(this);
-            ((GuiAccessSystem) getHost()).loadCenterFrame(yesNoDialog, true);
         }
         //Callback from yes/no dialog
         else if (yesNoDialog == button)
@@ -63,7 +69,7 @@ public class NodeEntry extends GuiComponentContainer<NodeEntry>
             {
                 PacketAccessGui.removeNode(((GuiAccessSystem) getHost()).currentProfile.getID(), group, node);
             }
-            ((GuiAccessSystem) getHost()).loadCenterFrame(((GuiYesNo) button).lastOpenedFrame, false);
+            nodesFrame.frameCenter.show(nodesFrame);
         }
         else
         {

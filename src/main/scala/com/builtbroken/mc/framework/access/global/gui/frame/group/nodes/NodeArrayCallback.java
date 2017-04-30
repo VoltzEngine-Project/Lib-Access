@@ -19,7 +19,7 @@ public class NodeArrayCallback extends CallbackGuiArray
     @Override
     protected GuiComponent newEntry(int index, int buttonID, int x, int y)
     {
-        return new NodeEntry(buttonID, x, y);
+        return new NodeEntry(gui, buttonID, x, y);
     }
 
     @Override
