@@ -13,7 +13,9 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Designed to be used as a container for AccessGroups and AccessUser. If you plan to use this make
@@ -25,12 +27,6 @@ import java.util.*;
 public class AccessProfile implements IVirtualObject
 {
     public static final String SAVE_FOLDER = NBTUtility.BBM_FOLDER + "access/profiles/";
-
-    /** List of all containers that use this profile to define some part of their functionality */
-    private final Set<IProfileContainer> containers = Collections.newSetFromMap(new WeakHashMap<IProfileContainer, Boolean>());
-
-    /** Players who currently have a GUI open looking at this access profile */
-    public final HashMap<EntityPlayer, Long> playersWithSettingsGUIOpen = new HashMap();
 
     /** A list of all groups attached to this profile */
     protected List<AccessGroup> groups = new ArrayList();
@@ -270,33 +266,6 @@ public class AccessProfile implements IVirtualObject
     }
 
     /**
-     * Adds a container to the profile so it can be
-     * notified of changes.
-     *
-     * @param container - tile using this profile
-     */
-    public void addContainer(IProfileContainer container)
-    {
-        if (!this.containers.contains(container))
-        {
-            this.containers.add(container);
-        }
-    }
-
-    /**
-     * Removes a container from this profile.
-     *
-     * @param container - tile that was using this profile
-     */
-    public void removeContainer(IProfileContainer container)
-    {
-        if (this.containers.contains(container))
-        {
-            this.containers.remove(container);
-        }
-    }
-
-    /**
      * Called to remove a user from the profile
      *
      * @param player
@@ -322,19 +291,7 @@ public class AccessProfile implements IVirtualObject
 
     public void onProfileUpdate()
     {
-        Iterator<IProfileContainer> it = containers.iterator();
-        while (it.hasNext())
-        {
-            IProfileContainer container = it.next();
-            if (container != null && this.equals(container.getAccessProfile()))
-            {
-                container.onProfileChange();
-            }
-            else
-            {
-                it.remove();
-            }
-        }
+
     }
 
     public AccessGroup getGroup(String name)

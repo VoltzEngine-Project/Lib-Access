@@ -2,6 +2,7 @@ package com.builtbroken.mc.framework.access;
 
 import com.builtbroken.jlib.type.Group;
 import com.builtbroken.mc.api.ISave;
+import com.builtbroken.mc.framework.access.perm.Permission;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;

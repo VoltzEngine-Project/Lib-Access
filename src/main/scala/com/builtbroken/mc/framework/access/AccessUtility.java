@@ -1,5 +1,9 @@
 package com.builtbroken.mc.framework.access;
 
+import com.builtbroken.mc.framework.access.api.IProfileContainer;
+import com.builtbroken.mc.framework.access.perm.Permission;
+import com.builtbroken.mc.framework.access.perm.Permissions;
+
 import java.util.*;
 import java.util.Map.Entry;
 
