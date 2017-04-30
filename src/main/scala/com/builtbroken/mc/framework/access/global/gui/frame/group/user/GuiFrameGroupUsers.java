@@ -2,7 +2,7 @@ package com.builtbroken.mc.framework.access.global.gui.frame.group.user;
 
 import com.builtbroken.mc.framework.access.AccessUser;
 import com.builtbroken.mc.framework.access.perm.Permissions;
-import com.builtbroken.mc.framework.access.global.gui.frame.group.GuiGroupFrame;
+import com.builtbroken.mc.framework.access.global.gui.frame.group.GuiSubFrameGroup;
 import com.builtbroken.mc.framework.access.global.gui.frame.main.GuiFrameCenter;
 import com.builtbroken.mc.framework.access.global.packets.PacketAccessGui;
 import com.builtbroken.mc.prefab.gui.GuiButton2;
@@ -18,7 +18,7 @@ import net.minecraft.client.gui.GuiButton;
  * @see <a href="https://github.com/BuiltBrokenModding/VoltzEngine/blob/development/license.md">License</a> for what you can and can't do with the code.
  * Created by Dark(DarkGuardsman, Robert) on 4/25/2017.
  */
-public class GuiFrameGroupUsers extends GuiGroupFrame<GuiFrameGroupUsers>
+public class GuiFrameGroupUsers extends GuiSubFrameGroup<GuiFrameGroupUsers>
 {
     public static int rowSpacingY = 10;
     public static int rows = 15;

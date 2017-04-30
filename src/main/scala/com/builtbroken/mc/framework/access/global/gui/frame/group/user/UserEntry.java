@@ -56,7 +56,7 @@ public class UserEntry extends GuiComponentContainer<UserEntry>
         //Edit group
         if (id == 0)
         {
-            yesNoDialog = new GuiYesNo(-1, getParentComponent().x(), getParentComponent().y(), "Remove User Dialog", "Do you want to remove user '" + userName + "' from group '" + group + "'?");
+            yesNoDialog = new GuiYesNo(-1, getParentComponent().x(), getParentComponent().y(), "Remove User Dialog", "Remove user '" + userName + "' from group '" + group + "'?");
             yesNoDialog.setRelativePosition(usersFrame.frameCenter.centerFramePos);
             yesNoDialog.setRelativeSize(new GuiRelativeSize(usersFrame.frameCenter.groupsFrame, 0, 0));
             usersFrame.frameCenter.show(yesNoDialog);

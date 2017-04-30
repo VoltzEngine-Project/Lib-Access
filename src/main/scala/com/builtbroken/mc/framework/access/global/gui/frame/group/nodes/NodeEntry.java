@@ -56,7 +56,7 @@ public class NodeEntry extends GuiComponentContainer<NodeEntry>
         //Edit group
         if (id == 0)
         {
-            yesNoDialog = new GuiYesNo(-1, 0, 0, "Remove Node Dialog", "Do you want to remove node '" + node + "' from group '" + group + "'?");
+            yesNoDialog = new GuiYesNo(-1, 0, 0, "Remove Node Dialog", "Remove node '" + node + "' from group '" + group + "'?");
             yesNoDialog.setRelativePosition(nodesFrame.frameCenter.centerFramePos);
             yesNoDialog.setRelativeSize(new GuiRelativeSize(nodesFrame.frameCenter.groupsFrame, 0, 0));
             nodesFrame.frameCenter.show(yesNoDialog);
