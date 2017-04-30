@@ -90,7 +90,7 @@ public class GuiFrameGroupNodes extends GuiSubFrameGroup<GuiFrameGroupNodes>
         {
             if (nodeField.getText() != null && !nodeField.getText().isEmpty())
             {
-                PacketAccessGui.addNode(getHost().currentProfile.getID(), groupID, nodeField.getText());
+                PacketAccessGui.addNodeToGroup(getHost().currentProfile.getID(), groupID, nodeField.getText());
             }
         }
         else

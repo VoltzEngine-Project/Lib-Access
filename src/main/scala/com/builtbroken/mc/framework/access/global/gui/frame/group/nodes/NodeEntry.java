@@ -67,7 +67,7 @@ public class NodeEntry extends GuiComponentContainer<NodeEntry>
         {
             if (((GuiYesNo) button).state == 0)
             {
-                PacketAccessGui.removeNode(((GuiAccessSystem) getHost()).currentProfile.getID(), group, node);
+                PacketAccessGui.removeNodeFromGroup(((GuiAccessSystem) getHost()).currentProfile.getID(), group, node);
             }
             nodesFrame.frameCenter.show(nodesFrame);
         }

@@ -32,6 +32,8 @@ public class PacketAccessGui extends PacketType implements IPacket
     public static int CREATE_GROUP = 6;
     public static int REMOVE_GROUP = 7;
     public static int UPDATE_GROUP_PARENT = 9;
+    public static int ADD_NODE_TO_GROUP = 10;
+    public static int REMOVE_NODE_FROM_GROUP = 11;
 
     int id = 0;
 
@@ -60,16 +62,16 @@ public class PacketAccessGui extends PacketType implements IPacket
     }
 
     @Override
-    public void handleServerSide(EntityPlayer player)
+    public void handleServerSide(EntityPlayer e)
     {
-        if (player instanceof EntityPlayerMP) //Could be a fake player
+        //TODO check if world is loaded
+        if (e instanceof EntityPlayerMP) //Could be a fake player
         {
+            final EntityPlayerMP player = (EntityPlayerMP) e;
             //Returns a message to let the client know the packet was received
             if (id != KEEP_ALIVE)
             {
-                PacketGui responsePacket = new PacketGui(5);
-                ByteBufUtils.writeUTF8String(responsePacket.data(), "packet.received");
-                Engine.instance.packetHandler.sendToPlayer(responsePacket, (EntityPlayerMP) player);
+                sendMessageToClient(player, "packet.received");
             }
 
             if (id == REQUEST_ALL_PROFILES)
@@ -109,15 +111,11 @@ public class PacketAccessGui extends PacketType implements IPacket
                         {
                             if (group.getMember(userID) != null)
                             {
-                                PacketGui packetGui = new PacketGui(5);
-                                ByteBufUtils.writeUTF8String(packetGui.data(), "error.group.user.add.exists");
-                                Engine.instance.packetHandler.sendToPlayer(packetGui, (EntityPlayerMP) player);
+                                sendMessageToClient(player, "error.group.user.add.exists");
                             }
                             else if (!group.addMember(userID)) //TODO get UUID
                             {
-                                PacketGui packetGui = new PacketGui(5);
-                                ByteBufUtils.writeUTF8String(packetGui.data(), "error.group.user.add");
-                                Engine.instance.packetHandler.sendToPlayer(packetGui, (EntityPlayerMP) player);
+                                sendMessageToClient(player, "error.group.user.add");
                             }
                             else
                             {
@@ -126,23 +124,17 @@ public class PacketAccessGui extends PacketType implements IPacket
                         }
                         else
                         {
-                            PacketGui packetGui = new PacketGui(5);
-                            ByteBufUtils.writeUTF8String(packetGui.data(), "error.group.not.found");
-                            Engine.instance.packetHandler.sendToPlayer(packetGui, (EntityPlayerMP) player);
+                            sendMessageToClient(player, "error.group.not.found");
                         }
                     }
                     else
                     {
-                        PacketGui packetGui = new PacketGui(5);
-                        ByteBufUtils.writeUTF8String(packetGui.data(), "error.profile.access.invalid");
-                        Engine.instance.packetHandler.sendToPlayer(packetGui, (EntityPlayerMP) player);
+                        sendMessageToClient(player, "error.profile.access.invalid");
                     }
                 }
                 else
                 {
-                    PacketGui packetGui = new PacketGui(5);
-                    ByteBufUtils.writeUTF8String(packetGui.data(), "error.profile.not.found");
-                    Engine.instance.packetHandler.sendToPlayer(packetGui, (EntityPlayerMP) player);
+                    sendMessageToClient(player, "error.profile.not.found");
                 }
             }
             else if (id == REMOVE_USER_FROM_GROUP)
@@ -163,9 +155,7 @@ public class PacketAccessGui extends PacketType implements IPacket
                             {
                                 if (!group.removeMember(userID))
                                 {
-                                    PacketGui packetGui = new PacketGui(5);
-                                    ByteBufUtils.writeUTF8String(packetGui.data(), "error.group.user.remove");
-                                    Engine.instance.packetHandler.sendToPlayer(packetGui, (EntityPlayerMP) player);
+                                    sendMessageToClient(player, "error.group.user.remove");
                                 }
                                 else
                                 {
@@ -174,30 +164,138 @@ public class PacketAccessGui extends PacketType implements IPacket
                             }
                             else
                             {
-                                PacketGui packetGui = new PacketGui(5);
-                                ByteBufUtils.writeUTF8String(packetGui.data(), "error.group.user.not.found");
-                                Engine.instance.packetHandler.sendToPlayer(packetGui, (EntityPlayerMP) player);
+                                sendMessageToClient(player, "error.group.user.not.found");
                             }
                         }
                         else
                         {
-                            PacketGui packetGui = new PacketGui(5);
-                            ByteBufUtils.writeUTF8String(packetGui.data(), "error.group.not.found");
-                            Engine.instance.packetHandler.sendToPlayer(packetGui, (EntityPlayerMP) player);
+                            sendMessageToClient(player, "error.group.not.found");
                         }
                     }
                     else
                     {
-                        PacketGui packetGui = new PacketGui(5);
-                        ByteBufUtils.writeUTF8String(packetGui.data(), "error.profile.access.invalid");
-                        Engine.instance.packetHandler.sendToPlayer(packetGui, (EntityPlayerMP) player);
+                        sendMessageToClient(player, "error.profile.access.invalid");
                     }
                 }
                 else
                 {
-                    PacketGui packetGui = new PacketGui(5);
-                    ByteBufUtils.writeUTF8String(packetGui.data(), "error.profile.not.found");
-                    Engine.instance.packetHandler.sendToPlayer(packetGui, (EntityPlayerMP) player);
+                    sendMessageToClient(player, "error.profile.not.found");
+                }
+            }
+            else if (id == CREATE_GROUP)
+            {
+                String profileID = ByteBufUtils.readUTF8String(data());
+                String groupID = ByteBufUtils.readUTF8String(data());
+                String parentID = ByteBufUtils.readUTF8String(data());
+
+                GlobalAccessProfile profile = GlobalAccessSystem.getProfile(profileID);
+                if (profile != null)
+                {
+                    if (profile.containsUser(player) && profile.hasNode(player, Permissions.profileAddGroup.toString()))
+                    {
+                        AccessGroup group = new AccessGroup(groupID);
+                        if (profile.getGroup(groupID) == null)
+                        {
+                            //add group
+                            profile.addGroup(group);
+
+                            //Parent handled seperatly
+                            AccessGroup parentGroup = profile.getGroup(parentID);
+                            if (parentGroup != null)
+                            {
+                                if (group.setToExtend(parentGroup))
+                                {
+                                    sendMessageToClient(player, "group.parent.set");
+                                }
+                                else if (group.isParent(parentGroup))
+                                {
+                                    sendMessageToClient(player, "error.group.parent.set.recursive");
+                                }
+                                else
+                                {
+                                    sendMessageToClient(player, "error.group.parent.set");
+                                }
+                            }
+                            else
+                            {
+                                sendMessageToClient(player, "error.group.parent.not.found");
+                            }
+
+                            sendProfileToClient(player, profileID);
+                        }
+                        else
+                        {
+                            sendMessageToClient(player, "error.group.add.exists");
+                        }
+                    }
+                    else
+                    {
+                        sendMessageToClient(player, "error.profile.access.invalid");
+                    }
+                }
+                else
+                {
+                    sendMessageToClient(player, "error.profile.not.found");
+                }
+            }
+            else if (id == UPDATE_GROUP_PARENT)
+            {
+                String profileID = ByteBufUtils.readUTF8String(data());
+                String groupID = ByteBufUtils.readUTF8String(data());
+                String parentID = ByteBufUtils.readUTF8String(data());
+
+                GlobalAccessProfile profile = GlobalAccessSystem.getProfile(profileID);
+                if (profile != null)
+                {
+                    if (profile.containsUser(player) && profile.hasNode(player, Permissions.groupSetting.toString()))
+                    {
+                        AccessGroup group = profile.getGroup(groupID);
+                        if (group != null)
+                        {
+                            if (parentID.trim() == "")
+                            {
+                                group.setToExtend(null);
+                                sendMessageToClient(player, "group.parent.set");
+                                sendProfileToClient(player, profileID);
+                            }
+                            else
+                            {
+                                AccessGroup parentGroup = profile.getGroup(parentID);
+                                if (parentGroup != null)
+                                {
+                                    if (group.setToExtend(parentGroup))
+                                    {
+                                        sendMessageToClient(player, "group.parent.set");
+                                        sendProfileToClient(player, profileID);
+                                    }
+                                    else if (group.isParent(parentGroup))
+                                    {
+                                        sendMessageToClient(player, "error.group.parent.set.recursive");
+                                    }
+                                    else
+                                    {
+                                        sendMessageToClient(player, "error.group.parent.set");
+                                    }
+                                }
+                                else
+                                {
+                                    sendMessageToClient(player, "error.group.parent.not.found");
+                                }
+                            }
+                        }
+                        else
+                        {
+                            sendMessageToClient(player, "error.group.not.found");
+                        }
+                    }
+                    else
+                    {
+                        sendMessageToClient(player, "error.profile.access.invalid");
+                    }
+                }
+                else
+                {
+                    sendMessageToClient(player, "error.profile.not.found");
                 }
             }
             else if (id == CREATE_PROFILE)
@@ -208,7 +306,92 @@ public class PacketAccessGui extends PacketType implements IPacket
                 profile.getOwnerGroup().addMember(player);
                 sendProfilesToClient((EntityPlayerMP) player);
             }
+            else if (id == ADD_NODE_TO_GROUP)
+            {
+                String profileID = ByteBufUtils.readUTF8String(data());
+                String groupID = ByteBufUtils.readUTF8String(data());
+                String node = ByteBufUtils.readUTF8String(data());
+
+                GlobalAccessProfile profile = GlobalAccessSystem.getProfile(profileID);
+                if (profile != null)
+                {
+                    if (profile.containsUser(player) && profile.hasNode(player, Permissions.groupPermissionAdd.toString()))
+                    {
+                        AccessGroup group = profile.getGroup(groupID);
+                        if (group != null)
+                        {
+                            if (group.hasExactNode(node))
+                            {
+                                group.addNode(node);
+                                sendProfileToClient(player, profileID);
+                            }
+                            else
+                            {
+                                sendMessageToClient(player, "error.node.exists");
+                            }
+                        }
+                        else
+                        {
+                            sendMessageToClient(player, "error.group.not.found");
+                        }
+                    }
+                    else
+                    {
+                        sendMessageToClient(player, "error.profile.access.invalid");
+                    }
+                }
+                else
+                {
+                    sendMessageToClient(player, "error.profile.not.found");
+                }
+            }
+            else if (id == REMOVE_NODE_FROM_GROUP)
+            {
+                String profileID = ByteBufUtils.readUTF8String(data());
+                String groupID = ByteBufUtils.readUTF8String(data());
+                String node = ByteBufUtils.readUTF8String(data());
+
+                GlobalAccessProfile profile = GlobalAccessSystem.getProfile(profileID);
+                if (profile != null)
+                {
+                    if (profile.containsUser(player) && profile.hasNode(player, Permissions.groupPermissionRemove.toString()))
+                    {
+                        AccessGroup group = profile.getGroup(groupID);
+                        if (group != null)
+                        {
+                            if (group.hasExactNode(node))
+                            {
+                                group.removeNode(node);
+                                sendProfileToClient(player, profileID);
+                            }
+                            else
+                            {
+                                sendMessageToClient(player, "error.node.not.found");
+                            }
+                        }
+                        else
+                        {
+                            sendMessageToClient(player, "error.group.not.found");
+                        }
+                    }
+                    else
+                    {
+                        sendMessageToClient(player, "error.profile.access.invalid");
+                    }
+                }
+                else
+                {
+                    sendMessageToClient(player, "error.profile.not.found");
+                }
+            }
         }
+    }
+
+    protected void sendMessageToClient(EntityPlayer player, String message)
+    {
+        PacketGui packetGui = new PacketGui(5);
+        ByteBufUtils.writeUTF8String(packetGui.data(), "" + message);
+        Engine.instance.packetHandler.sendToPlayer(packetGui, (EntityPlayerMP) player);
     }
 
     public void sendProfilesToClient(EntityPlayerMP player)
@@ -364,13 +547,13 @@ public class PacketAccessGui extends PacketType implements IPacket
         Engine.instance.packetHandler.sendToServer(new PacketAccessGui(REMOVE_GROUP).write(profile).write(name).write(pullUpSubGroups));
     }
 
-    public static void removeNode(String profileID, String group, String node)
+    public static void removeNodeFromGroup(String profileID, String group, String node)
     {
-
+        Engine.instance.packetHandler.sendToServer(new PacketAccessGui(REMOVE_NODE_FROM_GROUP).write(profileID).write(group).write(node));
     }
 
-    public static void addNode(String profileID, String group, String node)
+    public static void addNodeToGroup(String profileID, String group, String node)
     {
-
+        Engine.instance.packetHandler.sendToServer(new PacketAccessGui(ADD_NODE_TO_GROUP).write(profileID).write(group).write(node));
     }
 }

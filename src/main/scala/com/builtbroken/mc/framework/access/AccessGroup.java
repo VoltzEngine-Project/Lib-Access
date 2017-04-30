@@ -327,13 +327,40 @@ public class AccessGroup implements ISave, Cloneable
     /**
      * Sets this group it extends another group
      */
-    public void setToExtend(AccessGroup group)
+    public boolean setToExtend(AccessGroup group)
     {
-        this.extendGroup = group;
-        if (this.extendGroup != null)
+        if (!isParent(group))
         {
-            this.extendGroup_name = this.extendGroup.getName();
+            this.extendGroup = group;
+            if (this.extendGroup != null)
+            {
+                this.extendGroup_name = this.extendGroup.getName();
+            }
+            return true;
         }
+        return false;
+    }
+
+    /**
+     * Checks if this group is the passed in groups parent
+     *
+     * @param group
+     * @return
+     */
+    public boolean isParent(AccessGroup group)
+    {
+        if(group == this)
+        {
+            return true;
+        }
+        if (group != null)
+        {
+            if (group.getExtendGroup() != null)
+            {
+                return group.getExtendGroup() == this || isParent(group.getExtendGroup());
+            }
+        }
+        return false;
     }
 
     /**
