@@ -201,7 +201,7 @@ public final class GlobalAccessSystem extends AbstractLoadable
     @SubscribeEvent
     public void onWorldLoad(WorldEvent.Load event)
     {
-        if (event.world.provider.dimensionId == 0)
+        if (event.world.provider.dimensionId == 0 && !event.world.isRemote && MinecraftServer.getServer() != null)
         {
             File folder = new File(NBTUtility.getSaveDirectory(MinecraftServer.getServer().getFolderName()), GlobalAccessProfile.SAVE_FOLDER);
             if (folder.exists())
