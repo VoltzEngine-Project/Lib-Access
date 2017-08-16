@@ -391,7 +391,7 @@ public class PacketAccessGui extends PacketType implements IPacket
     {
         PacketGui packetGui = new PacketGui(5);
         ByteBufUtils.writeUTF8String(packetGui.data(), "" + message);
-        Engine.instance.packetHandler.sendToPlayer(packetGui, (EntityPlayerMP) player);
+        Engine.packetHandler.sendToPlayer(packetGui, (EntityPlayerMP) player);
     }
 
     public void sendProfilesToClient(EntityPlayerMP player)
@@ -408,7 +408,7 @@ public class PacketAccessGui extends PacketType implements IPacket
             packetGui.write(profile.getUserAccess(player).hasNode(Permissions.profileView)); //Disables view option
         }
 
-        Engine.instance.packetHandler.sendToPlayer(packetGui, player);
+        Engine.packetHandler.sendToPlayer(packetGui, player);
     }
 
     public void sendProfileToClient(EntityPlayerMP player, String profileID)
@@ -417,13 +417,13 @@ public class PacketAccessGui extends PacketType implements IPacket
         if (profile != null) //TODO check if player can view profile
         {
             IPacket packetGui = new PacketGui(1).write(profile.save(new NBTTagCompound()));
-            Engine.instance.packetHandler.sendToPlayer(packetGui, player);
+            Engine.packetHandler.sendToPlayer(packetGui, player);
         }
         else
         {
             PacketGui packetGui = new PacketGui(5);
             ByteBufUtils.writeUTF8String(packetGui.data(), "error.profile.not.found");
-            Engine.instance.packetHandler.sendToPlayer(packetGui, player);
+            Engine.packetHandler.sendToPlayer(packetGui, player);
         }
     }
 
@@ -449,7 +449,7 @@ public class PacketAccessGui extends PacketType implements IPacket
      */
     public static void doRequest()
     {
-        Engine.instance.packetHandler.sendToServer(new PacketAccessGui(REQUEST_ALL_PROFILES));
+        Engine.packetHandler.sendToServer(new PacketAccessGui(REQUEST_ALL_PROFILES));
     }
 
     /**
@@ -459,7 +459,7 @@ public class PacketAccessGui extends PacketType implements IPacket
      */
     public static void doRequest(String profileID)
     {
-        Engine.instance.packetHandler.sendToServer(new PacketAccessGui(REQUEST_PROFILE).write(profileID));
+        Engine.packetHandler.sendToServer(new PacketAccessGui(REQUEST_PROFILE).write(profileID));
     }
 
     /**
@@ -473,7 +473,7 @@ public class PacketAccessGui extends PacketType implements IPacket
      */
     public static void keepAlive(String profileID)
     {
-        Engine.instance.packetHandler.sendToServer(new PacketAccessGui(KEEP_ALIVE).write(profileID));
+        Engine.packetHandler.sendToServer(new PacketAccessGui(KEEP_ALIVE).write(profileID));
     }
 
     /**
@@ -485,7 +485,7 @@ public class PacketAccessGui extends PacketType implements IPacket
      */
     public static void removeUser(String profileID, String group, String userName)
     {
-        Engine.instance.packetHandler.sendToServer(new PacketAccessGui(REMOVE_USER_FROM_GROUP).write(profileID).write(group).write(userName));
+        Engine.packetHandler.sendToServer(new PacketAccessGui(REMOVE_USER_FROM_GROUP).write(profileID).write(group).write(userName));
     }
 
     /**
@@ -497,7 +497,7 @@ public class PacketAccessGui extends PacketType implements IPacket
      */
     public static void addUser(String profileID, String group, String userName)
     {
-        Engine.instance.packetHandler.sendToServer(new PacketAccessGui(ADD_USER_TO_GROUP).write(profileID).write(group).write(userName));
+        Engine.packetHandler.sendToServer(new PacketAccessGui(ADD_USER_TO_GROUP).write(profileID).write(group).write(userName));
     }
 
     /**
@@ -508,7 +508,7 @@ public class PacketAccessGui extends PacketType implements IPacket
      */
     public static void createProfile(String name, boolean defaults)
     {
-        Engine.instance.packetHandler.sendToServer(new PacketAccessGui(CREATE_PROFILE).write(name).write(defaults));
+        Engine.packetHandler.sendToServer(new PacketAccessGui(CREATE_PROFILE).write(name).write(defaults));
     }
 
     /**
@@ -520,7 +520,7 @@ public class PacketAccessGui extends PacketType implements IPacket
      */
     public static void createGroup(String profile, String name, String parent)
     {
-        Engine.instance.packetHandler.sendToServer(new PacketAccessGui(CREATE_GROUP).write(profile).write(name).write(parent));
+        Engine.packetHandler.sendToServer(new PacketAccessGui(CREATE_GROUP).write(profile).write(name).write(parent));
     }
 
     /**
@@ -532,7 +532,7 @@ public class PacketAccessGui extends PacketType implements IPacket
      */
     public static void updateGroupParent(String profile, String name, String parent)
     {
-        Engine.instance.packetHandler.sendToServer(new PacketAccessGui(UPDATE_GROUP_PARENT).write(profile).write(name).write(parent));
+        Engine.packetHandler.sendToServer(new PacketAccessGui(UPDATE_GROUP_PARENT).write(profile).write(name).write(parent));
     }
 
     /**
@@ -544,16 +544,16 @@ public class PacketAccessGui extends PacketType implements IPacket
      */
     public static void removeGroup(String profile, String name, boolean pullUpSubGroups)
     {
-        Engine.instance.packetHandler.sendToServer(new PacketAccessGui(REMOVE_GROUP).write(profile).write(name).write(pullUpSubGroups));
+        Engine.packetHandler.sendToServer(new PacketAccessGui(REMOVE_GROUP).write(profile).write(name).write(pullUpSubGroups));
     }
 
     public static void removeNodeFromGroup(String profileID, String group, String node)
     {
-        Engine.instance.packetHandler.sendToServer(new PacketAccessGui(REMOVE_NODE_FROM_GROUP).write(profileID).write(group).write(node));
+        Engine.packetHandler.sendToServer(new PacketAccessGui(REMOVE_NODE_FROM_GROUP).write(profileID).write(group).write(node));
     }
 
     public static void addNodeToGroup(String profileID, String group, String node)
     {
-        Engine.instance.packetHandler.sendToServer(new PacketAccessGui(ADD_NODE_TO_GROUP).write(profileID).write(group).write(node));
+        Engine.packetHandler.sendToServer(new PacketAccessGui(ADD_NODE_TO_GROUP).write(profileID).write(group).write(node));
     }
 }

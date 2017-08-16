@@ -55,6 +55,7 @@ public class AccessUser implements ISave
         this.setUserID(id);
     }
 
+    @Deprecated
     public AccessUser(EntityPlayer player)
     {
         this(player.getCommandSenderName(), player.getGameProfile().getId());

@@ -4,7 +4,7 @@ import com.builtbroken.mc.core.Engine;
 import com.builtbroken.mc.core.handler.SaveManager;
 import com.builtbroken.mc.framework.access.AccessUtility;
 import com.builtbroken.mc.lib.helper.NBTUtility;
-import com.builtbroken.mc.lib.mod.loadable.AbstractLoadable;
+import com.builtbroken.mc.framework.mod.loadable.AbstractLoadable;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import net.minecraft.entity.player.EntityPlayer;
