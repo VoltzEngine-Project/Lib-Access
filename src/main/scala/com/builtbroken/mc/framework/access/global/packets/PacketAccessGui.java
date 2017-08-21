@@ -8,12 +8,12 @@ import com.builtbroken.mc.framework.access.AccessGroup;
 import com.builtbroken.mc.framework.access.global.GlobalAccessProfile;
 import com.builtbroken.mc.framework.access.global.GlobalAccessSystem;
 import com.builtbroken.mc.framework.access.perm.Permissions;
-import cpw.mods.fml.common.network.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
 
 import java.util.List;
 
@@ -77,13 +77,13 @@ public class PacketAccessGui extends PacketType implements IPacket
             if (id == REQUEST_ALL_PROFILES)
             {
                 clearGui(player);
-                sendProfilesToClient((EntityPlayerMP) player);
+                sendProfilesToClient(player);
             }
             else if (id == REQUEST_PROFILE)
             {
                 clearGui(player);
                 final String profileID = ByteBufUtils.readUTF8String(data());
-                sendProfileToClient((EntityPlayerMP) player, profileID);
+                sendProfileToClient(player, profileID);
             }
             else if (id == KEEP_ALIVE)
             {

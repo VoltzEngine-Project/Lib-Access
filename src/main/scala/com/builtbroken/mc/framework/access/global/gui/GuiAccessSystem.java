@@ -16,11 +16,11 @@ import com.builtbroken.mc.prefab.gui.components.GuiArray;
 import com.builtbroken.mc.prefab.gui.components.GuiComponent;
 import com.builtbroken.mc.prefab.gui.components.frame.GuiFrame;
 import com.builtbroken.mc.prefab.gui.screen.GuiScreenBase;
-import cpw.mods.fml.common.network.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
 
 import java.awt.*;
 
@@ -208,7 +208,7 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
         //Header bar render
         this.drawGradientRect(0, 0, this.width, 15, a.getRGB(), b.getRGB());
         this.drawRect(0, 14, this.width, 15, Color.BLACK.getRGB());
-        this.drawCenteredString(this.fontRendererObj, "Global Access Permission System", this.width / 2, 3, 16777215);
+        this.drawCenteredString(Minecraft.getMinecraft().fontRenderer, "Global Access Permission System", this.width / 2, 3, 16777215);
 
 
 
@@ -219,8 +219,8 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
             name = currentProfile != null ? currentProfile.getName() : profileNames[currentProfileIndex];
             id = currentProfile != null ? currentProfile.getID() : profileIDs[currentProfileIndex];
         }
-        this.drawString(this.fontRendererObj, "Profile: " + name, 122, 20, 16777215);
-        this.drawString(this.fontRendererObj, "ID: " + id, 122, 30, 16777215);
+        this.drawString(Minecraft.getMinecraft().fontRenderer, "Profile: " + name, 122, 20, 16777215);
+        this.drawString(Minecraft.getMinecraft().fontRenderer, "ID: " + id, 122, 30, 16777215);
 
         if (profileNames != null)
         {
@@ -230,28 +230,28 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
             {
                 if (errorMessage.startsWith("error"))
                 {
-                    this.drawCenteredString(this.fontRendererObj, LanguageUtility.getLocal(errorMessage), this.width / 2, this.height / 2, Color.RED.getRGB());
+                    this.drawCenteredString(Minecraft.getMinecraft().fontRenderer, LanguageUtility.getLocal(errorMessage), this.width / 2, this.height / 2, Color.RED.getRGB());
                 }
                 else
                 {
-                    this.drawCenteredString(this.fontRendererObj, LanguageUtility.getLocal(errorMessage), this.width / 2, this.height / 2, GuiComponent.DEFAULT_STRING_COLOR);
+                    this.drawCenteredString(Minecraft.getMinecraft().fontRenderer, LanguageUtility.getLocal(errorMessage), this.width / 2, this.height / 2, GuiComponent.DEFAULT_STRING_COLOR);
                 }
             }
             else if (currentProfileIndex != -1)
             {
                 if (currentProfile == null)
                 {
-                    this.drawCenteredString(this.fontRendererObj, LanguageUtility.getLocal("gui.access.waiting.on.server"), this.width / 2, this.height / 2, GuiComponent.DEFAULT_STRING_COLOR);
+                    this.drawCenteredString(Minecraft.getMinecraft().fontRenderer, LanguageUtility.getLocal("gui.access.waiting.on.server"), this.width / 2, this.height / 2, GuiComponent.DEFAULT_STRING_COLOR);
                 }
             }
             else
             {
-                this.drawCenteredString(this.fontRendererObj, LanguageUtility.getLocal("gui.access.select.profile"), this.width / 2, this.height / 2, GuiComponent.DEFAULT_STRING_COLOR);
+                this.drawCenteredString(Minecraft.getMinecraft().fontRenderer, LanguageUtility.getLocal("gui.access.select.profile"), this.width / 2, this.height / 2, GuiComponent.DEFAULT_STRING_COLOR);
             }
         }
         else
         {
-            this.drawCenteredString(this.fontRendererObj, LanguageUtility.getLocal("gui.access.click.refresh"), this.width / 2, this.height / 2, GuiComponent.DEFAULT_STRING_COLOR);
+            this.drawCenteredString(Minecraft.getMinecraft().fontRenderer, LanguageUtility.getLocal("gui.access.click.refresh"), this.width / 2, this.height / 2, GuiComponent.DEFAULT_STRING_COLOR);
         }
 
         super.drawScreen(p_73863_1_, p_73863_2_, p_73863_3_);
@@ -306,12 +306,12 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
     {
         if (currentProfile != null)
         {
-            AccessUser user = currentProfile.getUserAccess(Minecraft.getMinecraft().thePlayer);
+            AccessUser user = currentProfile.getUserAccess(Minecraft.getMinecraft().player);
             if (user != null)
             {
                 return user;
             }
         }
-        return new AccessUser(Minecraft.getMinecraft().thePlayer).setTemporary(true);
+        return new AccessUser(Minecraft.getMinecraft().player).setTemporary(true);
     }
 }

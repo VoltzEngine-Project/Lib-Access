@@ -58,7 +58,7 @@ public class AccessUser implements ISave
     @Deprecated
     public AccessUser(EntityPlayer player)
     {
-        this(player.getCommandSenderName(), player.getGameProfile().getId());
+        this(player.getName(), player.getGameProfile().getId());
     }
 
     public static AccessUser loadFromNBT(NBTTagCompound nbt)

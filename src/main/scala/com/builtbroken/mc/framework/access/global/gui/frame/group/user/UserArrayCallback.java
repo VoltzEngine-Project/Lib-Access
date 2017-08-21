@@ -30,7 +30,7 @@ public class UserArrayCallback extends CallbackGuiArray
         if (gui.users != null && index < gui.users.length)
         {
             username = gui.users[index];
-            if (username.equalsIgnoreCase(Minecraft.getMinecraft().thePlayer.getCommandSenderName()))
+            if (username.equalsIgnoreCase(Minecraft.getMinecraft().player.getName()))
             {
                 username += "  [You]";
             }
@@ -58,7 +58,7 @@ public class UserArrayCallback extends CallbackGuiArray
     {
         if (gui.users != null && index < gui.users.length)
         {
-            return !gui.users[index].equalsIgnoreCase(Minecraft.getMinecraft().thePlayer.getCommandSenderName()); //TODO prevent removing higher permission users than current user
+            return !gui.users[index].equalsIgnoreCase(Minecraft.getMinecraft().player.getName()); //TODO prevent removing higher permission users than current user
         }
         return false;
     }

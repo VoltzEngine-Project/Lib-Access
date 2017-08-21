@@ -46,7 +46,7 @@ public class NodeEntry extends GuiComponentContainer<NodeEntry>
     protected void doRender(Minecraft mc, int mouseX, int mouseY)
     {
         super.doRender(mc, mouseX, mouseY);
-        this.drawString(mc.fontRenderer, "" + node, this.xPosition + 5, this.yPosition + 1, DEFAULT_STRING_COLOR);
+        this.drawString(mc.fontRenderer, "" + node, this.x() + 5, this.y() + 1, DEFAULT_STRING_COLOR);
     }
 
     @Override

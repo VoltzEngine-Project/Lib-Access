@@ -9,12 +9,10 @@ import com.builtbroken.mc.lib.helper.NBTUtility;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -134,7 +132,7 @@ public class AccessProfile implements IVirtualObject
     public AccessProfile generateNew(String name, EntityPlayer player)
     {
         AccessUtility.loadNewGroupSet(this);
-        initName(name, player.getCommandSenderName() + "_" + System.nanoTime());
+        initName(name, player.getName() + "_" + System.nanoTime());
         return this;
     }
 
@@ -177,7 +175,7 @@ public class AccessProfile implements IVirtualObject
      */
     public boolean containsUser(EntityPlayer player)
     {
-        return containsUser(player.getCommandSenderName());
+        return containsUser(player.getName());
     }
 
     /**
@@ -208,7 +206,7 @@ public class AccessProfile implements IVirtualObject
      */
     public AccessUser getUserAccess(EntityPlayer player)
     {
-        return getUserAccess(player.getCommandSenderName());
+        return getUserAccess(player.getName());
     }
 
     /**
@@ -407,7 +405,7 @@ public class AccessProfile implements IVirtualObject
     {
         if (this.saveFile == null)
         {
-            this.saveFile = new File(NBTUtility.getSaveDirectory(MinecraftServer.getServer().getFolderName()), getPathToProfile(this.getID()));
+            this.saveFile = new File(NBTUtility.getSaveDirectory(), getPathToProfile(this.getID()));
         }
         return this.saveFile;
     }
@@ -421,13 +419,12 @@ public class AccessProfile implements IVirtualObject
     public void setSaveFile(File file)
     {
         this.saveFile = file;
-
     }
 
     @Override
     public boolean shouldSaveForWorld(World world)
     {
-        return world != null && world.provider.dimensionId == 0;
+        return world != null && world.provider.getDimension() == 0;
     }
 
     @Override

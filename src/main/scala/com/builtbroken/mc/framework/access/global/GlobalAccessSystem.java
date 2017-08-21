@@ -3,15 +3,14 @@ package com.builtbroken.mc.framework.access.global;
 import com.builtbroken.mc.core.Engine;
 import com.builtbroken.mc.core.handler.SaveManager;
 import com.builtbroken.mc.framework.access.AccessUtility;
-import com.builtbroken.mc.lib.helper.NBTUtility;
 import com.builtbroken.mc.framework.mod.loadable.AbstractLoadable;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.TickEvent;
+import com.builtbroken.mc.lib.helper.NBTUtility;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -182,7 +181,7 @@ public final class GlobalAccessSystem extends AbstractLoadable
     @SubscribeEvent
     public void onWorldTick(TickEvent.WorldTickEvent event)
     {
-        if (event.world.provider.dimensionId == 0)
+        if (event.world.provider.getDimension() == 0)
         {
             ticks++;
             if (ticks % 6000 == 0) //every 5 mins, TODO setup with config
@@ -201,9 +200,9 @@ public final class GlobalAccessSystem extends AbstractLoadable
     @SubscribeEvent
     public void onWorldLoad(WorldEvent.Load event)
     {
-        if (event.world.provider.dimensionId == 0 && !event.world.isRemote && MinecraftServer.getServer() != null)
+        if (event.getWorld().provider.getDimension() == 0 && !event.getWorld().isRemote)
         {
-            File folder = new File(NBTUtility.getSaveDirectory(MinecraftServer.getServer().getFolderName()), GlobalAccessProfile.SAVE_FOLDER);
+            File folder = new File(event.getWorld().getSaveHandler().getWorldDirectory().getParentFile(), GlobalAccessProfile.SAVE_FOLDER);
             if (folder.exists())
             {
                 File[] files = folder.listFiles();
