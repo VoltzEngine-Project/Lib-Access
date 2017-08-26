@@ -76,9 +76,9 @@ public class AccessGroup implements ISave, Cloneable
             {
                 return uuid_to_profile.get(id);
             }
-            else if (username_to_profile.containsKey(player.getCommandSenderName()))
+            else if (username_to_profile.containsKey(player.getName()))
             {
-                return username_to_profile.get(player.getCommandSenderName());
+                return username_to_profile.get(player.getName());
             }
         }
         return null;

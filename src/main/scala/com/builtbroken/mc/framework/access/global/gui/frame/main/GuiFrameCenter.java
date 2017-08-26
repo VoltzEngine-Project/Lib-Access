@@ -39,10 +39,10 @@ public class GuiFrameCenter extends GuiFrameAccess<GuiFrameCenter>
 
         int yLevel = 25;
         add(GuiImageButton.newRefreshButton(0, 300, 24));
-        add(new GuiButton2(1, new HugXSide(this, 0, true).setYOffset(yLevel), "Groups").setWidth(50));
-        add(new GuiButton2(2, new HugXSide(this, 50, true).setYOffset(yLevel), "Entity").setWidth(50).disable());
-        add(new GuiButton2(3, new HugXSide(this, 100, true).setYOffset(yLevel), "Machines").setWidth(50).disable());
-        add(new GuiButton2(4, new HugXSide(this, 150, true).setYOffset(yLevel), "Users").setWidth(50).disable());
+        add(new GuiButton2(1, new HugXSide(this, 0, true).setYOffset(yLevel), "Groups").setComponentWidth(50));
+        add(new GuiButton2(2, new HugXSide(this, 50, true).setYOffset(yLevel), "Entity").setComponentWidth(50).disable());
+        add(new GuiButton2(3, new HugXSide(this, 100, true).setYOffset(yLevel), "Machines").setComponentWidth(50).disable());
+        add(new GuiButton2(4, new HugXSide(this, 150, true).setYOffset(yLevel), "Users").setComponentWidth(50).disable());
 
         centerFramePos = new HugXSide(this, 0, true).setYOffset(yLevel + 22);
         //Group frame
@@ -59,7 +59,7 @@ public class GuiFrameCenter extends GuiFrameAccess<GuiFrameCenter>
         int newHeight = getHost().height - y();
         if (getHeight() != newHeight)
         {
-            setHeight(newHeight);
+            setComponentHeight(newHeight);
         }
     }
 

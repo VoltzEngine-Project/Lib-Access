@@ -38,8 +38,8 @@ public abstract class GuiSubFrameGroup<E extends GuiSubFrameGroup> extends GuiSu
         super.initGui();
         groupNameLabel = add(new GuiLabel(0, 0, "Name: " + groupID));
         groupNameLabel.setRelativePosition(new GuiRelativePos(this, 20, 5));
-        groupNameLabel.setWidth(100);
-        groupNameLabel.setHeight(10);
+        groupNameLabel.setComponentWidth(100);
+        groupNameLabel.setComponentHeight(10);
     }
 
     @Override
@@ -61,9 +61,9 @@ public abstract class GuiSubFrameGroup<E extends GuiSubFrameGroup> extends GuiSu
 
 
     @Override
-    protected void doRender(Minecraft mc, int mouseX, int mouseY)
+    protected void doRender(Minecraft mc, int mouseX, int mouseY, float partialTicks)
     {
-        super.doRender(mc, mouseX, mouseY);
+        super.doRender(mc, mouseX, mouseY, partialTicks);
         AccessGroup group = getGroup();
         if (group != null)
         {

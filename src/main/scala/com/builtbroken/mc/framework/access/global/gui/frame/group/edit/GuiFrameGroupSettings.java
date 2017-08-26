@@ -34,8 +34,8 @@ public class GuiFrameGroupSettings extends GuiSubFrameGroup<GuiFrameGroupSetting
             int y = 30;
 
             GuiLabel parentFieldLabel = add(new GuiLabel(0, 0, "Parent:"));
-            parentFieldLabel.setWidth(40);
-            parentFieldLabel.setHeight(10);
+            parentFieldLabel.setComponentWidth(40);
+            parentFieldLabel.setComponentHeight(10);
             parentFieldLabel.setRelativePosition(new HugXSide(this, 2, true).setYOffset(y + 5));
 
             groupParentField = add(new GuiField(0, 0));
@@ -44,7 +44,7 @@ public class GuiFrameGroupSettings extends GuiSubFrameGroup<GuiFrameGroupSetting
             groupParentField.setRelativeSize(new GuiRelativeSize(this, -55 - parentFieldLabel.getWidth(), 18).setUseHostHeight(false));
 
             groupParentFieldSave = add(new GuiButton2(1, 0, 0, "Set"));
-            groupParentFieldSave.setWidth(50);
+            groupParentFieldSave.setComponentWidth(50);
             groupParentFieldSave.setRelativePosition(new HugXSide(this, -groupParentFieldSave.getWidth(), false).setYOffset(y));
         }
         updatePositions();

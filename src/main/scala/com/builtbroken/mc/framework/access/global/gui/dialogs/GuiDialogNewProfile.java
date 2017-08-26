@@ -26,8 +26,8 @@ public class GuiDialogNewProfile extends GuiDialog<GuiDialogNewProfile>
     public GuiDialogNewProfile(int id, int x, int y)
     {
         super(id, x, y);
-        setWidth(300);
-        setHeight(200);
+        setComponentWidth(300);
+        setComponentHeight(200);
     }
 
     @Override
@@ -38,12 +38,12 @@ public class GuiDialogNewProfile extends GuiDialog<GuiDialogNewProfile>
         backButton.setRelativePosition(new GuiRelativePos(this, 2, 2));
 
         profileNameField = add(new GuiField(0, 0)).setRelativePosition(new GuiRelativePos(this, 1, 30));
-        profileNameField.setWidth(140);
+        profileNameField.setComponentWidth(140);
 
         defaultCheckBox = add(new GuiButtonCheck(1, 0, 0, 0, true)).setRelativePosition(new GuiRelativePos(this, 70, 70));
 
-        saveButton = (GuiButton2) add(new GuiButton2(2, new HugBottom(this, 5, -25, true), "Save")).setWidth(50);
-        cancelButton = (GuiButton2) add(new GuiButton2(0, new HugBottom(this, -55, -25, false), "Cancel")).setWidth(50);
+        saveButton = (GuiButton2) add(new GuiButton2(2, new HugBottom(this, 5, -25, true), "Save")).setComponentWidth(50);
+        cancelButton = (GuiButton2) add(new GuiButton2(0, new HugBottom(this, -55, -25, false), "Cancel")).setComponentWidth(50);
 
         updatePositions();
     }

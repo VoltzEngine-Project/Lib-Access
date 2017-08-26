@@ -41,14 +41,14 @@ public class GuiFrameGroupNodes extends GuiSubFrameGroup<GuiFrameGroupNodes>
         {
             groupArray = add(new GuiArray(new NodeArrayCallback(this), 1, 0, 0, rows, rowSpacingY));
             groupArray.setRelativePosition(new GuiRelativePos(this, 0, 20));
-            groupArray.setWidth(200);
+            groupArray.setComponentWidth(200);
 
             nodeField = add(new GuiField(0, 0));
             nodeField.setRelativePosition(new HugBottom(this, 1, -41, true));
             nodeField.setRelativeSize(new GuiRelativeSize(this, -55, 20).setUseHostHeight(false));
 
             addButton = add(new GuiButton2(2, 0, 0, "Add"));
-            addButton.setWidth(50);
+            addButton.setComponentWidth(50);
             addButton.setRelativePosition(new HugBottom(this, -addButton.getWidth(), -40, false));
         }
         updatePositions();

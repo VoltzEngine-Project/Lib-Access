@@ -16,8 +16,8 @@ public class GuiSubFrameAccess<E extends GuiSubFrameAccess> extends GuiFrameAcce
     public GuiSubFrameAccess(GuiAccessSystem parent, int id, int x, int y)
     {
         super(parent, id, x, y);
-        this.setWidth(200);
-        this.setHeight(200);
+        this.setComponentWidth(200);
+        this.setComponentHeight(200);
     }
 
     @Override

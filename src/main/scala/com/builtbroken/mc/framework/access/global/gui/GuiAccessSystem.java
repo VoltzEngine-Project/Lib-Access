@@ -66,21 +66,23 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
 
         //Menu buttons
         refreshButton = add(GuiImageButton.newRefreshButton(0, 2, 16));
-        newProfile = (GuiButton2) add(new GuiButton2(1, 20, 16, "New Profile").setWidth(60).setHeight(18));
+        GuiButton2 button2 = new GuiButton2(1, 20, 16, "New Profile");
+        button2.setComponentHeight(18).setComponentWidth(60);
+        newProfile = add(button2);
 
         int sideWidths = 109;
         //Profile array
         profileArray = add(new GuiArray(new ProfileArrayCallback(this), -1, 2, 39, profileRows, 20));
-        profileArray.setWidth(sideWidths);
+        profileArray.setComponentWidth(sideWidths);
 
         int remainingWidth = this.width - sideWidths * 2 - 4;
         defaultCenterFrame = new GuiFrameCenter(this, 109 + 4, 15);
-        defaultCenterFrame.setWidth(remainingWidth);
-        defaultCenterFrame.setHeight(this.height - 15);
+        defaultCenterFrame.setComponentWidth(remainingWidth);
+        defaultCenterFrame.setComponentHeight(this.height - 15);
 
         rightFrame = add(new GuiFrameEvents(this, defaultCenterFrame.x() + defaultCenterFrame.getWidth(), 15));
-        rightFrame.setWidth(sideWidths);
-        rightFrame.setHeight(this.height - 15);
+        rightFrame.setComponentWidth(sideWidths);
+        rightFrame.setComponentHeight(this.height - 15);
 
         reloadProfileList();
         reloadGroupList();

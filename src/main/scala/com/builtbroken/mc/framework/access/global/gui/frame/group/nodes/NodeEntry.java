@@ -13,6 +13,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 
 import java.awt.*;
+import java.io.IOException;
 
 /**
  * @see <a href="https://github.com/BuiltBrokenModding/VoltzEngine/blob/development/license.md">License</a> for what you can and can't do with the code.
@@ -43,14 +44,14 @@ public class NodeEntry extends GuiComponentContainer<NodeEntry>
     }
 
     @Override
-    protected void doRender(Minecraft mc, int mouseX, int mouseY)
+    protected void doRender(Minecraft mc, int mouseX, int mouseY, float ticks)
     {
-        super.doRender(mc, mouseX, mouseY);
+        super.doRender(mc, mouseX, mouseY, ticks);
         this.drawString(mc.fontRenderer, "" + node, this.x() + 5, this.y() + 1, DEFAULT_STRING_COLOR);
     }
 
     @Override
-    public void actionPerformed(GuiButton button)
+    public void actionPerformed(GuiButton button) throws IOException
     {
         int id = button.id;
         //Edit group

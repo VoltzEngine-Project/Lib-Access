@@ -41,14 +41,14 @@ public class GuiFrameGroupUsers extends GuiSubFrameGroup<GuiFrameGroupUsers>
         {
             groupArray = add(new GuiArray(new UserArrayCallback(this), 1, 0, 0, rows, rowSpacingY));
             groupArray.setRelativePosition(new GuiRelativePos(this, 0, 20));
-            groupArray.setWidth(200);
+            groupArray.setComponentWidth(200);
 
             userNameField = add(new GuiField(0, 0));
             userNameField.setRelativePosition(new HugBottom(this, 1, -41, true));
             userNameField.setRelativeSize(new GuiRelativeSize(this, -55, 20).setUseHostHeight(false));
 
             addButton = add(new GuiButton2(2, 0, 0, "Add"));
-            addButton.setWidth(50);
+            addButton.setComponentWidth(50);
             addButton.setRelativePosition(new HugBottom(this, -addButton.getWidth(), -40, false));
         }
         updatePositions();
