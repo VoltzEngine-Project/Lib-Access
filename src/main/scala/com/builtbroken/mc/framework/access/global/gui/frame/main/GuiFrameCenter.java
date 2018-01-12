@@ -7,6 +7,7 @@ import com.builtbroken.mc.framework.access.global.gui.frame.group.main.GuiFrameG
 import com.builtbroken.mc.framework.access.global.packets.PacketAccessGui;
 import com.builtbroken.mc.prefab.gui.GuiButton2;
 import com.builtbroken.mc.prefab.gui.buttons.GuiImageButton;
+import com.builtbroken.mc.prefab.gui.buttons.GuiLeftRightArrowButton;
 import com.builtbroken.mc.prefab.gui.components.frame.GuiFrame;
 import com.builtbroken.mc.prefab.gui.pos.HugXSide;
 import com.builtbroken.mc.prefab.gui.pos.size.GuiRelativeSize;
@@ -14,6 +15,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 
 import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 
 /**
  * @see <a href="https://github.com/BuiltBrokenModding/VoltzEngine/blob/development/license.md">License</a> for what you can and can't do with the code.
@@ -21,6 +24,13 @@ import java.awt.*;
  */
 public class GuiFrameCenter extends GuiFrameAccess<GuiFrameCenter>
 {
+    public static final int BUTTON_REFRESH = 0;
+    public static final int BUTTON_GROUPS = 1;
+    public static final int BUTTON_ENTITY =2;
+    public static final int BUTTON_MACHINE = 3;
+    public static final int BUTTON_USER = 4;
+    public static final int BUTTON_COPY = 5;
+
     protected GuiFrame currentFrame;
     public GuiFrameGroups groupsFrame;
     public IPos2D centerFramePos;
@@ -38,11 +48,12 @@ public class GuiFrameCenter extends GuiFrameAccess<GuiFrameCenter>
         super.initGui();
 
         int yLevel = 25;
-        add(GuiImageButton.newRefreshButton(0, 300, 24));
-        add(new GuiButton2(1, new HugXSide(this, 0, true).setYOffset(yLevel), "Groups").setWidth(50));
-        add(new GuiButton2(2, new HugXSide(this, 50, true).setYOffset(yLevel), "Entity").setWidth(50).disable());
-        add(new GuiButton2(3, new HugXSide(this, 100, true).setYOffset(yLevel), "Machines").setWidth(50).disable());
-        add(new GuiButton2(4, new HugXSide(this, 150, true).setYOffset(yLevel), "Users").setWidth(50).disable());
+        add(GuiImageButton.newRefreshButton(BUTTON_REFRESH, 352, 17));
+        add(new GuiButton2(BUTTON_GROUPS, new HugXSide(this, 0, true).setYOffset(yLevel), "Groups").setWidth(50));
+        add(new GuiButton2(BUTTON_ENTITY, new HugXSide(this, 50, true).setYOffset(yLevel), "Entity").setWidth(50).disable());
+        add(new GuiButton2(BUTTON_MACHINE, new HugXSide(this, 100, true).setYOffset(yLevel), "Machines").setWidth(50).disable());
+        add(new GuiButton2(BUTTON_USER, new HugXSide(this, 150, true).setYOffset(yLevel), "Users").setWidth(50).disable());
+        add(new GuiLeftRightArrowButton(BUTTON_COPY, 300, 24, false));
 
         centerFramePos = new HugXSide(this, 0, true).setYOffset(yLevel + 22);
         //Group frame
@@ -71,14 +82,31 @@ public class GuiFrameCenter extends GuiFrameAccess<GuiFrameCenter>
         //TODO get list of profiles the user can edit
 
         //Refresh profile list
-        if (id == 0)
+        if (id == BUTTON_REFRESH)
         {
             reloadGroupList();
             PacketAccessGui.doRequest(getHost().currentProfile.getID());
         }
-        else if (id == 1)
+        else if (id == BUTTON_GROUPS)
         {
-            show(groupsFrame);
+            if (currentFrame != groupsFrame)
+            {
+                show(groupsFrame);
+            }
+        }
+        else if(id == BUTTON_COPY)
+        {
+            try
+            {
+                Toolkit toolkit = Toolkit.getDefaultToolkit();
+                Clipboard clipboard = toolkit.getSystemClipboard();
+                StringSelection strSel = new StringSelection(getHost().currentProfile.getID());
+                clipboard.setContents(strSel, null);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
         }
     }
 
