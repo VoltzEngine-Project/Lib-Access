@@ -30,8 +30,8 @@ public class AccessGroup implements ISave, Cloneable
     /** Name of the extend group, used mainly for save/load */
     protected String extendGroup_name;
 
-    /** Map of user's names to profiles */
-    protected final HashMap<String, AccessUser> username_to_profile = new HashMap();
+    //Cache of user profiles by name, names should be lowercase to reduce issues with checks
+    private final HashMap<String, AccessUser> username_to_profile = new HashMap();
     /** Map of user's UUID to profiles */
     protected final HashMap<UUID, AccessUser> uuid_to_profile = new HashMap();
 
@@ -52,11 +52,12 @@ public class AccessGroup implements ISave, Cloneable
      * @param username - user name of the EntityPlayer
      * @return the exact user
      */
-    public AccessUser getMember(String username)
+    public AccessUser getMember(final String username)
     {
-        if (username_to_profile.containsKey(username))
+        final String key = username.toLowerCase();
+        if (username_to_profile.containsKey(key))
         {
-            return username_to_profile.get(username);
+            return username_to_profile.get(key);
         }
         return null;
     }
@@ -71,15 +72,15 @@ public class AccessGroup implements ISave, Cloneable
     {
         if (player != null)
         {
+            //try UUID first
             UUID id = player.getGameProfile().getId();
             if (uuid_to_profile.containsKey(id))
             {
                 return uuid_to_profile.get(id);
             }
-            else if (username_to_profile.containsKey(player.getCommandSenderName()))
-            {
-                return username_to_profile.get(player.getCommandSenderName());
-            }
+
+            //try username last
+            return getMember(player.getCommandSenderName());
         }
         return null;
     }
@@ -98,7 +99,7 @@ public class AccessGroup implements ISave, Cloneable
             {
                 uuid_to_profile.put(obj.getUserID(), obj);
             }
-            username_to_profile.put(obj.username, obj);
+            username_to_profile.put(obj.username.toLowerCase(), obj);
             obj.setGroup(this);
             return true;
         }
@@ -155,14 +156,18 @@ public class AccessGroup implements ISave, Cloneable
     public boolean removeMember(AccessUser user)
     {
         //TODO trigger super profile that a member removed
-        if (user != null && username_to_profile.containsKey(user.getName()))
+        if (user != null)
         {
-            username_to_profile.remove(user.username);
-            if (user.getUserID() != null)
+            final String key = user.getName().toLowerCase();
+            if (username_to_profile.containsKey(key))
             {
-                uuid_to_profile.remove(user.getUserID());
+                username_to_profile.remove(key);
+                if (user.getUserID() != null)
+                {
+                    uuid_to_profile.remove(user.getUserID());
+                }
+                return true;
             }
-            return true;
         }
         return false;
     }
@@ -349,7 +354,7 @@ public class AccessGroup implements ISave, Cloneable
      */
     public boolean isParent(AccessGroup group)
     {
-        if(group == this)
+        if (group == this)
         {
             return true;
         }
@@ -445,7 +450,7 @@ public class AccessGroup implements ISave, Cloneable
     @Override
     public boolean equals(Object obj)
     {
-        return obj instanceof Group && ((Group<?>) obj).getName().equalsIgnoreCase(this.getName());
+        return obj instanceof AccessGroup && ((AccessGroup) obj).getName().equalsIgnoreCase(this.getName());
     }
 
     @Override
