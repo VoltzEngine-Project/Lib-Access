@@ -3,8 +3,8 @@ package com.builtbroken.mc.framework.access.global;
 import com.builtbroken.mc.core.Engine;
 import com.builtbroken.mc.core.handler.SaveManager;
 import com.builtbroken.mc.framework.access.AccessUtility;
-import com.builtbroken.mc.lib.helper.NBTUtility;
 import com.builtbroken.mc.framework.mod.loadable.AbstractLoadable;
+import com.builtbroken.mc.lib.helper.NBTUtility;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import net.minecraft.entity.player.EntityPlayer;
@@ -60,11 +60,15 @@ public final class GlobalAccessSystem extends AbstractLoadable
      */
     public static GlobalAccessProfile getProfile(String id)
     {
-        if (id_to_profiles.containsKey(id) && id_to_profiles.get(id) != null)
+        if (id != null && !id.trim().isEmpty())
         {
-            return id_to_profiles.get(id);
+            if (id_to_profiles.containsKey(id) && id_to_profiles.get(id) != null)
+            {
+                return id_to_profiles.get(id);
+            }
+            return loadProfile(id, false);
         }
-        return loadProfile(id, false);
+        return null;
     }
 
     /**
@@ -99,32 +103,34 @@ public final class GlobalAccessSystem extends AbstractLoadable
      */
     protected static GlobalAccessProfile loadProfile(String id, boolean create)
     {
-        Engine.logger().info("GlobalAccessSystem: Loading a profile[" + id + "] from disk");
-        NBTTagCompound tag = NBTUtility.loadData(GlobalAccessProfile.getPathToProfile(id));
-        if (!tag.hasNoTags())
+        Engine.logger().info("GlobalAccessSystem: Loading a profile[" + id + "] from save state");
+
+        String path = GlobalAccessProfile.getPathToProfile(id);
+        File file = NBTUtility.getSaveFile(path);
+        if(file.exists())
         {
-            GlobalAccessProfile profile = new GlobalAccessProfile();
-            profile.load(tag);
-            if (profile.getID() != null && profile.getName() != null)
+            NBTTagCompound tag = NBTUtility.loadData(file);
+            if (!tag.hasNoTags())
             {
-                id_to_profiles.put(profile.getID(), profile);
-                if (id_to_profiles.containsKey(id) && id_to_profiles.get(id) != null)
+                GlobalAccessProfile profile = new GlobalAccessProfile();
+                profile.load(tag);
+                if (profile.getID() != null && profile.getName() != null)
                 {
-                    Engine.logger().error("GlobalAccessSystem: Loading a profile over an existing profile[" + id + ", " + id_to_profiles.get(id) + "] with " + profile);
+                    id_to_profiles.put(profile.getID(), profile);
+                    if (id_to_profiles.containsKey(id) && id_to_profiles.get(id) != null)
+                    {
+                        Engine.logger().error("GlobalAccessSystem: Loading a profile over an existing profile[" + id + ", " + id_to_profiles.get(id) + "] with " + profile);
+                    }
+                    SaveManager.register(profile);
                 }
-                SaveManager.register(profile);
+                else
+                {
+                    Engine.logger().error("GlobalAccessSystem: Profile was invalid due to not containing id and name, skipping loading.");
+                }
+                return profile;
             }
-            else
-            {
-                Engine.logger().error("GlobalAccessSystem: Profile was invalid due to not containing id and name, skipping loading.");
-            }
-            return profile;
         }
-        else if (create)
-        {
-            return createProfile(id, true);
-        }
-        return null;
+        return create ? createProfile(id, true) : null;
     }
 
     /**
