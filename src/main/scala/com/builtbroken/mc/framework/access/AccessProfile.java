@@ -14,7 +14,6 @@ import net.minecraft.world.World;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -172,19 +171,29 @@ public class AccessProfile implements IVirtualObject
     /**
      * Checks to see if the profile contains the user
      *
-     * @param player
-     * @return
+     * @param player - user to check
+     * @return true if profile contains user in at least one group
      */
     public boolean containsUser(EntityPlayer player)
     {
-        return containsUser(player.getCommandSenderName());
+        for (AccessGroup group : this.groups)
+        {
+            AccessUser user = group.getMember(player);
+            if (user != null)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
      * Checks to see if the profile contains the user
+     * <p>
+     * Try to use {@link EntityPlayer} instance if possible
      *
-     * @param username
-     * @return
+     * @param username - name of the user
+     * @return true if profile contains user in at least one group
      */
     public boolean containsUser(String username)
     {
@@ -208,11 +217,26 @@ public class AccessProfile implements IVirtualObject
      */
     public AccessUser getUserAccess(EntityPlayer player)
     {
-        return getUserAccess(player.getCommandSenderName());
+        for (AccessGroup group : this.groups)
+        {
+            AccessUser user = group.getMember(player);
+            if (user != null)
+            {
+                return new AccessUserMultiGroup(this, user); //temp fix for user being in several groups at once
+            }
+        }
+        return new AccessUser(player).setTemporary(true);
     }
 
     /**
-     * EntityPlayer version should be used as usernames are not longer going to be supported.
+     * Gets the players Access object
+     * <p>
+     * Use {@link EntityPlayer} object if possible with {@link #getUserAccess(EntityPlayer)}
+     * this is meant as a legacy and edge case method. It should not be used as the main
+     * access point for permission checks.
+     *
+     * @param username - name of the user
+     * @return AccessUser for the player, or an empty AccessUser instance if player was not found
      */
     public AccessUser getUserAccess(String username)
     {
