@@ -1,7 +1,6 @@
 package com.builtbroken.mc.framework.access.api;
 
 import com.builtbroken.mc.framework.access.AccessProfile;
-import com.builtbroken.mc.framework.access.perm.Permissions;
 import net.minecraft.entity.player.EntityPlayer;
 
 /**
@@ -20,16 +19,22 @@ public interface IProfileContainer
     /**
      * Sets the active profile used by the machine. Should only be called by set profile GUI
      */
-    void setAccessProfile(AccessProfile profile);
+    @Deprecated //legacy, will be removed as its unused
+    default void setAccessProfile(AccessProfile profile)
+    {
+
+    }
+
 
     /**
      * Strait up yes or no can this user access the tile. Any future checks should be done after the
      * user has accessed the machine
-     * @deprecated use {@link #hasNode(EntityPlayer, String)} instead with permission node
-     * {@link Permissions#machineOpen}
      */
-    @Deprecated
-    boolean canAccess(String username);
+    @Deprecated //Legacy, will eventually be removed
+    default boolean canAccess(String username)
+    {
+        return hasNode(username, "root.machine.open");
+    }
 
     /**
      * Called to check if a user has the permission node.
@@ -52,5 +57,8 @@ public interface IProfileContainer
     /**
      * Called when the profile has changed, useful for updating the client
      */
-    void onProfileChange();
+    default void onProfileChange()
+    {
+
+    }
 }
