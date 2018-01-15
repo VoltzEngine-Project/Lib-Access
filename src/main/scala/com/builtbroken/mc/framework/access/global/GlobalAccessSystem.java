@@ -103,11 +103,14 @@ public final class GlobalAccessSystem extends AbstractLoadable
      */
     protected static GlobalAccessProfile loadProfile(String id, boolean create)
     {
-        Engine.logger().info("GlobalAccessSystem: Loading a profile[" + id + "] from save state");
+        if (Engine.runningAsDev)
+        {
+            Engine.logger().info("GlobalAccessSystem: Loading a profile[" + id + "] from save state");
+        }
 
         String path = GlobalAccessProfile.getPathToProfile(id);
         File file = NBTUtility.getSaveFile(path);
-        if(file.exists())
+        if (file.exists())
         {
             NBTTagCompound tag = NBTUtility.loadData(file);
             if (!tag.hasNoTags())
