@@ -3,7 +3,7 @@ package com.builtbroken.mc.framework.access.global.packets;
 import com.builtbroken.mc.api.data.IPacket;
 import com.builtbroken.mc.core.Engine;
 import com.builtbroken.mc.core.network.packet.PacketGui;
-import com.builtbroken.mc.core.network.packet.PacketType;
+import com.builtbroken.mc.core.network.packet.prefab.PacketBase;
 import com.builtbroken.mc.framework.access.AccessGroup;
 import com.builtbroken.mc.framework.access.global.GlobalAccessProfile;
 import com.builtbroken.mc.framework.access.global.GlobalAccessSystem;
@@ -21,7 +21,7 @@ import java.util.List;
  * @see <a href="https://github.com/BuiltBrokenModding/VoltzEngine/blob/development/license.md">License</a> for what you can and can't do with the code.
  * Created by Dark(DarkGuardsman, Robert) on 4/24/2017.
  */
-public class PacketAccessGui extends PacketType implements IPacket
+public class PacketAccessGui extends PacketBase<PacketAccessGui>
 {
     public static int REQUEST_ALL_PROFILES = 0;
     public static int REQUEST_PROFILE = 1;
@@ -51,14 +51,14 @@ public class PacketAccessGui extends PacketType implements IPacket
     public void encodeInto(ChannelHandlerContext ctx, ByteBuf buffer)
     {
         buffer.writeInt(id);
-        buffer.writeBytes(data());
+        super.encodeInto(ctx, buffer);
     }
 
     @Override
     public void decodeInto(ChannelHandlerContext ctx, ByteBuf buffer)
     {
         id = buffer.readInt();
-        data_$eq(buffer.slice());
+        super.decodeInto(ctx, buffer);
     }
 
     @Override
@@ -403,9 +403,9 @@ public class PacketAccessGui extends PacketType implements IPacket
         for (GlobalAccessProfile profile : profileList)
         {
             //We only want to send the bare minimal to function
-            packetGui.write(profile.getName());
-            packetGui.write(profile.getID());
-            packetGui.write(profile.getUserAccess(player).hasNode(Permissions.profileView)); //Disables view option
+            packetGui.addData(profile.getName());
+            packetGui.addData(profile.getID());
+            packetGui.addData(profile.getUserAccess(player).hasNode(Permissions.profileView)); //Disables view option
         }
 
         Engine.packetHandler.sendToPlayer(packetGui, player);
@@ -416,7 +416,7 @@ public class PacketAccessGui extends PacketType implements IPacket
         GlobalAccessProfile profile = GlobalAccessSystem.getProfile(profileID); //TODO send to all players
         if (profile != null) //TODO check if player can view profile
         {
-            IPacket packetGui = new PacketGui(1).write(profile.save(new NBTTagCompound()));
+            IPacket packetGui = new PacketGui(1).addData(profile.save(new NBTTagCompound()));
             Engine.packetHandler.sendToPlayer(packetGui, player);
         }
         else
@@ -459,7 +459,7 @@ public class PacketAccessGui extends PacketType implements IPacket
      */
     public static void doRequest(String profileID)
     {
-        Engine.packetHandler.sendToServer(new PacketAccessGui(REQUEST_PROFILE).write(profileID));
+        Engine.packetHandler.sendToServer(new PacketAccessGui(REQUEST_PROFILE).addData(profileID));
     }
 
     /**
@@ -473,7 +473,7 @@ public class PacketAccessGui extends PacketType implements IPacket
      */
     public static void keepAlive(String profileID)
     {
-        Engine.packetHandler.sendToServer(new PacketAccessGui(KEEP_ALIVE).write(profileID));
+        Engine.packetHandler.sendToServer(new PacketAccessGui(KEEP_ALIVE).addData(profileID));
     }
 
     /**
@@ -485,7 +485,7 @@ public class PacketAccessGui extends PacketType implements IPacket
      */
     public static void removeUser(String profileID, String group, String userName)
     {
-        Engine.packetHandler.sendToServer(new PacketAccessGui(REMOVE_USER_FROM_GROUP).write(profileID).write(group).write(userName));
+        Engine.packetHandler.sendToServer(new PacketAccessGui(REMOVE_USER_FROM_GROUP).addData(profileID, group, userName));
     }
 
     /**
@@ -497,7 +497,7 @@ public class PacketAccessGui extends PacketType implements IPacket
      */
     public static void addUser(String profileID, String group, String userName)
     {
-        Engine.packetHandler.sendToServer(new PacketAccessGui(ADD_USER_TO_GROUP).write(profileID).write(group).write(userName));
+        Engine.packetHandler.sendToServer(new PacketAccessGui(ADD_USER_TO_GROUP).addData(profileID, group, userName));
     }
 
     /**
@@ -508,7 +508,7 @@ public class PacketAccessGui extends PacketType implements IPacket
      */
     public static void createProfile(String name, boolean defaults)
     {
-        Engine.packetHandler.sendToServer(new PacketAccessGui(CREATE_PROFILE).write(name).write(defaults));
+        Engine.packetHandler.sendToServer(new PacketAccessGui(CREATE_PROFILE).addData(name, defaults));
     }
 
     /**
@@ -520,7 +520,7 @@ public class PacketAccessGui extends PacketType implements IPacket
      */
     public static void createGroup(String profile, String name, String parent)
     {
-        Engine.packetHandler.sendToServer(new PacketAccessGui(CREATE_GROUP).write(profile).write(name).write(parent));
+        Engine.packetHandler.sendToServer(new PacketAccessGui(CREATE_GROUP).addData(profile, name, parent));
     }
 
     /**
@@ -532,7 +532,7 @@ public class PacketAccessGui extends PacketType implements IPacket
      */
     public static void updateGroupParent(String profile, String name, String parent)
     {
-        Engine.packetHandler.sendToServer(new PacketAccessGui(UPDATE_GROUP_PARENT).write(profile).write(name).write(parent));
+        Engine.packetHandler.sendToServer(new PacketAccessGui(UPDATE_GROUP_PARENT).addData(profile, name, parent));
     }
 
     /**
@@ -544,16 +544,16 @@ public class PacketAccessGui extends PacketType implements IPacket
      */
     public static void removeGroup(String profile, String name, boolean pullUpSubGroups)
     {
-        Engine.packetHandler.sendToServer(new PacketAccessGui(REMOVE_GROUP).write(profile).write(name).write(pullUpSubGroups));
+        Engine.packetHandler.sendToServer(new PacketAccessGui(REMOVE_GROUP).addData(profile, name, pullUpSubGroups));
     }
 
     public static void removeNodeFromGroup(String profileID, String group, String node)
     {
-        Engine.packetHandler.sendToServer(new PacketAccessGui(REMOVE_NODE_FROM_GROUP).write(profileID).write(group).write(node));
+        Engine.packetHandler.sendToServer(new PacketAccessGui(REMOVE_NODE_FROM_GROUP).addData(profileID, group, node));
     }
 
     public static void addNodeToGroup(String profileID, String group, String node)
     {
-        Engine.packetHandler.sendToServer(new PacketAccessGui(ADD_NODE_TO_GROUP).write(profileID).write(group).write(node));
+        Engine.packetHandler.sendToServer(new PacketAccessGui(ADD_NODE_TO_GROUP).addData(profileID, group, node));
     }
 }

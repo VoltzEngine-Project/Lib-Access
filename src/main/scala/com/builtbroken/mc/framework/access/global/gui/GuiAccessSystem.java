@@ -1,7 +1,7 @@
 package com.builtbroken.mc.framework.access.global.gui;
 
+import com.builtbroken.mc.api.data.IPacket;
 import com.builtbroken.mc.core.network.IPacketIDReceiver;
-import com.builtbroken.mc.core.network.packet.PacketType;
 import com.builtbroken.mc.framework.access.AccessProfile;
 import com.builtbroken.mc.framework.access.AccessUser;
 import com.builtbroken.mc.framework.access.global.gui.dialogs.GuiDialogNewProfile;
@@ -260,7 +260,7 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
     }
 
     @Override
-    public boolean read(ByteBuf buf, int id, EntityPlayer player, PacketType type)
+    public boolean read(ByteBuf buf, int id, EntityPlayer player, IPacket type)
     {
         //Read profile list
         if (id == 0)
