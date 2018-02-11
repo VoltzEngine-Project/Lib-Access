@@ -55,7 +55,6 @@ public class AccessUser implements ISave
         this.setUserID(id);
     }
 
-    @Deprecated
     public AccessUser(EntityPlayer player)
     {
         this(player.getCommandSenderName(), player.getGameProfile().getId());
@@ -117,6 +116,12 @@ public class AccessUser implements ISave
      */
     public boolean hasNodeInUser(String node)
     {
+        //Special handling for max perm users
+        if (hasExactNode("*"))
+        {
+            return true;
+        }
+
         String tempNode = node.replace(".*", "");
         for (String headNode : nodes)
         {
