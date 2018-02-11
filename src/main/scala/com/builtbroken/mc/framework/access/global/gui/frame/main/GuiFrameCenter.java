@@ -84,8 +84,11 @@ public class GuiFrameCenter extends GuiFrameAccess<GuiFrameCenter>
         //Refresh profile list
         if (id == BUTTON_REFRESH)
         {
-            reloadGroupList();
-            PacketAccessGui.doRequest(getHost().currentProfile.getID());
+            if(getHost().currentProfile != null)
+            {
+                reloadGroupList();
+                PacketAccessGui.doRequest(getHost().currentProfile.getID());
+            }
         }
         else if (id == BUTTON_GROUPS)
         {
