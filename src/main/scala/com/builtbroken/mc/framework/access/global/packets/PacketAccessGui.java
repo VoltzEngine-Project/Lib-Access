@@ -2,6 +2,7 @@ package com.builtbroken.mc.framework.access.global.packets;
 
 import com.builtbroken.mc.api.data.IPacket;
 import com.builtbroken.mc.core.Engine;
+import com.builtbroken.mc.core.handler.SaveManager;
 import com.builtbroken.mc.core.network.packet.PacketGui;
 import com.builtbroken.mc.core.network.packet.PacketType;
 import com.builtbroken.mc.framework.access.AccessGroup;
@@ -13,7 +14,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.nbt.NBTTagCompound;
 
 import java.util.List;
 
@@ -416,7 +416,7 @@ public class PacketAccessGui extends PacketType implements IPacket
         GlobalAccessProfile profile = GlobalAccessSystem.getProfile(profileID); //TODO send to all players
         if (profile != null) //TODO check if player can view profile
         {
-            IPacket packetGui = new PacketGui(1).write(profile.save(new NBTTagCompound()));
+            IPacket packetGui = new PacketGui(1).write(SaveManager.generateSaveData(profile));
             Engine.packetHandler.sendToPlayer(packetGui, player);
         }
         else

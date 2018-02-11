@@ -4,6 +4,7 @@ import com.builtbroken.mc.core.network.IPacketIDReceiver;
 import com.builtbroken.mc.core.network.packet.PacketType;
 import com.builtbroken.mc.framework.access.AccessProfile;
 import com.builtbroken.mc.framework.access.AccessUser;
+import com.builtbroken.mc.framework.access.global.GlobalAccessSystem;
 import com.builtbroken.mc.framework.access.global.gui.dialogs.GuiDialogNewProfile;
 import com.builtbroken.mc.framework.access.global.gui.frame.main.GuiFrameCenter;
 import com.builtbroken.mc.framework.access.global.gui.frame.main.GuiFrameEvents;
@@ -211,7 +212,6 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
         this.drawCenteredString(this.fontRendererObj, "Global Access Permission System", this.width / 2, 3, 16777215);
 
 
-
         String name = "";
         String id = "";
         if (profileNames != null && currentProfileIndex >= 0 && currentProfileIndex < profileNames.length)
@@ -280,7 +280,7 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
         {
             if (currentProfile == null)
             {
-                currentProfile = new AccessProfile(ByteBufUtils.readTag(buf));
+                currentProfile = GlobalAccessSystem.createFromSave(null, ByteBufUtils.readTag(buf));
             }
             else
             {
