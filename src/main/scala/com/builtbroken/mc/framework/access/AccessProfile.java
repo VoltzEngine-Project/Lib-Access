@@ -48,7 +48,7 @@ public class AccessProfile implements IVirtualObject
     static
     {
         //Registers this class to the save manager so loading is easier
-        SaveManager.registerClass("AccessProfile", AccessProfile.class);
+        SaveManager.registerClass("AccessProfile", AccessProfile.class); //TODO move
     }
 
     public AccessProfile()

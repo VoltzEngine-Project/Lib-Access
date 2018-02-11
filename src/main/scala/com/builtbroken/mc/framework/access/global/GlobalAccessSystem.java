@@ -5,13 +5,9 @@ import com.builtbroken.mc.core.handler.SaveManager;
 import com.builtbroken.mc.framework.access.AccessUtility;
 import com.builtbroken.mc.framework.mod.loadable.AbstractLoadable;
 import com.builtbroken.mc.lib.helper.NBTUtility;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.TickEvent;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.world.WorldEvent;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -31,9 +27,6 @@ public final class GlobalAccessSystem extends AbstractLoadable
 {
     /** Map of profile IDs to profile instances, instances can be null if reserved or not loaded */
     private static final HashMap<String, GlobalAccessProfile> id_to_profiles = new HashMap();
-
-    /** Used for event reg */
-    public static final GlobalAccessSystem instance = new GlobalAccessSystem();
 
     /**
      * Called to get or create a profile
@@ -86,13 +79,26 @@ public final class GlobalAccessSystem extends AbstractLoadable
             AccessUtility.loadNewGroupSet(profile);
         }
         profile.initName(name.trim(), "P_" + name + "_" + System.nanoTime());
-        if (!id_to_profiles.containsKey(name) || id_to_profiles.get(name) == null)
-        {
-            id_to_profiles.put(profile.getID(), profile);
-        }
-        SaveManager.register(profile);
+        registerProfile(profile.getID(), profile);
         return profile;
     }
+
+    /**
+     * Registers the profile with the system
+     *
+     * @param id      - id to access the profile
+     * @param profile - profile instance
+     */
+    public static void registerProfile(String id, GlobalAccessProfile profile)
+    {
+        if (id_to_profiles.containsKey(id) && id_to_profiles.get(id) != null)
+        {
+            Engine.logger().error("GlobalAccessSystem: Loading a profile over an existing profile[" + id + ", " + id_to_profiles.get(id) + "] with " + profile);
+        }
+        id_to_profiles.put(profile.getID(), profile);
+        SaveManager.register(profile);
+    }
+
 
     /**
      * Called to load a profile from disk
@@ -103,11 +109,6 @@ public final class GlobalAccessSystem extends AbstractLoadable
      */
     protected static GlobalAccessProfile loadProfile(String id, boolean create)
     {
-        if (Engine.runningAsDev)
-        {
-            Engine.logger().info("GlobalAccessSystem: Loading a profile[" + id + "] from save state");
-        }
-
         String path = GlobalAccessProfile.getPathToProfile(id);
         File file = NBTUtility.getSaveFile(path);
         if (file.exists())
@@ -115,16 +116,13 @@ public final class GlobalAccessSystem extends AbstractLoadable
             NBTTagCompound tag = NBTUtility.loadData(file);
             if (!tag.hasNoTags())
             {
-                GlobalAccessProfile profile = new GlobalAccessProfile();
-                profile.load(tag);
+                //Load profile
+                GlobalAccessProfile profile = createFromSave(id, tag);
+
+                //Only use profile if we have an ID and name
                 if (profile.getID() != null && profile.getName() != null)
                 {
-                    id_to_profiles.put(profile.getID(), profile);
-                    if (id_to_profiles.containsKey(id) && id_to_profiles.get(id) != null)
-                    {
-                        Engine.logger().error("GlobalAccessSystem: Loading a profile over an existing profile[" + id + ", " + id_to_profiles.get(id) + "] with " + profile);
-                    }
-                    SaveManager.register(profile);
+                    registerProfile(id, profile);
                 }
                 else
                 {
@@ -135,6 +133,29 @@ public final class GlobalAccessSystem extends AbstractLoadable
         }
         return create ? createProfile(id, true) : null;
     }
+
+    public static GlobalAccessProfile createFromSave(String id, NBTTagCompound tag)
+    {
+        //Load profile
+        GlobalAccessProfile profile;
+
+        //Try save manager to allow custom profile objects
+        Object profileObject = SaveManager.createAndLoad(tag);
+        if (profileObject instanceof GlobalAccessProfile)
+        {
+            profile = (GlobalAccessProfile) profileObject;
+        }
+        //Fail safe to default to prevent data loss
+        else
+        {
+            Engine.logger().error("GlobalAccessSystem#loadProfile(" + id + ") failed to create profile from save. Using default object to prevent full data loss.", new RuntimeException("Error loading access profile"));
+            profile = new GlobalAccessProfile();
+            profile.load(tag);
+        }
+
+        return profile;
+    }
+
 
     /**
      * Finds all profiles that a player is contained in
