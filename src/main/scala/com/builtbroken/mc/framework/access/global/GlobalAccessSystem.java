@@ -172,75 +172,43 @@ public final class GlobalAccessSystem extends AbstractLoadable
         return id_to_profiles.values();
     }
 
-
-    //==================================================================================
-    //======SERVER AND EVENT STUFF ===================================================
-    //==================================================================================
-    private int ticks = 0;
-
-    private GlobalAccessSystem()
+    /** Cleanup data linked to the current save instance */
+    public static void cleanup()
     {
+        id_to_profiles.clear();
     }
 
-    @Override
-    public void preInit()
+    /**
+     * Called to load all profiles from disk.
+     * Should only be called on server start
+     */
+    public static void loadProfilesFromDisk()
     {
-        MinecraftForge.EVENT_BUS.register(instance);
-    }
-
-    @SubscribeEvent
-    public void onWorldTick(TickEvent.WorldTickEvent event)
-    {
-        if (event.world.provider.dimensionId == 0)
+        File folder = new File(NBTUtility.getSaveDirectory(MinecraftServer.getServer().getFolderName()), GlobalAccessProfile.SAVE_FOLDER);
+        if (folder.exists())
         {
-            ticks++;
-            if (ticks % 6000 == 0) //every 5 mins, TODO setup with config
+            File[] files = folder.listFiles();
+            for (File file : files)
             {
-                cleanup();
-            }
-        }
-    }
-
-    public void cleanup()
-    {
-        //todo clear broken, empty, and unowned profiles
-        // ^ might happen by neglect from users
-    }
-
-    @SubscribeEvent
-    public void onWorldLoad(WorldEvent.Load event)
-    {
-        if (event.world.provider.dimensionId == 0 && !event.world.isRemote && MinecraftServer.getServer() != null)
-        {
-            File folder = new File(NBTUtility.getSaveDirectory(MinecraftServer.getServer().getFolderName()), GlobalAccessProfile.SAVE_FOLDER);
-            if (folder.exists())
-            {
-                File[] files = folder.listFiles();
-                for (File file : files)
+                if (file.getName().endsWith(".dat"))
                 {
-                    if (file.getName().endsWith(".dat"))
+                    NBTTagCompound tag = NBTUtility.loadData(file);
+                    if (!tag.hasNoTags())
                     {
-                        NBTTagCompound tag = NBTUtility.loadData(file);
-                        if (!tag.hasNoTags())
+                        GlobalAccessProfile profile = createFromSave(file.getName(), tag);
+                        if (profile.getID() != null && profile.getName() != null)
                         {
-                            GlobalAccessProfile profile = new GlobalAccessProfile();
-                            profile.load(tag);
-                            if (profile.getID() != null && profile.getName() != null)
-                            {
-                                id_to_profiles.put(profile.getID(), profile);
-                                SaveManager.register(profile);
-                                //TODO check if has users, if not move to trash
-                            }
-                            else
-                            {
-                                //TODO note error and move to broken/trash folder
-                            }
+                            id_to_profiles.put(profile.getID(), profile);
+                            SaveManager.register(profile);
+                            //TODO check if has users, if not move to trash
+                        }
+                        else
+                        {
+                            //TODO note error and move to broken/trash folder
                         }
                     }
                 }
             }
         }
     }
-
-    //==================================================================================
 }

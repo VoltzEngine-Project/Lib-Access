@@ -1,6 +1,5 @@
 package com.builtbroken.mc.framework.access.global;
 
-import com.builtbroken.mc.core.handler.SaveManager;
 import com.builtbroken.mc.framework.access.AccessProfile;
 import net.minecraft.entity.player.EntityPlayer;
 
@@ -16,12 +15,6 @@ public class GlobalAccessProfile extends AccessProfile
 {
     /** Players who currently have a GUI open looking at this access profile */
     public final HashMap<EntityPlayer, Long> playersWithSettingsGUIOpen = new HashMap();
-
-    static
-    {
-        //Registers this class to the save manager so loading is easier
-        SaveManager.registerClass("GlobalAccessProfile", GlobalAccessProfile.class);
-    }
 
     public GlobalAccessProfile()
     {
