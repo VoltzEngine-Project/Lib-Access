@@ -1,6 +1,5 @@
 package com.builtbroken.mc.framework.access;
 
-import com.builtbroken.jlib.type.Group;
 import com.builtbroken.mc.api.ISave;
 import com.builtbroken.mc.framework.access.perm.Permission;
 import net.minecraft.entity.player.EntityPlayer;
@@ -20,6 +19,11 @@ public class AccessGroup implements ISave, Cloneable
 {
     /** Name of the group */
     private String name;
+    /** Overrides the default name for display in GUIs */
+    protected String displayName;
+    /** Show description for the GUI */
+    protected String description;
+
     /** System time when the group was created */
     protected long creation_time;
 
@@ -457,5 +461,27 @@ public class AccessGroup implements ISave, Cloneable
     public String toString()
     {
         return "[Group:" + this.getName() + "]";
+    }
+
+    /** Overrides the default name for display in GUIs */
+    public String getDisplayName()
+    {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName)
+    {
+        this.displayName = displayName;
+    }
+
+    /** Show description for the GUI */
+    public String getDescription()
+    {
+        return description;
+    }
+
+    public void setDescription(String description)
+    {
+        this.description = description;
     }
 }
