@@ -1,5 +1,7 @@
 package com.builtbroken.mc.framework.access.global.gui.frame.group.main;
 
+import com.builtbroken.mc.framework.access.AccessGroup;
+import com.builtbroken.mc.framework.access.perm.Permission;
 import com.builtbroken.mc.framework.access.perm.Permissions;
 import com.builtbroken.mc.framework.access.global.gui.GuiAccessSystem;
 import com.builtbroken.mc.framework.access.global.gui.frame.group.edit.GuiFrameGroupSettings;
@@ -87,13 +89,31 @@ public class GroupEntry extends GuiComponentContainer<GroupEntry>
     {
         super.update(mc, mouseX, mouseY);
 
-        groupButtons[0].setEnabled(((GuiAccessSystem) getHost()).getPlayer().hasNode(Permissions.groupSetting));
-        groupButtons[1].setEnabled(
-                ((GuiAccessSystem) getHost()).getPlayer().hasNode(Permissions.groupPermissionAdd)
-                        || ((GuiAccessSystem) getHost()).getPlayer().hasNode(Permissions.groupPermissionRemove));
-        groupButtons[2].setEnabled(
-                ((GuiAccessSystem) getHost()).getPlayer().hasNode(Permissions.groupUserPermissionAdd)
-                        || ((GuiAccessSystem) getHost()).getPlayer().hasNode(Permissions.groupUserPermissionRemove));
+        groupButtons[0].setEnabled(canEditGroup() && hasNodes(Permissions.groupSetting));
+        groupButtons[1].setEnabled(canEditGroup() && hasNodes(Permissions.groupPermissionAdd, Permissions.groupPermissionRemove));
+        groupButtons[2].setEnabled(canEditGroup() && hasNodes(Permissions.groupUserPermissionAdd, Permissions.groupUserPermissionRemove)); //TODO move required permissions to a helper
+    }
+
+    protected boolean hasNodes(Permission... nodes)
+    {
+        for(Permission node : nodes)
+        {
+            if(node == null || !((GuiAccessSystem) getHost()).getPlayer().hasNode(node))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    protected boolean canEditGroup()
+    {
+        return ((GuiAccessSystem) getHost()).currentProfile != null && ((GuiAccessSystem) getHost()).currentProfile.canEdit() && getGroup() != null && getGroup().canEdit();
+    }
+
+    public AccessGroup getGroup()
+    {
+        return ((GuiAccessSystem) getHost()).currentProfile != null ? ((GuiAccessSystem) getHost()).currentProfile.getGroup(groupID) : null;
     }
 
     protected void reloadGroupList()

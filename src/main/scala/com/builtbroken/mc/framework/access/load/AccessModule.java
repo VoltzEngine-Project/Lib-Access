@@ -4,7 +4,7 @@ import com.builtbroken.mc.core.handler.SaveManager;
 import com.builtbroken.mc.framework.access.AccessProfile;
 import com.builtbroken.mc.framework.access.global.GlobalAccessProfile;
 import com.builtbroken.mc.framework.access.global.GlobalAccessSystem;
-import com.builtbroken.mc.framework.access.global.SingleOwnerAccessProfile;
+import com.builtbroken.mc.framework.access.global.GlobalAccessProfileSimple;
 import com.builtbroken.mc.framework.mod.loadable.AbstractLoadable;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
@@ -25,7 +25,7 @@ public class AccessModule extends AbstractLoadable
 
         //Register virtual objects with save manager
         SaveManager.registerClass("AccessProfile", AccessProfile.class);
-        SaveManager.registerClass("SingleOwnerAccessProfile", SingleOwnerAccessProfile.class);
+        SaveManager.registerClass("SingleOwnerAccessProfile", GlobalAccessProfileSimple.class);
         SaveManager.registerClass("GlobalAccessProfile", GlobalAccessProfile.class);
     }
 

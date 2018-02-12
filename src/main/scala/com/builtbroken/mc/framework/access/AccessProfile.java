@@ -1,166 +1,26 @@
 package com.builtbroken.mc.framework.access;
 
-import com.builtbroken.mc.api.IVirtualObject;
-import com.builtbroken.mc.api.tile.ITile;
-import com.builtbroken.mc.core.handler.SaveManager;
+import com.builtbroken.mc.api.ISave;
 import com.builtbroken.mc.framework.access.wrapper.AccessUserMultiGroup;
-import com.builtbroken.mc.lib.helper.LanguageUtility;
-import com.builtbroken.mc.lib.helper.NBTUtility;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.World;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Designed to be used as a container for AccessGroups and AccessUser. If you plan to use this make
- * sure to use it correctly. This is designed to be saved separate from the world save if marked for
- * global access. Which means it can save/load at will from the world file.
+ * Designed to be used as a container for {@link AccessGroup}s containing  {@link AccessUser}s. Great for
+ * simple node based permission systems.
  *
  * @author DarkGuardsman
  */
-public class AccessProfile implements IVirtualObject
+public class AccessProfile implements ISave
 {
-    public static final String SAVE_FOLDER = NBTUtility.BBM_FOLDER + "access/profiles/";
+    protected boolean canEdit = true; //TODO implement, allow disabling modifications to object
 
     /** A list of all groups attached to this profile */
     protected List<AccessGroup> groups = new ArrayList();
-
-    /** Display name of the profile for the user to easily read */
-    protected String profileName = "";
-
-    /**
-     * Only used by global profiles that have no defined container. Defaults to localHost defining
-     * the profile as non-global
-     */
-    protected String profileID = "LocalHost";
-
-    /** Is this profile global */
-    protected boolean global = false;
-
-    /** Save file by which this was loaded. Not currently used but stored if ever needed. */
-    protected File saveFile;
-
-    public AccessProfile()
-    {
-
-    }
-
-    public AccessProfile(boolean global)
-    {
-        this.global = global;
-        if (global)
-        {
-            SaveManager.register(this);
-        }
-    }
-
-    public AccessProfile(NBTTagCompound nbt)
-    {
-        this(nbt, false);
-    }
-
-    public AccessProfile(NBTTagCompound nbt, boolean global)
-    {
-        this();
-        this.load(nbt);
-        if (this.profileName == null || this.profileID == null)
-        {
-            if (!global)
-            {
-                this.generateNew("Default", (ITile) null);
-            }
-            else
-            {
-                this.generateNew("New Group");
-            }
-        }
-    }
-
-    /**
-     * Called to generate a new data for an
-     * access profile. Will set {@link #profileID},
-     * {@link #profileName}, and init {@link #groups}
-     * with registered defaults
-     *
-     * @param name - profile name, used in ID
-     * @return this
-     */
-    public AccessProfile generateNew(String name)
-    {
-        AccessUtility.loadNewGroupSet(this);
-        initName(name.trim(), "P_" + name + "_" + System.currentTimeMillis());
-        return this;
-    }
-
-    /**
-     * Called to generate a new data for an
-     * access profile. Will set {@link #profileID},
-     * {@link #profileName}, and init {@link #groups}
-     * with registered defaults
-     *
-     * @param name   - profile name, used in ID
-     * @param entity - tile that created this group
-     * @return this
-     */
-    public AccessProfile generateNew(String name, ITile entity)
-    {
-        AccessUtility.loadNewGroupSet(this);
-        initName(name.trim(), "LocalHost:" + name);
-        return this;
-    }
-
-    /**
-     * Called to generate a new data for an
-     * access profile. Will set {@link #profileID},
-     * {@link #profileName}, and init {@link #groups}
-     * with registered defaults
-     *
-     * @param name   - profile name, used in ID
-     * @param player - user that created this group, used in profile id
-     * @return this
-     */
-    public AccessProfile generateNew(String name, EntityPlayer player)
-    {
-        AccessUtility.loadNewGroupSet(this);
-        initName(name, player.getCommandSenderName() + "_" + System.nanoTime());
-        return this;
-    }
-
-    public AccessProfile initName(String name, String id)
-    {
-        this.profileName = name;
-        this.profileID = id;
-        return this;
-    }
-
-    /**
-     * Display name of the profile
-     */
-    public String getName()
-    {
-        return this.profileName;
-    }
-
-    /**
-     * Save/Global id of the profie
-     */
-    public String getID()
-    {
-        return this.profileID;
-    }
-
-    /**
-     * Is this a global profile that is can be accessed by all objects
-     */
-    public boolean isGlobal()
-    {
-        return this.global;
-    }
 
     /**
      * Checks to see if the profile contains the user
@@ -219,7 +79,7 @@ public class AccessProfile implements IVirtualObject
                 return new AccessUserMultiGroup(this, user); //temp fix for user being in several groups at once
             }
         }
-        return new AccessUser(player).setTemporary(true);
+        return new AccessUser(player).setTemporary(true).disableEdit();
     }
 
     /**
@@ -242,7 +102,7 @@ public class AccessProfile implements IVirtualObject
                 return new AccessUserMultiGroup(this, user); //temp fix for user being in several groups at once
             }
         }
-        return new AccessUser(username).setTemporary(true);
+        return new AccessUser(username).setTemporary(true).disableEdit();
     }
 
     /**
@@ -292,21 +152,27 @@ public class AccessProfile implements IVirtualObject
     public boolean removeUserAccess(String player)
     {
         boolean re = false;
-        for (AccessGroup group : this.groups)
+        if(canEdit)
         {
-            AccessUser user = group.getMember(player);
-            if (user != null && group.removeMember(user))
+            for (AccessGroup group : this.groups)
             {
-                re = true;
+                AccessUser user = group.getMember(player);
+                if (user != null && group.removeMember(user))
+                {
+                    re = true;
+                }
             }
-        }
-        if (re)
-        {
-            this.onProfileUpdate();
+            if (re)
+            {
+                this.onProfileUpdate();
+            }
         }
         return re;
     }
 
+    /**
+     * Called any time the profile changes
+     */
     public void onProfileUpdate()
     {
 
@@ -324,7 +190,7 @@ public class AccessProfile implements IVirtualObject
 
     public AccessGroup removeGroup(AccessGroup group)
     {
-        if (group != null && getGroups().contains(group))
+        if (canEdit && group != null && getGroups().contains(group))
         {
             if (getGroups().remove(group))
             {
@@ -336,7 +202,7 @@ public class AccessProfile implements IVirtualObject
 
     public boolean addGroup(AccessGroup group)
     {
-        if (!this.groups.contains(group))
+        if (canEdit && !this.groups.contains(group))
         {
             if (this.groups.add(group))
             {
@@ -376,10 +242,6 @@ public class AccessProfile implements IVirtualObject
     @Override
     public void load(NBTTagCompound nbt)
     {
-        this.profileName = nbt.getString("name");
-        this.global = nbt.getBoolean("global");
-        this.profileID = nbt.getString("profileID");
-
         //Load groups
         NBTTagList group_list = nbt.getTagList("groups", 10);
         if (group_list != null && group_list.tagCount() > 0)
@@ -406,9 +268,6 @@ public class AccessProfile implements IVirtualObject
     @Override
     public NBTTagCompound save(NBTTagCompound nbt)
     {
-        nbt.setString("name", this.profileName);
-        nbt.setBoolean("global", this.global);
-        nbt.setString("profileID", this.profileID);
         NBTTagList groupTags = new NBTTagList();
         for (AccessGroup group : this.getGroups())
         {
@@ -420,37 +279,32 @@ public class AccessProfile implements IVirtualObject
         return nbt;
     }
 
-    @Override
-    public File getSaveFile()
+    public <E extends AccessProfile> E disableEdit()
     {
-        if (this.saveFile == null)
-        {
-            this.saveFile = new File(NBTUtility.getSaveDirectory(MinecraftServer.getServer().getFolderName()), getPathToProfile(this.getID()));
-        }
-        return this.saveFile;
+        canEdit = false;
+        return (E) this;
     }
 
-    public static String getPathToProfile(String name)
+    public <E extends AccessProfile> E enableEdit()
     {
-        return SAVE_FOLDER + name + ".dat";
+        canEdit = true;
+        return (E) this;
     }
 
-    @Override
-    public void setSaveFile(File file)
+    public <E extends AccessProfile> E setEditState(boolean state)
     {
-        this.saveFile = file;
-
+        canEdit = state;
+        return (E) this;
     }
 
-    @Override
-    public boolean shouldSaveForWorld(World world)
+    public boolean canEdit()
     {
-        return world != null && world.provider.dimensionId == 0;
+        return canEdit;
     }
 
     @Override
     public String toString()
     {
-        return LanguageUtility.getLocal("info.accessprofile.tostring").replaceAll("%p", this.profileName.toString()).replaceAll("%g", groups.toString());
+        return getClass().getSimpleName() + " groups: " + groups.size();
     }
 }

@@ -1,35 +1,37 @@
 package com.builtbroken.mc.framework.access.global;
 
-import com.builtbroken.mc.framework.access.AccessProfile;
 import com.builtbroken.mc.framework.access.AccessUser;
-import com.builtbroken.mc.framework.access.perm.Permissions;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 
 import java.util.UUID;
 
 /**
- * Seperate version from the base {@link AccessProfile} that contains additional settings and features.
+ * Simplified version of the {@link GlobalAccessProfile} to setup a single owner of the profile. This
+ * prevents the profile from switching hands. The intended use for this version is for default profiles.
+ * An example use case is friends lists that will only have one group.
  *
  * @see <a href="https://github.com/BuiltBrokenModding/VoltzEngine/blob/development/license.md">License</a> for what you can and can't do with the code.
  * Created by Dark(DarkGuardsman, Robert) on 4/30/2017.
  */
-public class SingleOwnerAccessProfile extends GlobalAccessProfile
+public class GlobalAccessProfileSimple extends GlobalAccessProfile
 {
-    public String ownerUsername;
-    public UUID ownerID;
+    /** Username of the owner */
+    protected String ownerUsername;
+    /** Universal unique id of the owner */
+    protected UUID ownerID;
 
-    public SingleOwnerAccessProfile()
+    public GlobalAccessProfileSimple()
     {
         //Needed for save manager
     }
 
-    public SingleOwnerAccessProfile(EntityPlayer player)
+    public GlobalAccessProfileSimple(EntityPlayer player)
     {
         this(player.getGameProfile().getName(), player.getGameProfile().getId());
     }
 
-    public SingleOwnerAccessProfile(String username, UUID ownerID)
+    public GlobalAccessProfileSimple(String username, UUID ownerID)
     {
         this.ownerUsername = username;
         this.ownerID = ownerID;
@@ -53,7 +55,8 @@ public class SingleOwnerAccessProfile extends GlobalAccessProfile
         if (isOwner(player))
         {
             AccessUser user = new AccessUser(player);
-            user.addNode(Permissions.root);
+            user.addNode("*");
+            user.disableEdit();
             return user;
         }
         return super.getUserAccess(player);
@@ -66,7 +69,7 @@ public class SingleOwnerAccessProfile extends GlobalAccessProfile
         {
             AccessUser user = new AccessUser(ownerUsername, ownerID);
             user.addNode("*");
-            user.addNode(Permissions.root + ".*");
+            user.disableEdit();
             return user;
         }
         return super.getUserAccess(username);

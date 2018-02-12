@@ -85,6 +85,11 @@ public abstract class GuiSubFrameGroup<E extends GuiSubFrameGroup> extends GuiSu
         return getHost().currentProfile != null ? getHost().currentProfile.getGroup(groupID) : null;
     }
 
+    public boolean canEditGroup()
+    {
+        return getGroup() != null && getHost().currentProfile.canEdit() && getGroup().canEdit();
+    }
+
     public AccessUser getPlayer()
     {
         return getHost().getPlayer();

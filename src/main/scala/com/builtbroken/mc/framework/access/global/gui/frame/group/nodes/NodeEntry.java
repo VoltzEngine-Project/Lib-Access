@@ -81,7 +81,7 @@ public class NodeEntry extends GuiComponentContainer<NodeEntry>
     protected void update(Minecraft mc, int mouseX, int mouseY)
     {
         super.update(mc, mouseX, mouseY);
-        removeNodeButton.setEnabled(((GuiAccessSystem) getHost()).getPlayer().hasNode(Permissions.groupPermissionRemove));
+        removeNodeButton.setEnabled(nodesFrame.canEditGroup() && nodesFrame.getPlayer().hasNode(Permissions.groupPermissionRemove));
     }
 
     protected void reloadGroupList()

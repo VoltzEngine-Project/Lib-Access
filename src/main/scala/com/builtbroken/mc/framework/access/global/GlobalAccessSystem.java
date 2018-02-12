@@ -84,21 +84,21 @@ public final class GlobalAccessSystem extends AbstractLoadable
         if (profile == null)
         {
             //Init profile
-            profile = new SingleOwnerAccessProfile(username, uuid);
+            profile = new GlobalAccessProfileSimple(username, uuid);
             profile.initName("Friends", id);
 
             //Add default group
-            AccessGroup friend = new AccessGroup("friends");
-            friend.setDisplayName("Friends");
-            friend.setDescription("People you trust and want to have access to your stuff");
-            friend.addNode(Permissions.PROFILE_FOF);
-            friend.addNode(Permissions.targetFriend);
-            friend.addNode(Permissions.inventory);
-            friend.addNode(Permissions.machine);
-            profile.addGroup(friend);
+            final AccessGroup friendsGroup = new AccessGroup("friends");
+            friendsGroup.setDisplayName("Friends");
+            friendsGroup.setDescription("People you trust and want to have access to your stuff");
+            friendsGroup.addNode(Permissions.PROFILE_FOF);
+            friendsGroup.addNode(Permissions.targetFriend);
+            friendsGroup.addNode(Permissions.inventory);
+            friendsGroup.addNode(Permissions.machine);
+            profile.addGroup(friendsGroup.disableEdit());
 
             //Register
-            registerProfile(id, profile);
+            registerProfile(id, profile.disableEdit());
         }
         return profile;
     }

@@ -2,8 +2,8 @@ package com.builtbroken.mc.framework.access.global.gui;
 
 import com.builtbroken.mc.core.network.IPacketIDReceiver;
 import com.builtbroken.mc.core.network.packet.PacketType;
-import com.builtbroken.mc.framework.access.AccessProfile;
 import com.builtbroken.mc.framework.access.AccessUser;
+import com.builtbroken.mc.framework.access.global.GlobalAccessProfile;
 import com.builtbroken.mc.framework.access.global.GlobalAccessSystem;
 import com.builtbroken.mc.framework.access.global.gui.dialogs.GuiDialogNewProfile;
 import com.builtbroken.mc.framework.access.global.gui.frame.main.GuiFrameCenter;
@@ -40,7 +40,7 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
 
     public GuiArray profileArray;
 
-    public AccessProfile currentProfile;
+    public GlobalAccessProfile currentProfile;
 
     public String[] profileNames;
     public String[] profileIDs;
