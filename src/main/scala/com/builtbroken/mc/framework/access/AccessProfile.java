@@ -152,7 +152,7 @@ public class AccessProfile implements ISave
     public boolean removeUserAccess(String player)
     {
         boolean re = false;
-        if(canEdit)
+        if (canEdit)
         {
             for (AccessGroup group : this.groups)
             {
@@ -180,7 +180,11 @@ public class AccessProfile implements ISave
 
     public AccessGroup getGroup(String name)
     {
-        return AccessUtility.getGroup(this.getGroups(), name.toLowerCase());
+        if (name != null && !name.isEmpty())
+        {
+            return AccessUtility.getGroup(this.getGroups(), name.toLowerCase());
+        }
+        return null;
     }
 
     public AccessGroup removeGroup(String name)
