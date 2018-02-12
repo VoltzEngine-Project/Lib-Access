@@ -41,6 +41,7 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
     public GuiArray profileArray;
 
     public GlobalAccessProfile currentProfile;
+    public String profileToLoad;
 
     public String[] profileNames;
     public String[] profileIDs;
@@ -83,6 +84,10 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
         rightFrame.setWidth(sideWidths);
         rightFrame.setHeight(this.height - 15);
 
+        if(currentProfile != null && profileToLoad == null)
+        {
+            profileToLoad = currentProfile.getID();
+        }
         reloadProfileList();
         reloadGroupList();
     }
@@ -135,6 +140,35 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
         {
             loadCenterFrame(defaultCenterFrame, false);
         }
+
+        if(profileToLoad != null)
+        {
+            if(profileIDs != null)
+            {
+                if (currentProfile == null || !currentProfile.getID().equalsIgnoreCase(profileToLoad))
+                {
+                    for (int i = 0; i < profileIDs.length; i++)
+                    {
+                        String profile = profileIDs[i];
+                        if(profile.equalsIgnoreCase(profileToLoad))
+                        {
+                            loadProfile(i);
+                            break;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                PacketAccessGui.doRequest();
+            }
+        }
+    }
+
+    public void loadProfile(String name)
+    {
+        profileToLoad = name;
+        PacketAccessGui.doRequest();
     }
 
     /**
@@ -146,6 +180,7 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
     {
         currentProfileIndex = index;
         currentProfile = null;
+        profileToLoad = null;
         if (profileIDs != null && currentProfileIndex >= 0 && currentProfileIndex < profileIDs.length)
         {
             loadCenterFrame(defaultCenterFrame, false);
@@ -271,6 +306,10 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
                 profileNames[i] = ByteBufUtils.readUTF8String(buf);
                 profileIDs[i] = ByteBufUtils.readUTF8String(buf);
                 buf.readBoolean();
+            }
+            if(currentProfile != null)
+            {
+                profileToLoad = currentProfile.getID();
             }
             reloadProfileList();
             return true;
