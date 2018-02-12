@@ -1,40 +1,30 @@
 package com.builtbroken.mc.framework.access;
 
-import com.builtbroken.mc.api.ISave;
-import com.builtbroken.mc.framework.access.perm.Permission;
+import com.builtbroken.mc.framework.access.prefab.AccessObject;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 /**
- * Used to define a users access to a terminal based object.
+ * Used to define a users for a permission system
  *
  * @author DarkGuardsman
  */
-public class AccessUser implements ISave
+public class AccessUser extends AccessObject
 {
     /** Username of player, main way to check owner */
     protected String username;
     private UUID userID;
-
-    /** Toggle to note this user will not save, and is only used for a short time */
-    protected boolean isTempary = false;
 
     /** Extra user data, only store permission related settings here */
     protected NBTTagCompound extraData;
     /** User's main group */
     protected AccessGroup group;
 
-    /** List of permission nodes */
-    public List<String> nodes = new ArrayList();
-
-    /** Only use for save/load */
     protected AccessUser()
     {
+        //Mainly for save/load
     }
 
     /**
@@ -78,120 +68,15 @@ public class AccessUser implements ISave
         return this;
     }
 
-    /**
-     * Checks if the user has the permission node
-     *
-     * @param permission - node
-     * @return true if the user has the node or a super * node
-     */
-    public boolean hasNode(Permission permission)
-    {
-        return hasNode(permission.toString());
-    }
-
-    /**
-     * Checks if the user has the permission node
-     *
-     * @param node - node
-     * @return true if the user has the node or a super * node
-     */
-    public boolean hasNode(String node)
-    {
-        return hasExactNode(node) || hasNodeInUser(node) || groupHasNode(node);
-    }
-
     public boolean groupHasNode(String node)
     {
         return this.getGroup() != null && this.getGroup().hasNode(node);
     }
 
-    /**
-     * Checks if the user has the permission node
-     * for this user only. Doesn't check group nodes
-     * user {@link #hasNode(String)} to check
-     * group as well
-     *
-     * @param node - node
-     * @return true if the user has the node or a super * node
-     */
-    public boolean hasNodeInUser(String node)
+    @Override
+    public boolean hasNode(String node)
     {
-        //Special handling for max perm users
-        if (hasExactNode("*"))
-        {
-            return true;
-        }
-
-        String tempNode = node.replace(".*", "");
-        for (String headNode : nodes)
-        {
-            if (tempNode.contains(headNode))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Checks to see if the user has the exact node
-     *
-     * @param node - node
-     * @return true only if exact match is found
-     */
-    public boolean hasExactNode(String node)
-    {
-        return this.nodes.contains(node);
-    }
-
-    /**
-     * Removes a permission node from this user
-     *
-     * @param perm
-     * @return
-     */
-    public boolean removeNode(Permission perm)
-    {
-
-        return removeNode(perm.toString());
-    }
-
-    /**
-     * Adds a permission node to this user
-     *
-     * @param perm
-     * @return
-     */
-    public boolean addNode(Permission perm)
-    {
-        return addNode(perm.toString());
-    }
-
-    /**
-     * Removes a permission node from this user
-     *
-     * @param perm
-     * @return
-     */
-    public boolean removeNode(String perm)
-    {
-        return nodes.remove(perm);
-    }
-
-    /**
-     * Adds a permission node to this user
-     *
-     * @param perm
-     * @return
-     */
-    public boolean addNode(String perm)
-    {
-        //TODO if contains * remove all sub nodes
-        if (!hasExactNode(perm))
-        {
-            nodes.add(perm);
-        }
-        return false;
+        return super.hasNode(node) || groupHasNode(node);
     }
 
     @Override
@@ -199,14 +84,6 @@ public class AccessUser implements ISave
     {
         nbt.setString("username", this.username);
         nbt.setTag("extraData", this.userData());
-        NBTTagList usersTag = new NBTTagList();
-        for (String str : this.nodes)
-        {
-            NBTTagCompound accessData = new NBTTagCompound();
-            accessData.setString("name", str);
-            usersTag.appendTag(accessData);
-        }
-        nbt.setTag("permissions", usersTag);
         if (getUserID() != null)
         {
             NBTTagCompound tag = new NBTTagCompound();
@@ -214,20 +91,15 @@ public class AccessUser implements ISave
             tag.setLong("m", getUserID().getMostSignificantBits());
             nbt.setTag("UUID", tag);
         }
-        return nbt;
+        return super.save(nbt);
     }
 
     @Override
     public void load(NBTTagCompound nbt)
     {
+        super.load(nbt);
         this.username = nbt.getString("username");
         this.extraData = nbt.getCompoundTag("extraData");
-        NBTTagList userList = nbt.getTagList("permissions", 10);
-        this.nodes.clear();
-        for (int i = 0; i < userList.tagCount(); ++i)
-        {
-            this.nodes.add(userList.getCompoundTagAt(i).getString("name"));
-        }
         if (nbt.hasKey("UUID"))
         {
             NBTTagCompound tag = nbt.getCompoundTag("UUID");
@@ -255,7 +127,7 @@ public class AccessUser implements ISave
      */
     public AccessUser setTemporary(boolean temp)
     {
-        this.isTempary = temp;
+        this.isTemporary = temp;
         return this;
     }
 

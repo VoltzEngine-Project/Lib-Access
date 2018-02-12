@@ -1,7 +1,6 @@
 package com.builtbroken.mc.framework.access;
 
-import com.builtbroken.mc.api.ISave;
-import com.builtbroken.mc.framework.access.perm.Permission;
+import com.builtbroken.mc.framework.access.prefab.AccessObject;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -15,7 +14,7 @@ import java.util.*;
  *
  * @author DarkGuardsman
  */
-public class AccessGroup implements ISave, Cloneable
+public class AccessGroup extends AccessObject implements Cloneable
 {
     /** Name of the group */
     private String name;
@@ -209,16 +208,8 @@ public class AccessGroup implements ISave, Cloneable
 
         nbt.setTag("users", usersTag);
 
-        NBTTagList nodesTag = new NBTTagList();
-        for (String str : this.nodes)
-        {
-            NBTTagCompound accessData = new NBTTagCompound();
-            accessData.setString("name", str);
-            nodesTag.appendTag(accessData);
-        }
-        nbt.setTag("permissions", nodesTag);
         nbt.setLong("creationDate", this.creation_time);
-        return nbt;
+        return super.save(nbt);
     }
 
     @Override
@@ -243,14 +234,6 @@ public class AccessGroup implements ISave, Cloneable
             this.addMember(user);
         }
 
-        // Load permission permissions
-        NBTTagList nodeList = nbt.getTagList("permissions", 10);
-        this.nodes.clear();
-        for (int i = 0; i < nodeList.tagCount(); ++i)
-        {
-            this.nodes.add(nodeList.getCompoundTagAt(i).getString("name"));
-        }
-
         // Load creation date
         if (nbt.hasKey("creationDate"))
         {
@@ -262,75 +245,10 @@ public class AccessGroup implements ISave, Cloneable
         }
     }
 
-    /**
-     * Checks if this or it's supper group has the permission node
-     */
+    @Override
     public boolean hasNode(String node)
     {
-        return hasExactNode(node) || hasNodeInGroup(node) || this.getExtendGroup() != null && this.getExtendGroup().hasNode(node);
-    }
-
-    /**
-     * Checks if this or it's supper group has the permission node
-     */
-    public boolean hasNode(Permission node)
-    {
-        return hasNode(node.toString());
-    }
-
-    /**
-     * Tries to match the node to a parent node
-     * <p>
-     * E.g. root.owner would return true if group has root or root.*
-     * <p>
-     * use {@link #hasExactNode(String)} to check for 100% match
-     * and to ignore parent checks.
-     *
-     * @param node - string value of node to check
-     * @return true if group contains the node's parent
-     */
-    public boolean hasNodeInGroup(String node)
-    {
-        final String tempNode = node.replace(".*", "");
-        for (String groupNode : nodes)
-        {
-            final String headNode = groupNode.replace(".*", "");
-            if (tempNode.startsWith(headNode))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean hasExactNode(String node)
-    {
-        return this.nodes.contains(node);
-    }
-
-    /**
-     * Adds a permission node to the group
-     */
-    public void addNode(String node)
-    {
-        this.nodes.add(node);
-    }
-
-    public void addNode(Permission node)
-    {
-        addNode(node.toString());
-    }
-
-    /**
-     * Removes a permission node from the group
-     */
-    public void removeNode(String node)
-    {
-        // TODO remove sub permissions linked to this node
-        if (this.nodes.contains(node))
-        {
-            this.nodes.remove(node);
-        }
+        return super.hasNode(node) || this.getExtendGroup() != null && this.getExtendGroup().hasNode(node);
     }
 
     /**
@@ -387,11 +305,6 @@ public class AccessGroup implements ISave, Cloneable
     public String getExtendGroupName()
     {
         return this.extendGroup_name;
-    }
-
-    public Set<String> getNodes()
-    {
-        return nodes;
     }
 
     /**
