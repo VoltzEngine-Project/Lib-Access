@@ -45,12 +45,6 @@ public class AccessProfile implements IVirtualObject
     /** Save file by which this was loaded. Not currently used but stored if ever needed. */
     protected File saveFile;
 
-    static
-    {
-        //Registers this class to the save manager so loading is easier
-        SaveManager.registerClass("AccessProfile", AccessProfile.class); //TODO move
-    }
-
     public AccessProfile()
     {
 

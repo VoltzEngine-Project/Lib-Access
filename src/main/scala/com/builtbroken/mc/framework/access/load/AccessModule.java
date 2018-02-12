@@ -1,6 +1,7 @@
-package com.builtbroken.mc.framework.access;
+package com.builtbroken.mc.framework.access.load;
 
 import com.builtbroken.mc.core.handler.SaveManager;
+import com.builtbroken.mc.framework.access.AccessProfile;
 import com.builtbroken.mc.framework.access.global.GlobalAccessProfile;
 import com.builtbroken.mc.framework.access.global.GlobalAccessSystem;
 import com.builtbroken.mc.framework.access.global.SingleOwnerAccessProfile;
@@ -23,6 +24,7 @@ public class AccessModule extends AbstractLoadable
         MinecraftForge.EVENT_BUS.register(this);
 
         //Register virtual objects with save manager
+        SaveManager.registerClass("AccessProfile", AccessProfile.class);
         SaveManager.registerClass("SingleOwnerAccessProfile", SingleOwnerAccessProfile.class);
         SaveManager.registerClass("GlobalAccessProfile", GlobalAccessProfile.class);
     }
