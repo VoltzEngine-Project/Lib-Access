@@ -2,7 +2,9 @@ package com.builtbroken.mc.framework.access.global;
 
 import com.builtbroken.mc.core.Engine;
 import com.builtbroken.mc.core.handler.SaveManager;
+import com.builtbroken.mc.framework.access.AccessGroup;
 import com.builtbroken.mc.framework.access.AccessUtility;
+import com.builtbroken.mc.framework.access.perm.Permissions;
 import com.builtbroken.mc.framework.mod.loadable.AbstractLoadable;
 import com.builtbroken.mc.lib.helper.NBTUtility;
 import net.minecraft.entity.player.EntityPlayer;
@@ -10,10 +12,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * Singleton for dealing with {@link GlobalAccessProfile} that are shared globally over
@@ -27,6 +26,12 @@ public final class GlobalAccessSystem extends AbstractLoadable
 {
     /** Map of profile IDs to profile instances, instances can be null if reserved or not loaded */
     private static final HashMap<String, GlobalAccessProfile> id_to_profiles = new HashMap();
+
+    /**
+     * String ID to use to note you want to use the user's friend list.
+     * Still requires providing the actual ID of the user's UUID
+     */
+    public static final String FRIENDS_LIST_ID = "friends_list";
 
     /**
      * Called to get or create a profile
@@ -62,6 +67,40 @@ public final class GlobalAccessSystem extends AbstractLoadable
             return loadProfile(id, false);
         }
         return null;
+    }
+
+    public static GlobalAccessProfile getFriendList(EntityPlayer player)
+    {
+        return getFriendList(player.getGameProfile().getName(), player.getGameProfile().getId());
+    }
+
+    public static GlobalAccessProfile getFriendList(final String username, final UUID uuid)
+    {
+        //Get id from UUID
+        final String id = uuid.toString().replace("-", "");
+
+        //Try to locate profile
+        GlobalAccessProfile profile = getProfile(id);
+        if (profile == null)
+        {
+            //Init profile
+            profile = new SingleOwnerAccessProfile(username, uuid);
+            profile.initName("Friends", id);
+
+            //Add default group
+            AccessGroup friend = new AccessGroup("friends");
+            friend.setDisplayName("Friends");
+            friend.setDescription("People you trust and want to have access to your stuff");
+            friend.addNode(Permissions.PROFILE_FOF);
+            friend.addNode(Permissions.targetFriend);
+            friend.addNode(Permissions.inventory);
+            friend.addNode(Permissions.machine);
+            profile.addGroup(friend);
+
+            //Register
+            registerProfile(id, profile);
+        }
+        return profile;
     }
 
     /**
