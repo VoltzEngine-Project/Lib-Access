@@ -4,9 +4,15 @@ import com.builtbroken.mc.core.Engine;
 import com.builtbroken.mc.core.handler.SaveManager;
 import com.builtbroken.mc.framework.access.AccessGroup;
 import com.builtbroken.mc.framework.access.AccessUtility;
+import com.builtbroken.mc.framework.access.global.gui.GuiAccessSystem;
 import com.builtbroken.mc.framework.access.perm.Permissions;
 import com.builtbroken.mc.framework.mod.loadable.AbstractLoadable;
 import com.builtbroken.mc.lib.helper.NBTUtility;
+import com.builtbroken.mc.prefab.gui.event.RestorePrevGui;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
@@ -269,6 +275,32 @@ public final class GlobalAccessSystem extends AbstractLoadable
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * Called to open the Global Access System GUI
+     *
+     * @param profileID - profile to open, null for default view
+     */
+    @SideOnly(Side.CLIENT)
+    public static void openGUI(String profileID)
+    {
+        if (!(Minecraft.getMinecraft().currentScreen instanceof GuiAccessSystem)) //TODO check previous GUI to prevent bugs (e.g. prevent opening on death screen)
+        {
+            final GuiScreen prev_gui = Minecraft.getMinecraft().currentScreen;
+            //Close previous
+            if (prev_gui != null)
+            {
+                prev_gui.onGuiClosed();
+            }
+
+            //Create and set profile to load
+            GuiAccessSystem gui = new GuiAccessSystem(new RestorePrevGui(prev_gui));
+            gui.loadProfile(profileID);
+
+            //Open
+            Minecraft.getMinecraft().displayGuiScreen(gui);
         }
     }
 }
