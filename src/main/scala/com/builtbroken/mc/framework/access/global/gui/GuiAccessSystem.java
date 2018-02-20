@@ -13,6 +13,7 @@ import com.builtbroken.mc.framework.access.global.packets.PacketAccessGui;
 import com.builtbroken.mc.lib.helper.LanguageUtility;
 import com.builtbroken.mc.prefab.gui.GuiButton2;
 import com.builtbroken.mc.prefab.gui.buttons.GuiImageButton;
+import com.builtbroken.mc.prefab.gui.buttons.GuiLeftRightArrowButton;
 import com.builtbroken.mc.prefab.gui.components.GuiArray;
 import com.builtbroken.mc.prefab.gui.components.GuiComponent;
 import com.builtbroken.mc.prefab.gui.components.frame.GuiFrame;
@@ -21,9 +22,11 @@ import cpw.mods.fml.common.network.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 
 import java.awt.*;
+import java.util.function.Consumer;
 
 /**
  * Global access system
@@ -33,10 +36,18 @@ import java.awt.*;
  */
 public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
 {
+    public static final int BUTTON_REFRESH_PROFILES = 0;
+    public static final int BUTTON_NEW_PROFILE = 1;
+    public static final int BUTTON_BACK = 2;
+
     public static int profileRows = 12;
 
+    /** Function to call when the page is closed, can be used to return to previous GUIs */
+    protected final Consumer<GuiScreen> returnGuiHandler;
+
     public GuiButton2 refreshButton;
-    public GuiButton2 newProfile;
+    public GuiButton2 newProfileButton;
+    public GuiLeftRightArrowButton backButton;
 
     public GuiArray profileArray;
 
@@ -58,6 +69,11 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
 
     public GuiFrameCenter defaultCenterFrame;
 
+    public GuiAccessSystem(Consumer<GuiScreen> returnGuiHandler)
+    {
+        this.returnGuiHandler = returnGuiHandler;
+    }
+
     @Override
     public void initGui()
     {
@@ -67,8 +83,12 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
         errorMessage = "";
 
         //Menu buttons
-        refreshButton = add(GuiImageButton.newRefreshButton(0, 2, 16));
-        newProfile = (GuiButton2) add(new GuiButton2(1, 20, 16, "New Profile").setWidth(60).setHeight(18));
+        refreshButton = add(GuiImageButton.newRefreshButton(BUTTON_REFRESH_PROFILES, 2, 16));
+        newProfileButton = (GuiButton2) add(new GuiButton2(BUTTON_NEW_PROFILE, 20, 16, "New Profile").setWidth(60).setHeight(18));
+        if (returnGuiHandler != null)
+        {
+            backButton = add(new GuiLeftRightArrowButton(BUTTON_BACK, 2, 2, true));
+        }
 
         int sideWidths = 109;
         //Profile array
@@ -84,7 +104,7 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
         rightFrame.setWidth(sideWidths);
         rightFrame.setHeight(this.height - 15);
 
-        if(currentProfile != null && profileToLoad == null)
+        if (currentProfile != null && profileToLoad == null)
         {
             profileToLoad = currentProfile.getID();
         }
@@ -113,16 +133,20 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
         //TODO get list of profiles the user can edit
 
         //Refresh profile list
-        if (id == 0)
+        if (id == BUTTON_REFRESH_PROFILES)
         {
             reloadProfileList();
             PacketAccessGui.doRequest();
         }
         ///New profile
-        else if (id == 1)
+        else if (id == BUTTON_NEW_PROFILE)
         {
             GuiDialogNewProfile guiDialogNewProfile = add(new GuiDialogNewProfile(2, 120, 40));
             loadCenterFrame(guiDialogNewProfile, false);
+        }
+        else if (id == BUTTON_BACK)
+        {
+            returnGuiHandler.accept(this);
         }
     }
 
@@ -141,16 +165,16 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
             loadCenterFrame(defaultCenterFrame, false);
         }
 
-        if(profileToLoad != null)
+        if (profileToLoad != null)
         {
-            if(profileIDs != null)
+            if (profileIDs != null)
             {
                 if (currentProfile == null || !currentProfile.getID().equalsIgnoreCase(profileToLoad))
                 {
                     for (int i = 0; i < profileIDs.length; i++)
                     {
                         String profile = profileIDs[i];
-                        if(profile.equalsIgnoreCase(profileToLoad))
+                        if (profile.equalsIgnoreCase(profileToLoad))
                         {
                             loadProfile(i);
                             break;
@@ -307,7 +331,7 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
                 profileIDs[i] = ByteBufUtils.readUTF8String(buf);
                 buf.readBoolean();
             }
-            if(currentProfile != null)
+            if (currentProfile != null)
             {
                 profileToLoad = currentProfile.getID();
             }
