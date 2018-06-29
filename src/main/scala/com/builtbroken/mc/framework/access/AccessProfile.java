@@ -1,6 +1,7 @@
 package com.builtbroken.mc.framework.access;
 
 import com.builtbroken.mc.api.ISave;
+import com.builtbroken.mc.framework.access.perm.Permission;
 import com.builtbroken.mc.framework.access.wrapper.AccessUserMultiGroup;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
@@ -237,10 +238,19 @@ public class AccessProfile implements ISave
         return getUserAccess(player).hasNode(node);
     }
 
+    public boolean hasNode(EntityPlayer player, Permission node)
+    {
+        return hasNode(player, node.toString());
+    }
 
     public boolean hasNode(String username, String node)
     {
         return getUserAccess(username).hasNode(node);
+    }
+
+    public boolean hasNode(String player, Permission node)
+    {
+        return hasNode(player, node.toString());
     }
 
     @Override

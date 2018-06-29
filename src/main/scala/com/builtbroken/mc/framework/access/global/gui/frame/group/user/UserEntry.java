@@ -2,6 +2,7 @@ package com.builtbroken.mc.framework.access.global.gui.frame.group.user;
 
 import com.builtbroken.mc.framework.access.global.gui.GuiAccessSystem;
 import com.builtbroken.mc.framework.access.global.packets.PacketAccessGui;
+import com.builtbroken.mc.framework.access.perm.Permission;
 import com.builtbroken.mc.framework.access.perm.Permissions;
 import com.builtbroken.mc.prefab.gui.buttons.GuiButton9px;
 import com.builtbroken.mc.prefab.gui.buttons.GuiImageButton;
@@ -81,7 +82,12 @@ public class UserEntry extends GuiComponentContainer<UserEntry>
     protected void update(Minecraft mc, int mouseX, int mouseY)
     {
         super.update(mc, mouseX, mouseY);
-        removeUserButton.setEnabled(((GuiAccessSystem) getHost()).getPlayer().hasNode(Permissions.groupPermissionRemove));
+        removeUserButton.setEnabled(hasNodes(Permissions.groupPermissionRemove));
+    }
+
+    protected boolean hasNodes(Permission... nodes)
+    {
+        return ((GuiAccessSystem) getHost()).doesPlayerHavePerms(nodes);
     }
 
     protected void reloadGroupList()

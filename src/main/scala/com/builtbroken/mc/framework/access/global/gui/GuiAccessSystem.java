@@ -2,7 +2,6 @@ package com.builtbroken.mc.framework.access.global.gui;
 
 import com.builtbroken.mc.core.network.IPacketIDReceiver;
 import com.builtbroken.mc.core.network.packet.PacketType;
-import com.builtbroken.mc.framework.access.AccessUser;
 import com.builtbroken.mc.framework.access.global.GlobalAccessProfile;
 import com.builtbroken.mc.framework.access.global.GlobalAccessSystem;
 import com.builtbroken.mc.framework.access.global.gui.dialogs.GuiDialogNewProfile;
@@ -10,6 +9,7 @@ import com.builtbroken.mc.framework.access.global.gui.frame.main.GuiFrameCenter;
 import com.builtbroken.mc.framework.access.global.gui.frame.main.GuiFrameEvents;
 import com.builtbroken.mc.framework.access.global.gui.frame.main.ProfileArrayCallback;
 import com.builtbroken.mc.framework.access.global.packets.PacketAccessGui;
+import com.builtbroken.mc.framework.access.perm.Permission;
 import com.builtbroken.mc.lib.helper.LanguageUtility;
 import com.builtbroken.mc.prefab.gui.GuiButton2;
 import com.builtbroken.mc.prefab.gui.buttons.GuiImageButton;
@@ -217,6 +217,33 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
     }
 
     /**
+     * Checks if the local player has the permission nodes
+     * <p>
+     * Keep in mind the server still does check permissions. This
+     * should be used as a local way to stop users. Not a sure
+     * fire way to prevent actions.
+     *
+     * @param nodes - list of nodes to check
+     * @return true if the user has all nodes
+     */
+    public boolean doesPlayerHavePerms(Permission... nodes)
+    {
+        GlobalAccessProfile profile = currentProfile;
+        if (profile != null)
+        {
+            for (Permission node : nodes)
+            {
+                if (node != null && !profile.hasNode(Minecraft.getMinecraft().thePlayer, node))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Called to load a frame to display on the right side of the GUI
      *
      * @param frame     - frame to load
@@ -358,23 +385,5 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
             return true;
         }
         return false;
-    }
-
-    /**
-     * Gets the local player's access entry from the current profile
-     *
-     * @return
-     */
-    public AccessUser getPlayer()
-    {
-        if (currentProfile != null)
-        {
-            AccessUser user = currentProfile.getUserAccess(Minecraft.getMinecraft().thePlayer);
-            if (user != null)
-            {
-                return user;
-            }
-        }
-        return new AccessUser(Minecraft.getMinecraft().thePlayer).setTemporary(true);
     }
 }

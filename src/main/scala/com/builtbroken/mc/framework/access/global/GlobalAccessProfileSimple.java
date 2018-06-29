@@ -1,6 +1,7 @@
 package com.builtbroken.mc.framework.access.global;
 
 import com.builtbroken.mc.framework.access.AccessUser;
+import com.builtbroken.mc.framework.access.perm.Permissions;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 
@@ -68,6 +69,7 @@ public class GlobalAccessProfileSimple extends GlobalAccessProfile
         {
             AccessUser user = new AccessUser(player);
             user.addNode("*");
+            user.addNode(Permissions.root);
             user.disableEdit();
             return user;
         }
@@ -81,6 +83,7 @@ public class GlobalAccessProfileSimple extends GlobalAccessProfile
         {
             AccessUser user = new AccessUser(ownerUsername, ownerID);
             user.addNode("*");
+            user.addNode(Permissions.root);
             user.disableEdit();
             return user;
         }

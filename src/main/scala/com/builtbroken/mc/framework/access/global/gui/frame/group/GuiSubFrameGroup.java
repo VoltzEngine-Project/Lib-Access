@@ -1,7 +1,6 @@
 package com.builtbroken.mc.framework.access.global.gui.frame.group;
 
 import com.builtbroken.mc.framework.access.AccessGroup;
-import com.builtbroken.mc.framework.access.AccessUser;
 import com.builtbroken.mc.framework.access.global.gui.frame.GuiSubFrameAccess;
 import com.builtbroken.mc.framework.access.global.gui.frame.main.GuiFrameCenter;
 import com.builtbroken.mc.prefab.gui.components.GuiLabel;
@@ -89,10 +88,4 @@ public abstract class GuiSubFrameGroup<E extends GuiSubFrameGroup> extends GuiSu
     {
         return getGroup() != null && getHost().currentProfile.canEdit() && getGroup().canEdit();
     }
-
-    public AccessUser getPlayer()
-    {
-        return getHost().getPlayer();
-    }
-
 }

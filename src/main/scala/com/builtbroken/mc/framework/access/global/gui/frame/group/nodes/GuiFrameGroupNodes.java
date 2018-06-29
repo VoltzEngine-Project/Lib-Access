@@ -3,6 +3,7 @@ package com.builtbroken.mc.framework.access.global.gui.frame.group.nodes;
 import com.builtbroken.mc.framework.access.global.gui.frame.group.GuiSubFrameGroup;
 import com.builtbroken.mc.framework.access.global.gui.frame.main.GuiFrameCenter;
 import com.builtbroken.mc.framework.access.global.packets.PacketAccessGui;
+import com.builtbroken.mc.framework.access.perm.Permission;
 import com.builtbroken.mc.framework.access.perm.Permissions;
 import com.builtbroken.mc.prefab.gui.GuiButton2;
 import com.builtbroken.mc.prefab.gui.components.GuiArray;
@@ -78,8 +79,13 @@ public class GuiFrameGroupNodes extends GuiSubFrameGroup<GuiFrameGroupNodes>
 
         if (getGroup() != null)
         {
-            addButton.setEnabled(canEditGroup() && getPlayer().hasNode(Permissions.groupPermissionAdd));
+            addButton.setEnabled(canEditGroup() && hasNodes(Permissions.groupPermissionAdd));
         }
+    }
+
+    protected boolean hasNodes(Permission... nodes)
+    {
+        return getHost().doesPlayerHavePerms(nodes);
     }
 
     @Override

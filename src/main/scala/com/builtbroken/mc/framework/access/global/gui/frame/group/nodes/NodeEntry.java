@@ -2,6 +2,7 @@ package com.builtbroken.mc.framework.access.global.gui.frame.group.nodes;
 
 import com.builtbroken.mc.framework.access.global.gui.GuiAccessSystem;
 import com.builtbroken.mc.framework.access.global.packets.PacketAccessGui;
+import com.builtbroken.mc.framework.access.perm.Permission;
 import com.builtbroken.mc.framework.access.perm.Permissions;
 import com.builtbroken.mc.prefab.gui.buttons.GuiButton9px;
 import com.builtbroken.mc.prefab.gui.buttons.GuiImageButton;
@@ -81,7 +82,12 @@ public class NodeEntry extends GuiComponentContainer<NodeEntry>
     protected void update(Minecraft mc, int mouseX, int mouseY)
     {
         super.update(mc, mouseX, mouseY);
-        removeNodeButton.setEnabled(nodesFrame.canEditGroup() && nodesFrame.getPlayer().hasNode(Permissions.groupPermissionRemove));
+        removeNodeButton.setEnabled(nodesFrame.canEditGroup() && hasNodes(Permissions.groupPermissionRemove));
+    }
+
+    protected boolean hasNodes(Permission... nodes)
+    {
+        return nodesFrame.getHost().doesPlayerHavePerms(nodes);
     }
 
     protected void reloadGroupList()

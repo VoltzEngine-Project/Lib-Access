@@ -1,13 +1,13 @@
 package com.builtbroken.mc.framework.access.global.gui.frame.group.main;
 
 import com.builtbroken.mc.framework.access.AccessGroup;
-import com.builtbroken.mc.framework.access.perm.Permission;
-import com.builtbroken.mc.framework.access.perm.Permissions;
 import com.builtbroken.mc.framework.access.global.gui.GuiAccessSystem;
 import com.builtbroken.mc.framework.access.global.gui.frame.group.edit.GuiFrameGroupSettings;
 import com.builtbroken.mc.framework.access.global.gui.frame.group.nodes.GuiFrameGroupNodes;
 import com.builtbroken.mc.framework.access.global.gui.frame.group.user.GuiFrameGroupUsers;
 import com.builtbroken.mc.framework.access.global.gui.frame.main.GuiFrameCenter;
+import com.builtbroken.mc.framework.access.perm.Permission;
+import com.builtbroken.mc.framework.access.perm.Permissions;
 import com.builtbroken.mc.prefab.gui.buttons.GuiButton9px;
 import com.builtbroken.mc.prefab.gui.buttons.GuiImageButton;
 import com.builtbroken.mc.prefab.gui.components.GuiComponentContainer;
@@ -89,21 +89,15 @@ public class GroupEntry extends GuiComponentContainer<GroupEntry>
     {
         super.update(mc, mouseX, mouseY);
 
-        groupButtons[0].setEnabled(canEditGroup() && hasNodes(Permissions.groupSetting));
-        groupButtons[1].setEnabled(canEditGroup() && hasNodes(Permissions.groupPermissionAdd, Permissions.groupPermissionRemove));
-        groupButtons[2].setEnabled(canEditGroup() && hasNodes(Permissions.groupUserPermissionAdd, Permissions.groupUserPermissionRemove)); //TODO move required permissions to a helper
+        boolean canEdit = canEditGroup();
+        groupButtons[0].setEnabled(canEdit && hasNodes(Permissions.groupSetting));
+        groupButtons[1].setEnabled(canEdit && hasNodes(Permissions.groupPermissionAdd, Permissions.groupPermissionRemove));
+        groupButtons[2].setEnabled(canEdit && hasNodes(Permissions.groupUserPermissionAdd, Permissions.groupUserPermissionRemove)); //TODO move required permissions to a helper
     }
 
     protected boolean hasNodes(Permission... nodes)
     {
-        for(Permission node : nodes)
-        {
-            if(node == null || !((GuiAccessSystem) getHost()).getPlayer().hasNode(node))
-            {
-                return false;
-            }
-        }
-        return true;
+        return ((GuiAccessSystem) getHost()).doesPlayerHavePerms(nodes);
     }
 
     protected boolean canEditGroup()
