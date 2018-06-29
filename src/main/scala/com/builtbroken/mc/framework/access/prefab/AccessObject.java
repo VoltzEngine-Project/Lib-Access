@@ -17,6 +17,10 @@ import java.util.Set;
  */
 public abstract class AccessObject implements ISave
 {
+    private static final String NBT_PERMISSIONS = "permissions";
+    private static final String NBT_PERMISSION_NAME = "name";
+    private static final String NBT_CAN_EDIT = "canEdit";
+
     /** Notes that this object is temporary and should not save */
     protected boolean isTemporary = false;
     /** Allows disabling edit ability on the object */
@@ -155,27 +159,27 @@ public abstract class AccessObject implements ISave
     @Override
     public NBTTagCompound save(NBTTagCompound nbt)
     {
-        nbt.setBoolean("canEdit", canEdit);
+        nbt.setBoolean(NBT_CAN_EDIT, canEdit);
         NBTTagList usersTag = new NBTTagList();
         for (String str : this.nodes)
         {
             NBTTagCompound accessData = new NBTTagCompound();
-            accessData.setString("name", str);
+            accessData.setString(NBT_PERMISSION_NAME, str);
             usersTag.appendTag(accessData);
         }
-        nbt.setTag("permissions", usersTag);
+        nbt.setTag(NBT_PERMISSIONS, usersTag);
         return nbt;
     }
 
     @Override
     public void load(NBTTagCompound nbt)
     {
-        this.canEdit = nbt.getBoolean("canEdit");
-        NBTTagList userList = nbt.getTagList("permissions", 10);
+        this.canEdit = nbt.getBoolean(NBT_CAN_EDIT);
+        NBTTagList userList = nbt.getTagList(NBT_PERMISSIONS, 10);
         this.nodes.clear();
         for (int i = 0; i < userList.tagCount(); ++i)
         {
-            this.nodes.add(userList.getCompoundTagAt(i).getString("name"));
+            this.nodes.add(userList.getCompoundTagAt(i).getString(NBT_PERMISSION_NAME));
         }
     }
 

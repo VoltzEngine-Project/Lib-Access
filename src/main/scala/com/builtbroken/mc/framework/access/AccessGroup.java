@@ -16,6 +16,11 @@ import java.util.*;
  */
 public class AccessGroup extends AccessObject implements Cloneable
 {
+    private static final String NBT_GROUP_NAME = "groupName";
+    private static final String NBT_GROUP_EXTEND = "extendGroup";
+    private static final String NBT_USERS = "users";
+    private static final String NBT_CREATION_DATE = "creationDate";
+
     /** Name of the group */
     private String name;
     /** Overrides the default name for display in GUIs */
@@ -25,9 +30,6 @@ public class AccessGroup extends AccessObject implements Cloneable
 
     /** System time when the group was created */
     protected long creation_time;
-
-    /** Permission nodes this group contains, not including super nodes from {@link #extendGroup} */
-    protected Set<String> nodes = new LinkedHashSet();
     /** Group this group inebriates permissions from */
     protected AccessGroup extendGroup;
     /** Name of the extend group, used mainly for save/load */
@@ -193,10 +195,10 @@ public class AccessGroup extends AccessObject implements Cloneable
     @Override
     public NBTTagCompound save(NBTTagCompound nbt)
     {
-        nbt.setString("groupName", this.getName());
+        nbt.setString(NBT_GROUP_NAME, this.getName());
         if (this.extendGroup_name != null)
         {
-            nbt.setString("extendGroup", this.extendGroup_name);
+            nbt.setString(NBT_GROUP_EXTEND, this.extendGroup_name);
         }
         NBTTagList usersTag = new NBTTagList();
         for (AccessUser user : this.username_to_profile.values())
@@ -206,26 +208,28 @@ public class AccessGroup extends AccessObject implements Cloneable
             usersTag.appendTag(accessData);
         }
 
-        nbt.setTag("users", usersTag);
+        nbt.setTag(NBT_USERS, usersTag);
 
-        nbt.setLong("creationDate", this.creation_time);
+        nbt.setLong(NBT_CREATION_DATE, this.creation_time);
         return super.save(nbt);
     }
 
     @Override
     public void load(NBTTagCompound nbt)
     {
+        super.load(nbt);
+
         // load group name
-        this.setName(nbt.getString("groupName"));
+        this.setName(nbt.getString(NBT_GROUP_NAME));
 
         // Load extend group
-        if (nbt.hasKey("extendGroup"))
+        if (nbt.hasKey(NBT_GROUP_EXTEND))
         {
-            this.extendGroup_name = nbt.getString("extendGroup");
+            this.extendGroup_name = nbt.getString(NBT_GROUP_EXTEND);
         }
 
         // Load users
-        NBTTagList userList = nbt.getTagList("users", 10);
+        NBTTagList userList = nbt.getTagList(NBT_USERS, 10);
         getMembers().clear();
 
         for (int i = 0; i < userList.tagCount(); ++i)
@@ -235,9 +239,9 @@ public class AccessGroup extends AccessObject implements Cloneable
         }
 
         // Load creation date
-        if (nbt.hasKey("creationDate"))
+        if (nbt.hasKey(NBT_CREATION_DATE))
         {
-            this.creation_time = nbt.getLong("creationDate");
+            this.creation_time = nbt.getLong(NBT_CREATION_DATE);
         }
         else
         {

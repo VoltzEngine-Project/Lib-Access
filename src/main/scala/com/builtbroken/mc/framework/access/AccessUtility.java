@@ -83,7 +83,6 @@ public class AccessUtility
         createDefaultGroup("user", null, userPerms);
         createDefaultGroup("admin", "user", adminPerms);
         createDefaultGroup("owner", "admin", ownerPerms);
-        createDefaultGroup("owner", "admin", ownerPerms);
 
         //FoF system groups - used as a user friendly solution
         List<String> hostilePerms = new ArrayList();

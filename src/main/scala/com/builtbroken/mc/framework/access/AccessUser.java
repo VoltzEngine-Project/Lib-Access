@@ -13,6 +13,10 @@ import java.util.UUID;
  */
 public class AccessUser extends AccessObject
 {
+    private static final String NBT_USERNAME = "username";
+    private static final String NBT_USER_UUID = "UUID";
+    private static final String NBT_EXTRA_DATA = "extraData";
+
     /** Username of player, main way to check owner */
     protected String username;
     private UUID userID;
@@ -82,14 +86,14 @@ public class AccessUser extends AccessObject
     @Override
     public NBTTagCompound save(NBTTagCompound nbt)
     {
-        nbt.setString("username", this.username);
-        nbt.setTag("extraData", this.userData());
+        nbt.setString(NBT_USERNAME, this.username);
+        nbt.setTag(NBT_EXTRA_DATA, this.userData());
         if (getUserID() != null)
         {
             NBTTagCompound tag = new NBTTagCompound();
             tag.setLong("l", getUserID().getLeastSignificantBits());
             tag.setLong("m", getUserID().getMostSignificantBits());
-            nbt.setTag("UUID", tag);
+            nbt.setTag(NBT_USER_UUID, tag);
         }
         return super.save(nbt);
     }
@@ -98,11 +102,11 @@ public class AccessUser extends AccessObject
     public void load(NBTTagCompound nbt)
     {
         super.load(nbt);
-        this.username = nbt.getString("username");
-        this.extraData = nbt.getCompoundTag("extraData");
-        if (nbt.hasKey("UUID"))
+        this.username = nbt.getString(NBT_USERNAME);
+        this.extraData = nbt.getCompoundTag(NBT_EXTRA_DATA);
+        if (nbt.hasKey(NBT_USER_UUID))
         {
-            NBTTagCompound tag = nbt.getCompoundTag("UUID");
+            NBTTagCompound tag = nbt.getCompoundTag(NBT_USER_UUID);
             long l = tag.getLong("l");
             long m = tag.getLong("m");
             setUserID(new UUID(m, l));
