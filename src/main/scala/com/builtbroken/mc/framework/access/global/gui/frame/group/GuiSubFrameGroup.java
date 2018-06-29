@@ -8,6 +8,7 @@ import com.builtbroken.mc.prefab.gui.components.frame.GuiFrame;
 import com.builtbroken.mc.prefab.gui.pos.GuiRelativePos;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
+import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 
@@ -72,6 +73,9 @@ public abstract class GuiSubFrameGroup<E extends GuiSubFrameGroup> extends GuiSu
         {
             drawCenteredString(mc.fontRenderer, "Error: could not load group", x() + (getWidth() / 2), y() + (getHeight() / 2), Color.red.getRGB());
         }
+
+        //Reset color
+        GL11.glColor4f(1f, 1f, 1f, 1f);
     }
 
     protected void doRender(Minecraft mc, AccessGroup group, int mouseX, int mouseY)
