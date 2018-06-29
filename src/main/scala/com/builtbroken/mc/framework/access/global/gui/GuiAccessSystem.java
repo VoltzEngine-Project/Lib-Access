@@ -141,7 +141,7 @@ public class GuiAccessSystem extends GuiScreenBase implements IPacketIDReceiver
         ///New profile
         else if (id == BUTTON_NEW_PROFILE)
         {
-            GuiDialogNewProfile guiDialogNewProfile = add(new GuiDialogNewProfile(2, 120, 40));
+            GuiDialogNewProfile guiDialogNewProfile = add(new GuiDialogNewProfile(-1, 120, 40));
             loadCenterFrame(guiDialogNewProfile, false);
         }
         else if (id == BUTTON_BACK)
