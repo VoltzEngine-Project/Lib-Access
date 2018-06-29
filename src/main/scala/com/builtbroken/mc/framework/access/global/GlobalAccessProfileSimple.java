@@ -38,6 +38,18 @@ public class GlobalAccessProfileSimple extends GlobalAccessProfile
     }
 
     @Override
+    public boolean canSeeProfile(EntityPlayer player)
+    {
+        return isOwner(player);
+    }
+
+    @Override
+    public boolean canDelete(EntityPlayer player)
+    {
+        return false; //TODO add flag to toggle
+    }
+
+    @Override
     public boolean containsUser(EntityPlayer player)
     {
         return isOwner(player) || super.containsUser(player);

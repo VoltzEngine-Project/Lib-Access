@@ -34,6 +34,7 @@ public class PacketAccessGui extends PacketType implements IPacket
     public static int UPDATE_GROUP_PARENT = 9;
     public static int ADD_NODE_TO_GROUP = 10;
     public static int REMOVE_NODE_FROM_GROUP = 11;
+    public static int REMOVE_PROFILE = 12;
 
     int id = 0;
 
@@ -306,6 +307,27 @@ public class PacketAccessGui extends PacketType implements IPacket
                 profile.getOwnerGroup().addMember(player);
                 sendProfilesToClient((EntityPlayerMP) player);
             }
+            else if (id == REMOVE_PROFILE)
+            {
+                String profileID = ByteBufUtils.readUTF8String(data());
+                GlobalAccessProfile profile = GlobalAccessSystem.getProfile(profileID);
+                if (profile != null)
+                {
+                    if (profile.containsUser(player) && profile.canDelete(player))
+                    {
+                        GlobalAccessSystem.removeProfile(profile, player);
+                        sendProfilesToClient((EntityPlayerMP) player);
+                    }
+                    else
+                    {
+                        sendMessageToClient(player, "error.profile.access.invalid");
+                    }
+                }
+                else
+                {
+                    sendMessageToClient(player, "error.profile.not.found");
+                }
+            }
             else if (id == ADD_NODE_TO_GROUP)
             {
                 String profileID = ByteBufUtils.readUTF8String(data());
@@ -387,14 +409,14 @@ public class PacketAccessGui extends PacketType implements IPacket
         }
     }
 
-    protected void sendMessageToClient(EntityPlayer player, String message)
+    public static void sendMessageToClient(EntityPlayer player, String message)
     {
         PacketGui packetGui = new PacketGui(5);
         ByteBufUtils.writeUTF8String(packetGui.data(), "" + message);
         Engine.packetHandler.sendToPlayer(packetGui, (EntityPlayerMP) player);
     }
 
-    public void sendProfilesToClient(EntityPlayerMP player)
+    public static void sendProfilesToClient(EntityPlayerMP player)
     {
         PacketGui packetGui = new PacketGui(0);
 
@@ -411,7 +433,7 @@ public class PacketAccessGui extends PacketType implements IPacket
         Engine.packetHandler.sendToPlayer(packetGui, player);
     }
 
-    public void sendProfileToClient(EntityPlayerMP player, String profileID)
+    public static void sendProfileToClient(EntityPlayerMP player, String profileID)
     {
         GlobalAccessProfile profile = GlobalAccessSystem.getProfile(profileID); //TODO send to all players
         if (profile != null) //TODO check if player can view profile
@@ -433,13 +455,14 @@ public class PacketAccessGui extends PacketType implements IPacket
      *
      * @param player - player to remove
      */
-    protected void clearGui(EntityPlayer player)
+    public static void clearGui(EntityPlayer player)
     {
         for (GlobalAccessProfile profile : GlobalAccessSystem.getProfiles())
         {
             if (profile != null)
             {
                 profile.playersWithSettingsGUIOpen.remove(player);
+                //TODO send packet to client
             }
         }
     }
@@ -510,6 +533,19 @@ public class PacketAccessGui extends PacketType implements IPacket
     {
         Engine.packetHandler.sendToServer(new PacketAccessGui(CREATE_PROFILE).write(name).write(defaults));
     }
+
+    /**
+     * Called to remove a profile
+     * <p>
+     * Server does validate bad requests
+     *
+     * @param id - unique string to find the profile
+     */
+    public static void removeProfile(String id)
+    {
+        Engine.packetHandler.sendToServer(new PacketAccessGui(REMOVE_PROFILE).write(id));
+    }
+
 
     /**
      * Called to create a new group

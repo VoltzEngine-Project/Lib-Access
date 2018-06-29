@@ -57,6 +57,40 @@ public final class GlobalAccessSystem extends AbstractLoadable
     }
 
     /**
+     * Called to remove a profile and its save file
+     *
+     * @param profile - profile instance
+     * @param player  - player that removed the profile
+     */
+    public static void removeProfile(GlobalAccessProfile profile, EntityPlayer player)
+    {
+        if (profile != null)
+        {
+            Engine.logger().info("Request had been made to delete access profile " + profile + " by " + player.getGameProfile().getName() + " [" + player.getGameProfile().getId() + "]");
+
+            //Notify profile is will be deleted
+            profile.onProfileDeleted();
+
+            //Remove profile
+            String id = profile.getID();
+            if (id_to_profiles.containsKey(id))
+            {
+                id_to_profiles.remove(id);
+                //TODO trigger event
+                Engine.logger().info("Profile '" + id + "' cleared from map");
+            }
+
+            //Remove file TODO add backup option
+            File file = profile.getSaveFile();
+            if (file.exists())
+            {
+                file.delete();
+                Engine.logger().info("Profile '" + id + "' save file delete");
+            }
+        }
+    }
+
+    /**
      * Gets a profile by ID from the map or loads it from disk
      *
      * @param id - unique profile ID
@@ -218,7 +252,7 @@ public final class GlobalAccessSystem extends AbstractLoadable
                 GlobalAccessProfile profile = getProfile(name); //Will load from disk if not loaded
                 if (profile != null)
                 {
-                    if (profile.containsUser(player))
+                    if (profile.canSeeProfile(player))
                     {
                         profiles.add(profile);
                     }

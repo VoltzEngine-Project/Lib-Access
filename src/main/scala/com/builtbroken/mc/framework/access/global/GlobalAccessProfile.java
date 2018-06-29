@@ -2,6 +2,8 @@ package com.builtbroken.mc.framework.access.global;
 
 import com.builtbroken.mc.api.IVirtualObject;
 import com.builtbroken.mc.framework.access.AccessProfile;
+import com.builtbroken.mc.framework.access.global.packets.PacketAccessGui;
+import com.builtbroken.mc.framework.access.perm.Permissions;
 import com.builtbroken.mc.lib.helper.NBTUtility;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
@@ -37,6 +39,8 @@ public class GlobalAccessProfile extends AccessProfile implements IVirtualObject
      */
     protected String profileID = "LocalHost";
 
+    protected boolean deleted = false;
+
     public GlobalAccessProfile()
     {
         //Need default for save manager
@@ -61,6 +65,34 @@ public class GlobalAccessProfile extends AccessProfile implements IVirtualObject
     {
         super.onProfileUpdate();
         //TODO trigger update packet
+    }
+
+    /**
+     * Called when the profile has been removed
+     * from the system and should be considered
+     * dead and no longer valid for use.
+     */
+    public void onProfileDeleted()
+    {
+        deleted = true;
+        //TODO clear data
+
+        for (EntityPlayer player : playersWithSettingsGUIOpen.keySet())
+        {
+            PacketAccessGui.sendMessageToClient(player, "info.profile.removed");
+        }
+        playersWithSettingsGUIOpen.clear();
+    }
+
+
+    /**
+     * Checks if the profile is valid for use
+     *
+     * @return true if valid
+     */
+    public boolean isValid()
+    {
+        return !deleted;
     }
 
     @Override
@@ -121,6 +153,29 @@ public class GlobalAccessProfile extends AccessProfile implements IVirtualObject
     public String getID()
     {
         return this.profileID;
+    }
+
+    /**
+     * Checks if the user can see/access the profile via a GUI
+     * or other system that gives access.
+     *
+     * @param player
+     * @return true to allow the user to see the profile
+     */
+    public boolean canSeeProfile(EntityPlayer player)
+    {
+        return containsUser(player);
+    }
+
+    /**
+     * Checks if the user can delete the profile
+     *
+     * @param player
+     * @return
+     */
+    public boolean canDelete(EntityPlayer player)
+    {
+        return getUserAccess(player).hasNode(Permissions.PROFILE_OWNER);
     }
 
     @Override
