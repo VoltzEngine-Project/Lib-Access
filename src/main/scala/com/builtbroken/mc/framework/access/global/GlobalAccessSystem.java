@@ -116,31 +116,35 @@ public final class GlobalAccessSystem extends AbstractLoadable
 
     public static GlobalAccessProfile getFriendList(final String username, final UUID uuid)
     {
-        //Get id from UUID
-        final String id = uuid.toString().replace("-", "");
-
-        //Try to locate profile
-        GlobalAccessProfile profile = getProfile(id);
-        if (profile == null)
+        if(uuid != null)
         {
-            //Init profile
-            profile = new GlobalAccessProfileSimple(username, uuid);
-            profile.initName("Friends", id);
+            //Get id from UUID
+            final String id = uuid.toString().replace("-", "");
 
-            //Add default group
-            final AccessGroup friendsGroup = new AccessGroup("friends");
-            friendsGroup.setDisplayName("Friends");
-            friendsGroup.setDescription("People you trust and want to have access to your stuff");
-            friendsGroup.addNode(Permissions.PROFILE_FOF);
-            friendsGroup.addNode(Permissions.targetFriend);
-            friendsGroup.addNode(Permissions.inventory);
-            friendsGroup.addNode(Permissions.machine);
-            profile.addGroup(friendsGroup.disableEdit());
+            //Try to locate profile
+            GlobalAccessProfile profile = getProfile(id);
+            if (profile == null)
+            {
+                //Init profile
+                profile = new GlobalAccessProfileSimple(username, uuid);
+                profile.initName("Friends", id);
 
-            //Register
-            registerProfile(id, profile.disableEdit());
+                //Add default group
+                final AccessGroup friendsGroup = new AccessGroup("friends");
+                friendsGroup.setDisplayName("Friends");
+                friendsGroup.setDescription("People you trust and want to have access to your stuff");
+                friendsGroup.addNode(Permissions.PROFILE_FOF);
+                friendsGroup.addNode(Permissions.targetFriend);
+                friendsGroup.addNode(Permissions.inventory);
+                friendsGroup.addNode(Permissions.machine);
+                profile.addGroup(friendsGroup.disableEdit());
+
+                //Register
+                registerProfile(id, profile.disableEdit());
+            }
+            return profile;
         }
-        return profile;
+        return null;
     }
 
     /**

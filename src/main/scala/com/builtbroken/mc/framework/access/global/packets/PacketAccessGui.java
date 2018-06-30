@@ -45,21 +45,14 @@ public class PacketAccessGui extends PacketType implements IPacket
 
     public PacketAccessGui(int id)
     {
-        this.id = id;
-    }
-
-    @Override
-    public void encodeInto(ChannelHandlerContext ctx, ByteBuf buffer)
-    {
-        buffer.writeInt(id);
-        buffer.writeBytes(data());
+        add(this.id = id);
     }
 
     @Override
     public void decodeInto(ChannelHandlerContext ctx, ByteBuf buffer)
     {
+        super.decodeInto(ctx, buffer);
         id = buffer.readInt();
-        data_$eq(buffer.slice());
     }
 
     @Override
@@ -83,13 +76,13 @@ public class PacketAccessGui extends PacketType implements IPacket
             else if (id == REQUEST_PROFILE)
             {
                 clearGui(player);
-                final String profileID = ByteBufUtils.readUTF8String(data());
+                final String profileID = ByteBufUtils.readUTF8String(getDataToRead());
                 sendProfileToClient((EntityPlayerMP) player, profileID);
             }
             else if (id == KEEP_ALIVE)
             {
                 clearGui(player);
-                String accessGroup = ByteBufUtils.readUTF8String(data());
+                String accessGroup = ByteBufUtils.readUTF8String(getDataToRead());
                 GlobalAccessProfile profile = GlobalAccessSystem.getProfile(accessGroup);
                 if (profile != null)
                 {
@@ -98,9 +91,9 @@ public class PacketAccessGui extends PacketType implements IPacket
             }
             else if (id == ADD_USER_TO_GROUP)
             {
-                String profileID = ByteBufUtils.readUTF8String(data());
-                String groupID = ByteBufUtils.readUTF8String(data());
-                String userID = ByteBufUtils.readUTF8String(data());
+                String profileID = ByteBufUtils.readUTF8String(getDataToRead());
+                String groupID = ByteBufUtils.readUTF8String(getDataToRead());
+                String userID = ByteBufUtils.readUTF8String(getDataToRead());
 
                 GlobalAccessProfile profile = GlobalAccessSystem.getProfile(profileID);
                 if (profile != null)
@@ -140,9 +133,9 @@ public class PacketAccessGui extends PacketType implements IPacket
             }
             else if (id == REMOVE_USER_FROM_GROUP)
             {
-                String profileID = ByteBufUtils.readUTF8String(data());
-                String groupID = ByteBufUtils.readUTF8String(data());
-                String userID = ByteBufUtils.readUTF8String(data());
+                String profileID = ByteBufUtils.readUTF8String(getDataToRead());
+                String groupID = ByteBufUtils.readUTF8String(getDataToRead());
+                String userID = ByteBufUtils.readUTF8String(getDataToRead());
 
                 GlobalAccessProfile profile = GlobalAccessSystem.getProfile(profileID);
                 if (profile != null)
@@ -185,9 +178,9 @@ public class PacketAccessGui extends PacketType implements IPacket
             }
             else if (id == CREATE_GROUP)
             {
-                String profileID = ByteBufUtils.readUTF8String(data());
-                String groupID = ByteBufUtils.readUTF8String(data());
-                String parentID = ByteBufUtils.readUTF8String(data());
+                String profileID = ByteBufUtils.readUTF8String(getDataToRead());
+                String groupID = ByteBufUtils.readUTF8String(getDataToRead());
+                String parentID = ByteBufUtils.readUTF8String(getDataToRead());
 
                 GlobalAccessProfile profile = GlobalAccessSystem.getProfile(profileID);
                 if (profile != null)
@@ -241,9 +234,9 @@ public class PacketAccessGui extends PacketType implements IPacket
             }
             else if (id == UPDATE_GROUP_PARENT)
             {
-                String profileID = ByteBufUtils.readUTF8String(data());
-                String groupID = ByteBufUtils.readUTF8String(data());
-                String parentID = ByteBufUtils.readUTF8String(data());
+                String profileID = ByteBufUtils.readUTF8String(getDataToRead());
+                String groupID = ByteBufUtils.readUTF8String(getDataToRead());
+                String parentID = ByteBufUtils.readUTF8String(getDataToRead());
 
                 GlobalAccessProfile profile = GlobalAccessSystem.getProfile(profileID);
                 if (profile != null)
@@ -301,15 +294,15 @@ public class PacketAccessGui extends PacketType implements IPacket
             }
             else if (id == CREATE_PROFILE)
             {
-                String profileID = ByteBufUtils.readUTF8String(data());
-                boolean defaults = data().readBoolean();
+                String profileID = ByteBufUtils.readUTF8String(getDataToRead());
+                boolean defaults = getDataToRead().readBoolean();
                 GlobalAccessProfile profile = GlobalAccessSystem.createProfile(profileID, defaults);
                 profile.getOwnerGroup().addMember(player);
                 sendProfilesToClient((EntityPlayerMP) player);
             }
             else if (id == REMOVE_PROFILE)
             {
-                String profileID = ByteBufUtils.readUTF8String(data());
+                String profileID = ByteBufUtils.readUTF8String(getDataToRead());
                 GlobalAccessProfile profile = GlobalAccessSystem.getProfile(profileID);
                 if (profile != null)
                 {
@@ -330,9 +323,9 @@ public class PacketAccessGui extends PacketType implements IPacket
             }
             else if (id == ADD_NODE_TO_GROUP)
             {
-                String profileID = ByteBufUtils.readUTF8String(data());
-                String groupID = ByteBufUtils.readUTF8String(data());
-                String node = ByteBufUtils.readUTF8String(data());
+                String profileID = ByteBufUtils.readUTF8String(getDataToRead());
+                String groupID = ByteBufUtils.readUTF8String(getDataToRead());
+                String node = ByteBufUtils.readUTF8String(getDataToRead());
 
                 GlobalAccessProfile profile = GlobalAccessSystem.getProfile(profileID);
                 if (profile != null)
@@ -369,9 +362,9 @@ public class PacketAccessGui extends PacketType implements IPacket
             }
             else if (id == REMOVE_NODE_FROM_GROUP)
             {
-                String profileID = ByteBufUtils.readUTF8String(data());
-                String groupID = ByteBufUtils.readUTF8String(data());
-                String node = ByteBufUtils.readUTF8String(data());
+                String profileID = ByteBufUtils.readUTF8String(getDataToRead());
+                String groupID = ByteBufUtils.readUTF8String(getDataToRead());
+                String node = ByteBufUtils.readUTF8String(getDataToRead());
 
                 GlobalAccessProfile profile = GlobalAccessSystem.getProfile(profileID);
                 if (profile != null)
@@ -411,23 +404,23 @@ public class PacketAccessGui extends PacketType implements IPacket
 
     public static void sendMessageToClient(EntityPlayer player, String message)
     {
-        PacketGui packetGui = new PacketGui(5);
-        ByteBufUtils.writeUTF8String(packetGui.data(), "" + message);
+        PacketGui packetGui = new PacketGui().add(5);
+        packetGui.add("" + message);
         Engine.packetHandler.sendToPlayer(packetGui, (EntityPlayerMP) player);
     }
 
     public static void sendProfilesToClient(EntityPlayerMP player)
     {
-        PacketGui packetGui = new PacketGui(0);
+        PacketGui packetGui = new PacketGui().add(0);
 
         List<GlobalAccessProfile> profileList = GlobalAccessSystem.getProfilesFor(player);
-        packetGui.data().writeInt(profileList.size());
+        packetGui.add(profileList.size());
         for (GlobalAccessProfile profile : profileList)
         {
             //We only want to send the bare minimal to function
-            packetGui.write(profile.getName());
-            packetGui.write(profile.getID());
-            packetGui.write(profile.getUserAccess(player).hasNode(Permissions.profileView)); //Disables view option
+            packetGui.add(profile.getName());
+            packetGui.add(profile.getID());
+            packetGui.add(profile.getUserAccess(player).hasNode(Permissions.profileView)); //Disables view option
         }
 
         Engine.packetHandler.sendToPlayer(packetGui, player);
@@ -438,13 +431,13 @@ public class PacketAccessGui extends PacketType implements IPacket
         GlobalAccessProfile profile = GlobalAccessSystem.getProfile(profileID); //TODO send to all players
         if (profile != null) //TODO check if player can view profile
         {
-            IPacket packetGui = new PacketGui(1).write(SaveManager.generateSaveData(profile));
+            IPacket packetGui = new PacketGui().add(1).add(SaveManager.generateSaveData(profile));
             Engine.packetHandler.sendToPlayer(packetGui, player);
         }
         else
         {
-            PacketGui packetGui = new PacketGui(5);
-            ByteBufUtils.writeUTF8String(packetGui.data(), "error.profile.not.found");
+            PacketGui packetGui = new PacketGui().add(5);
+            packetGui.add("error.profile.not.found");
             Engine.packetHandler.sendToPlayer(packetGui, player);
         }
     }
@@ -482,7 +475,7 @@ public class PacketAccessGui extends PacketType implements IPacket
      */
     public static void doRequest(String profileID)
     {
-        Engine.packetHandler.sendToServer(new PacketAccessGui(REQUEST_PROFILE).write(profileID));
+        Engine.packetHandler.sendToServer(new PacketAccessGui(REQUEST_PROFILE).add(profileID));
     }
 
     /**
@@ -496,7 +489,7 @@ public class PacketAccessGui extends PacketType implements IPacket
      */
     public static void keepAlive(String profileID)
     {
-        Engine.packetHandler.sendToServer(new PacketAccessGui(KEEP_ALIVE).write(profileID));
+        Engine.packetHandler.sendToServer(new PacketAccessGui(KEEP_ALIVE).add(profileID));
     }
 
     /**
@@ -508,7 +501,7 @@ public class PacketAccessGui extends PacketType implements IPacket
      */
     public static void removeUser(String profileID, String group, String userName)
     {
-        Engine.packetHandler.sendToServer(new PacketAccessGui(REMOVE_USER_FROM_GROUP).write(profileID).write(group).write(userName));
+        Engine.packetHandler.sendToServer(new PacketAccessGui(REMOVE_USER_FROM_GROUP).add(profileID).add(group).add(userName));
     }
 
     /**
@@ -520,7 +513,7 @@ public class PacketAccessGui extends PacketType implements IPacket
      */
     public static void addUser(String profileID, String group, String userName)
     {
-        Engine.packetHandler.sendToServer(new PacketAccessGui(ADD_USER_TO_GROUP).write(profileID).write(group).write(userName));
+        Engine.packetHandler.sendToServer(new PacketAccessGui(ADD_USER_TO_GROUP).add(profileID).add(group).add(userName));
     }
 
     /**
@@ -531,7 +524,7 @@ public class PacketAccessGui extends PacketType implements IPacket
      */
     public static void createProfile(String name, boolean defaults)
     {
-        Engine.packetHandler.sendToServer(new PacketAccessGui(CREATE_PROFILE).write(name).write(defaults));
+        Engine.packetHandler.sendToServer(new PacketAccessGui(CREATE_PROFILE).add(name).add(defaults));
     }
 
     /**
@@ -543,7 +536,7 @@ public class PacketAccessGui extends PacketType implements IPacket
      */
     public static void removeProfile(String id)
     {
-        Engine.packetHandler.sendToServer(new PacketAccessGui(REMOVE_PROFILE).write(id));
+        Engine.packetHandler.sendToServer(new PacketAccessGui(REMOVE_PROFILE).add(id));
     }
 
 
@@ -556,7 +549,7 @@ public class PacketAccessGui extends PacketType implements IPacket
      */
     public static void createGroup(String profile, String name, String parent)
     {
-        Engine.packetHandler.sendToServer(new PacketAccessGui(CREATE_GROUP).write(profile).write(name).write(parent));
+        Engine.packetHandler.sendToServer(new PacketAccessGui(CREATE_GROUP).add(profile).add(name).add(parent));
     }
 
     /**
@@ -568,7 +561,7 @@ public class PacketAccessGui extends PacketType implements IPacket
      */
     public static void updateGroupParent(String profile, String name, String parent)
     {
-        Engine.packetHandler.sendToServer(new PacketAccessGui(UPDATE_GROUP_PARENT).write(profile).write(name).write(parent));
+        Engine.packetHandler.sendToServer(new PacketAccessGui(UPDATE_GROUP_PARENT).add(profile).add(name).add(parent));
     }
 
     /**
@@ -580,16 +573,16 @@ public class PacketAccessGui extends PacketType implements IPacket
      */
     public static void removeGroup(String profile, String name, boolean pullUpSubGroups)
     {
-        Engine.packetHandler.sendToServer(new PacketAccessGui(REMOVE_GROUP).write(profile).write(name).write(pullUpSubGroups));
+        Engine.packetHandler.sendToServer(new PacketAccessGui(REMOVE_GROUP).add(profile).add(name).add(pullUpSubGroups));
     }
 
     public static void removeNodeFromGroup(String profileID, String group, String node)
     {
-        Engine.packetHandler.sendToServer(new PacketAccessGui(REMOVE_NODE_FROM_GROUP).write(profileID).write(group).write(node));
+        Engine.packetHandler.sendToServer(new PacketAccessGui(REMOVE_NODE_FROM_GROUP).add(profileID).add(group).add(node));
     }
 
     public static void addNodeToGroup(String profileID, String group, String node)
     {
-        Engine.packetHandler.sendToServer(new PacketAccessGui(ADD_NODE_TO_GROUP).write(profileID).write(group).write(node));
+        Engine.packetHandler.sendToServer(new PacketAccessGui(ADD_NODE_TO_GROUP).add(profileID).add(group).add(node));
     }
 }
